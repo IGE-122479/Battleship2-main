@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String GUARDAPDF = "guardapdf";
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -104,6 +105,12 @@ public class Tasks {
                 case AJUDA:
                     menuHelp();
                     break;
+				case GUARDAPDF:
+					if (game != null)
+						PdfExporter.exportGameToPdf(game.getAlienMoves());
+					else
+						System.out.println("Nenhum jogo em andamento para exportar.");
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -127,6 +134,7 @@ public class Tasks {
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
 		System.out.println("===============================================================");
 	}
 	/**
