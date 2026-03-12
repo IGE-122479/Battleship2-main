@@ -157,6 +157,9 @@ public class Game implements IGame
 	private Integer countSinks;
 	private int moveNumber;
 
+	/** Cronómetro para medir o tempo de cada jogada. */
+	private final MoveTimer moveTimer;
+
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
@@ -172,6 +175,8 @@ public class Game implements IGame
 		this.countRepeatedShots = 0;
 		this.countHits = 0;
 		this.countSinks = 0;
+
+		this.moveTimer = new MoveTimer();
 	}
 
 	@Override
@@ -208,6 +213,9 @@ public class Game implements IGame
 	 * @throws RuntimeException if there is an error during the JSON serialization of the shots.
 	 */
 	public String randomEnemyFire() {
+
+		// Iniciar o cronómetro antes de gerar os tiros
+		moveTimer.start();
 
 		// Criar uma instância de Random com uma seed baseada no timestamp atual
 		Random random = new Random(System.currentTimeMillis());
@@ -273,6 +281,9 @@ public class Game implements IGame
 
 		assert in != null;
 
+		// Iniciar o cronómetro assim que se pede a jogada ao jogador
+		moveTimer.start();
+
 		String input = in.nextLine().trim();
 
 		// Criar lista para armazenar os tiros
@@ -334,8 +345,11 @@ public class Game implements IGame
 			alreadyShot.add(pos);
 		}
 
-		Move move = new Move(moveNumber, shots, shotResults);
+		// Parar o cronómetro e guardar o tempo na jogada
+		long elapsed = moveTimer.stop();
 
+		Move move = new Move(moveNumber, shots, shotResults);
+		move.setDuration(elapsed);
 //		System.out.println(move);
 
 		move.processEnemyFire(true);
@@ -434,7 +448,56 @@ public class Game implements IGame
 		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
 	}
 
+	/**
+	 * Imprime uma tabela com o tempo gasto em cada jogada,
+	 * incluindo o total, a média, a jogada mais rápida e a mais lenta.
+	 */
+	public void printTimingStats() {
+		if (alienMoves.isEmpty()) {
+			System.out.println("Nenhuma jogada registada.");
+			return;
+		}
+
+		System.out.println();
+		System.out.println("+----------- RELÓGIO DAS JOGADAS -----------+");
+		System.out.printf("| %-10s | %-28s |%n", "Jogada nº", "Tempo gasto");
+		System.out.println("+------------+-----------------------------+");
+
+		long total = 0L;
+		long fastest = Long.MAX_VALUE;
+		long slowest = Long.MIN_VALUE;
+		int fastestMove = 0, slowestMove = 0;
+
+		for (IMove iMove : alienMoves) {
+			if (iMove instanceof Move move) {
+				long d = move.getDuration();
+				total += d;
+
+				if (d < fastest) { fastest = d; fastestMove = move.getNumber(); }
+				if (d > slowest) { slowest = d; slowestMove = move.getNumber(); }
+
+				System.out.printf("| %-10d | %-28s |%n",
+						move.getNumber(), MoveTimer.format(d));
+			}
+		}
+
+		System.out.println("+------------+-----------------------------+");
+
+		long count = alienMoves.size();
+		long avg = count > 0 ? total / count : 0L;
+
+		System.out.printf("| %-10s | %-28s |%n", "TOTAL", MoveTimer.format(total));
+		System.out.printf("| %-10s | %-28s |%n", "MÉDIA", MoveTimer.format(avg));
+		System.out.printf("| %-10s | %-28s |%n", "MAIS RÁPIDA (nº" + fastestMove + ")", MoveTimer.format(fastest));
+		System.out.printf("| %-10s | %-28s |%n", "MAIS LENTA (nº"  + slowestMove + ")", MoveTimer.format(slowest));
+		System.out.println("+------------+-----------------------------+");
+		System.out.println();
+	}
+
+
 	public void over() {
+			// Mostrar o relógio das jogadas antes da mensagem de fim de jogo
+			printTimingStats();
 			System.out.println();
 			System.out.println("+--------------------------------------------------------------+");
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
