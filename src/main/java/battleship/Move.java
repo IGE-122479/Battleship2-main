@@ -20,11 +20,33 @@ public class Move implements IMove {
 	private final List<IPosition> shots;
 	private final List<IGame.ShotResult> shotResults;
 
+	/** Tempo em milissegundos que esta jogada demorou. */
+	private long durationMs;
+
 	//-------------------------------------------------------------------
 	public Move(int moveNumber, List<IPosition> moveShots, List<IGame.ShotResult> moveResults) {
 		this.number = moveNumber;
 		this.shots = moveShots;
 		this.shotResults = moveResults;
+		this.durationMs = 0L;
+	}
+
+	/**
+	 * Define o tempo gasto nesta jogada, em milissegundos.
+	 *
+	 * @param durationMs o tempo decorrido em milissegundos
+	 */
+	public void setDuration(long durationMs) {
+		this.durationMs = durationMs;
+	}
+
+	/**
+	 * Devolve o tempo gasto nesta jogada, em milissegundos.
+	 *
+	 * @return o tempo decorrido em milissegundos
+	 */
+	public long getDuration() {
+		return durationMs;
 	}
 
 	@Override
@@ -33,6 +55,7 @@ public class Move implements IMove {
 				"number=" + number +
 				", shots=" + shots.size() +
 				", results=" + shotResults.size() +
+				", duration=" + MoveTimer.format(durationMs) +
 				'}';
 	}
 
@@ -151,7 +174,7 @@ public class Move implements IMove {
 			}
 
 			// Imprimir na consola se verbose for true
-			System.out.println("Jogada nº" + this.number + " -> " + output);
+			System.out.println("Jogada nº" + this.number + " -> " + output + "  [⏱ " + MoveTimer.format(this.durationMs) + "]");
 		}
 
 		// Criar o mapa para o JSON
@@ -160,6 +183,7 @@ public class Move implements IMove {
 		response.put("outsideShots", outsideShots);
 		response.put("repeatedShots", repeatedShots);
 		response.put("missedShots", missedShots);
+		response.put("durationMs", durationMs); // tempo da jogada em milissegundos
 
 		// Criar a lista de barcos afundados
 		List<Map<String, Object>> sunkBoats = new ArrayList<>();

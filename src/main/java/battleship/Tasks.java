@@ -32,6 +32,7 @@ public class Tasks {
 	private static final String MAPA = "mapa";
 	private static final String STATUS = "estado";
 	private static final String SIMULA = "simula";
+	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
 
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -101,6 +102,13 @@ public class Tasks {
 					if (game != null)
 						game.printMyBoard(true, true);
 					break;
+				case TEMPO:
+					// Mostrar a tabela do relógio das jogadas
+					if (game instanceof Game g)
+						g.printTimingStats();
+					else
+						System.out.println("Nenhum jogo em curso ou nenhuma jogada registada.");
+					break;
                 case AJUDA:
                     menuHelp();
                     break;
@@ -126,6 +134,7 @@ public class Tasks {
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
+		System.out.println("- " + TEMPO     + ": Mostra o relógio com o tempo gasto em cada jogada.");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		System.out.println("===============================================================");
 	}
