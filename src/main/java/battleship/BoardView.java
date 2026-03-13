@@ -45,3 +45,4 @@ public class BoardView extends GridPane {
         });*/
         return pane;
     }
+}
