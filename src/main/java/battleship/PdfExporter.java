@@ -21,9 +21,6 @@ import java.time.format.DateTimeFormatter;
  * @version 2.0
  * @since 2026
  *
- * @see IMove
- * @see IPosition
- * @see IGame.ShotResult
  */
 public class PdfExporter {
 
@@ -33,9 +30,8 @@ public class PdfExporter {
      * Exports the full game history to a single unified PDF table.
      * Each row represents one move, showing who fired, the shots, results and duration.
      *
-     * @param game the game to export — must not be null
+     * @param game the game to export, must not be null
      */
-
     public static void exportGameToPdf(IGame game) {
         String outputFile = resolveOutputFile();
 
@@ -60,6 +56,13 @@ public class PdfExporter {
         }
     }
 
+    /**
+     * Builds a single table interleaving alien moves and player moves.
+     * Columns: Lado | Jogada | Tiros | Resultados | Duração
+     *
+     * @param game the game containing both move lists
+     * @return the unified Table element
+     */
     public static Table buildUnifiedTable(IGame game) {
 
         Table table = new Table(5);
@@ -84,6 +87,14 @@ public class PdfExporter {
         return table;
     }
 
+    /**
+     * Adds a single move row to the table.
+     *
+     * @param table    the table to add the row to
+     * @param move     the move data
+     * @param side     label identifying who fired ("Inimigo" or "Jogador")
+     * @param showTime if true, fills the Tempo cell with the move duration
+     */
     private static void addMoveRow(Table table, IMove move, String side, boolean showTime) {
         table.addCell(new Cell().add(new Paragraph(side)));
         table.addCell(new Cell().add(new Paragraph("Jogada nº" + move.getNumber())));
@@ -92,6 +103,12 @@ public class PdfExporter {
         table.addCell(new Cell().add(new Paragraph(showTime ? buildTimeText(move) : "-")));
     }
 
+    /**
+     * Builds the shots text for a move.
+     *
+     * @param move the move to extract shots from
+     * @return formatted string of shot positions
+     */
     private static String buildShotsText(IMove move) {
         StringBuilder sb = new StringBuilder();
         for(IPosition shot : move.getShots())
@@ -99,7 +116,12 @@ public class PdfExporter {
         return sb.toString();
     }
 
-
+    /**
+     * Builds the results text for a move (e.g. "Água, Acerto em Nau, Repetido").
+     *
+     * @param move the move to extract results from
+     * @return formatted string of shot results
+     */
     private static String buildResultsText(IMove move) {
         StringBuilder sb = new StringBuilder();
         for(IGame.ShotResult result : move.getShotResults())
@@ -117,12 +139,24 @@ public class PdfExporter {
         return sb.toString();
     }
 
+    /**
+     * Returns the formatted duration of a move, or "-" if not available.
+     *
+     * @param move the move to extract duration from
+     * @return formatted duration string or "-"
+     */
     private static String buildTimeText(IMove move) {
         if(move instanceof Move m && m.getDuration() > 0)
             return MoveTimer.format(m.getDuration());
         return "-";
     }
 
+    /**
+     * Resolves the output file path.
+     * If the default file is locked, returns a timestamped alternative.
+     *
+     * @return the resolved output file path
+     */
     private static String resolveOutputFile() {
         try {
             File file = new File(OUTPUT_FILE);
