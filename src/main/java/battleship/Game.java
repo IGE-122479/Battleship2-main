@@ -758,6 +758,7 @@ public class Game implements IGame
 	public void over() {
 			// Mostrar o relógio das jogadas antes da mensagem de fim de jogo
 			printTimingStats();
+			PdfExporter.exportGameToPdf(this);
 			System.out.println();
 			System.out.println("+--------------------------------------------------------------+");
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
@@ -769,6 +770,7 @@ public class Game implements IGame
 	 */
 	public void win() {
 		printTimingStats();
+		PdfExporter.exportGameToPdf(this);
 		System.out.println();
 		System.out.println("+--------------------------------------------------------------+");
 		System.out.println("|       Parabéns! Afundaste toda a frota do adversário!        |");

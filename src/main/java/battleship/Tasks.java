@@ -149,7 +149,7 @@ public class Tasks {
                     break;
 				case GUARDAPDF:
 					if (game != null)
-						PdfExporter.exportGameToPdf(game.getAlienMoves());
+						PdfExporter.exportGameToPdf(game);
 					else
 						System.out.println("Nenhum jogo em andamento para exportar.");
 					break;

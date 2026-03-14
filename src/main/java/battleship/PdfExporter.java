@@ -10,7 +10,6 @@ import com.itextpdf.layout.element.Cell;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 /**
  * PdfExporter is a utility class responsible for exporting Battleship game move history
@@ -18,11 +17,7 @@ import java.util.List;
  * containing detailed information about all moves, shots, and their results throughout
  * a game session.
  *
- * <p>The class handles file conflicts by automatically generating timestamped filenames
- * when the default PDF file is locked or in use by another process. This ensures that
- * multiple export operations can occur without errors.
- *
- * @author Battleship Team
+ * @author 99845
  * @version 2.0
  * @since 2026
  *
@@ -32,49 +27,17 @@ import java.util.List;
  */
 public class PdfExporter {
 
-    /**
-     * The default output filename for the exported PDF document.
-     * If this file is locked by another process, a timestamped alternative will be used instead.
-     */
     private static final String OUTPUT_FILE = "battleship_game.pdf";
 
     /**
-     * Exports the game move history to a PDF document.
+     * Exports the full game history to a single unified PDF table.
+     * Each row represents one move, showing who fired, the shots, results and duration.
      *
-     * <p>This method generates a comprehensive PDF report containing all moves from a Battleship game.
-     * @param moves A list of {@link IMove} objects representing all moves made during the game.
-     *              Each move contains the shots fired and their corresponding results.
-     *              Must not be null.
-     *
-     * @throws Exception If an error occurs during PDF document creation or writing.
-     *                   The exception is caught and printed to the console rather than propagated.
-     *
-     * @see IMove
-     * @see IPosition
-     * @see IGame.ShotResult
-     * @see java.time.LocalDateTime
+     * @param game the game to export — must not be null
      */
-    public static void exportGameToPdf(List<IMove> moves) {
-        String outputFile = OUTPUT_FILE;
 
-        // Attempt to delete the existing file to avoid file lock conflicts
-        // If deletion fails, use a timestamped filename as a fallback
-        try {
-            File file = new File(OUTPUT_FILE);
-            if (file.exists() && !file.delete()) {
-                // File exists but cannot be deleted (likely locked by another process)
-                // Generate a timestamped filename to avoid overwrite conflicts
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-                String timestamp = LocalDateTime.now().format(formatter);
-                outputFile = "battleship_game_" + timestamp + ".pdf";
-            }
-        } catch (Exception e) {
-            // Exception occurred during file deletion attempt
-            // Use timestamped filename as fallback
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-            String timestamp = LocalDateTime.now().format(formatter);
-            outputFile = "battleship_game_" + timestamp + ".pdf";
-        }
+    public static void exportGameToPdf(IGame game) {
+        String outputFile = resolveOutputFile();
 
         try {
             // Create PDF writer and document structures
@@ -84,44 +47,10 @@ public class PdfExporter {
 
             // Add title to the document with formatting
             document.add(new Paragraph("Batalha Naval- Histórico de Jogadas").setBold().setFontSize(18));
+            document.add(new Paragraph(" ")); // Add empty line for spacing
 
-            // Create and configure table with 3 columns (Move Number, Shots, Results)
-            Table table = new Table(3);
-            table.addHeaderCell(new Cell().add(new Paragraph("Jogada").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Tiros").setBold()));
-            table.addHeaderCell(new Cell().add(new Paragraph("Resultados").setBold()));
+            document.add(buildUnifiedTable(game));
 
-            // Populate table with move data
-            for (IMove move : moves) {
-                // Add move number
-                table.addCell(new Cell().add(new Paragraph("Jogada nº" + move.getNumber())));
-
-                // Add all shots for this move
-                StringBuilder shotsBuilder = new StringBuilder();
-                for (IPosition shot : move.getShots()) {
-                    shotsBuilder.append(shot.toString()).append(", ");
-                }
-                table.addCell(new Cell().add(new Paragraph(shotsBuilder.toString())));
-
-                // Add detailed shot results
-                StringBuilder resultsBuilder = new StringBuilder();
-                for (IGame.ShotResult result : move.getShotResults()) {
-                    if (!result.valid())
-                        resultsBuilder.append("Exterior, ");
-                    else if (result.repeated())
-                        resultsBuilder.append("Repetido, ");
-                    else if (result.ship() == null)
-                        resultsBuilder.append("Água, ");
-                    else if (result.sunk())
-                        resultsBuilder.append(result.ship().getCategory() + " afundado ");
-                    else
-                        resultsBuilder.append("Acerto em " + result.ship().getCategory() + " ");
-                }
-                table.addCell(new Cell().add(new Paragraph(resultsBuilder.toString())));
-            }
-
-            // Add table to document and close
-            document.add(table);
             document.close();
             System.out.println("Game exported to " + outputFile);
         } catch (Exception e) {
@@ -130,4 +59,79 @@ public class PdfExporter {
             e.printStackTrace();
         }
     }
+
+    public static Table buildUnifiedTable(IGame game) {
+
+        Table table = new Table(5);
+
+        // Add header cells with bold formatting
+        table.addHeaderCell(new Cell().add(new Paragraph("Lado").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Jogada").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Tiros").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Resultados").setBold()));
+        table.addHeaderCell(new Cell().add(new Paragraph("Duração").setBold()));
+
+        int alienSize = game.getAlienMoves().size();
+        int mySize = game.getMyMoves().size();
+        int total = Math.max(alienSize, mySize);
+
+        for (int i = 0; i < total; i++){
+            if(i < alienSize)
+                addMoveRow(table, game.getAlienMoves().get(i), "Inimigo", false);
+            if(i < mySize)
+                addMoveRow(table, game.getMyMoves().get(i), "Jogador", true);
+        }
+        return table;
+    }
+
+    private static void addMoveRow(Table table, IMove move, String side, boolean showTime) {
+        table.addCell(new Cell().add(new Paragraph(side)));
+        table.addCell(new Cell().add(new Paragraph("Jogada nº" + move.getNumber())));
+        table.addCell(new Cell().add(new Paragraph(buildShotsText(move))));
+        table.addCell(new Cell().add(new Paragraph(buildResultsText(move))));
+        table.addCell(new Cell().add(new Paragraph(showTime ? buildTimeText(move) : "-")));
+    }
+
+    private static String buildShotsText(IMove move) {
+        StringBuilder sb = new StringBuilder();
+        for(IPosition shot : move.getShots())
+            sb.append(shot.toString()).append(", ");
+        return sb.toString();
+    }
+
+
+    private static String buildResultsText(IMove move) {
+        StringBuilder sb = new StringBuilder();
+        for(IGame.ShotResult result : move.getShotResults())
+            if(!result.valid())
+                sb.append("Tiro inválido, ");
+            else if(result.repeated())
+                sb.append("Tiro repetido, ");
+            else if(result.ship() == null)
+                sb.append("Água, ");
+            else if(result.sunk())
+                sb.append("Acertou, ");
+            else
+                sb.append("Acertou em ").append(result.ship().getCategory()).append(", ");
+
+        return sb.toString();
+    }
+
+    private static String buildTimeText(IMove move) {
+        if(move instanceof Move m && m.getDuration() > 0)
+            return MoveTimer.format(m.getDuration());
+        return "-";
+    }
+
+    private static String resolveOutputFile() {
+        try {
+            File file = new File(OUTPUT_FILE);
+            if (!file.exists() || file.delete())
+                return OUTPUT_FILE;
+        } catch (Exception e){}
+
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        return "battleship_game_" + timestamp + ".pdf";
+    }
+
 }
