@@ -37,6 +37,7 @@ public class Tasks {
 	private static final String SIMULA = "simula";
 	private static final String GUARDAPDF = "guardapdf";
 	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
+	private static final String SCOREBOARD = "scoreboard"
 	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
 
 	private static final String GUI = "gui";
@@ -166,6 +167,9 @@ public class Tasks {
 						stage.show();
 					});
 					break;
+				case SCOREBOARD:
+					ScoreboardManager.printScoreboard();
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -193,6 +197,7 @@ public class Tasks {
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		System.out.println("- " + GUI + ": Gui do jogo");
 		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
+		System.out.println("- " + SCOREBOARD + ": Mostra o scoreboard dos jogos passados. ");
 		System.out.println("===============================================================");
 	}
 	/**
