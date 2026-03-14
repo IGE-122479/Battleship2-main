@@ -2,6 +2,9 @@ package battleship;
 
 import java.util.Scanner;
 
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +39,7 @@ public class Tasks {
 	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
 	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
 
+	private static final String GUI = "gui";
 	/**
 	 * This task also tests the fighting element of a round of three shots
 	 */
@@ -149,6 +153,19 @@ public class Tasks {
 					else
 						System.out.println("Nenhum jogo em andamento para exportar.");
 					break;
+				// Dentro do switch/case ou if/else dos comandos:
+				case GUI:
+					Platform.startup(() -> {
+						Stage stage = new Stage();
+						// Passa a instância atual do jogo para a View
+						BoardView boardView = new BoardView();
+
+						Scene scene = new Scene(boardView, 400, 400);
+						stage.setTitle("Visualização Gráfica do Tabuleiro");
+						stage.setScene(scene);
+						stage.show();
+					});
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -174,6 +191,7 @@ public class Tasks {
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + TEMPO     + ": Mostra o relógio com o tempo gasto em cada jogada.");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
+		System.out.println("- " + GUI + ": Gui do jogo");
 		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
 		System.out.println("===============================================================");
 	}
