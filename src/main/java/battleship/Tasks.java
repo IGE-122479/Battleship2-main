@@ -37,7 +37,7 @@ public class Tasks {
 	private static final String SIMULA = "simula";
 	private static final String GUARDAPDF = "guardapdf";
 	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
-	private static final String SCOREBOARD = "scoreboard"
+	private static final String SCOREBOARD = "scoreboard";
 	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
 
 	private static final String GUI = "gui";
