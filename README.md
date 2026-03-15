@@ -8,6 +8,10 @@
 
 ---
 
+## Link do video
+
+https://youtu.be/c8THn1gbzZw
+
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
 - [Key Features](#-key-features)
