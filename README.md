@@ -144,19 +144,36 @@ Contributions are what make the open-source community such an amazing place to l
 ---
 
 ## Prompt final
-Considere agora a seguinte tática de geração de rajadas de tiros.
+Quando atingires um navio sem o afundar, segue esta ordem de prioridade:
+  - Se só tens 1 acerto nesse navio: dispara nas 4 direções ortogonais(Norte, Sul, Este, Oeste) em jogadas seguintes, uma de cada vez.
+  - Se tens 2 acertos no mesmo navio: já sabes a orientação (horizontal ou vertical). Continua APENAS nessa direção, para ambos os lados,até afundar. Não percas       tiros nas outras direções.
+  - Se tens múltiplos navios atingidos em simultâneo: termina de afundar o maior antes de passar ao seguinte — navios maiores têm mais posições e confirmam mais       "água garantida" em redor.
 
-• Crie um Diário de Bordo com o registo de cada rajada disparada, numerando-as sequencialmente (Rajada 1, 2, 3...). Guarde as coordenadas exatas de cada tiro e o respetivo resultado (Água, Nau atingida, Barca afundada, etc.). A memória é a principal arma de um bom estratega.
+Quando não há alvos prioritários (nenhum navio atingido pendente), usa um padrão de varredura em xadrez: dispara apenas em posições onde a soma (linha + coluna) é par por exemplo A1, A3, C2, B5.
 
-• Não dispare fora dos limites do mapa (ex: Z99) nem repita tiros em coordenadas já testadas. A única exceção para este desperdício de pólvora é a última rajada do jogo, apenas para perfazer os 3 tiros obrigatórios quando a frota inimiga já estiver irremediavelmente no fundo do mar.
+Porquê? A menor embarcação (Barca) ocupa 1 posição, mas a Caravela ocupa 2. Com o padrão de xadrez garantes que nenhuma Caravela, Nau, Fragata ou Galeão pode existir no tabuleiro sem que pelo menos 1 das suas posições seja coberta pelo padrão. Isto reduz os tiros necessários para encontrar todos os navios em aproximadamente 50%.
 
-• Se atingir um navio numa rajada, dispare nas posições contíguas (Norte, Sul, Este, Oeste) na jogada seguinte para descobrir a orientação da embarcação e acabar de afundar. No entanto, se a rajada anterior confirmar que o navio já foi afundado, não dispare para as posições contíguas, pois os navios nunca estão encostados.
+O Galeão tem forma de T com 4 orientações possíveis. Quando atingires uma posição que pode ser parte do Galeão:
+  - Se os acertos formam uma linha reta de 3: pode ser o corpo do T. Dispara também nas posições perpendiculares ao centro da linha, pois podem ser as "asas".
+  - Se encontrares acertos em L ou T: confirmaste o Galeão. Completa o padrão em T na orientação correspondente.
 
-• Como as Caravelas, Naus e Fragatas são linhas retas, um tiro certeiro significa que oresto do navio está na horizontal ou na vertical. Como os navios não se podem tocar(nem sequer nos cantos), as posições diagonais a um tiro certeiro são garantidamente água (a única exceção é o corpo do Galeão, devido à sua forma em T). Evitar estas diagonais poupa imensos tiros.
+Nunca descartares uma posição diagonal como "água garantida" enquanto não confirmares que o navio atingido não é o Galeão.
 
-• Quando o relatório de uma rajada confirmar que um navio foi afundado (ex: Fragata de 4 posições), analise os dados do seu Diário de Bordo para identificar exatamente onde caíram esses 4 tiros. Confirmada a posição exata da carcaça, marque todas as quadrículas adjacentes (o halo de 1 posição em redor do navio) como água intransitável. É impossível haver outra embarcação nesse perímetro.
+Rajada 5 resultado: {"validShots":3, "hitsOnBoats":[{"hits":1,"type":"Nau"}], "missedShots":2}
 
-• Se a sua frota for toda afundada, declare a derrota com honra. Em contrapartida, seja um vencedor magnânimo se for o inimigo a render-se com os navios todos no fundo do oceano!
+Raciocínio:
+  - Atingi a Nau em C5 (único acerto desta rajada).
+  - A Nau ocupa 3 posições em linha reta (N-S ou E-O).
+  - Próxima jogada: disparo em C4 e C6 (vertical) e B5 e D5 (horizontal)
+    para descobrir a orientação. Escolho C4, C6 e B5 para esta rajada.
+  - As diagonais B4, B6, D4, D6 são água garantida — marco como proibidas.
+
+Próxima rajada: [C4, C6, B5]
+
+Controlo de fim de jogo:
+  - Após cada rajada, verifica se o total de posições afundadas soma 20(4×1 + 3×2 + 2×3 + 1×4 + 1×5 = 20). Se sim, declara vitória.
+  - Se receberes uma mensagem de que a tua frota foi toda afundada, declara derrota com a mensagem: "A minha frota foi ao fundo. Glub glub."
+  - Na última rajada (quando faltam poucos navios), é aceitável repetir uma posição já disparada apenas para perfazer os 3 tiros obrigatórios.
 
 ---
 
