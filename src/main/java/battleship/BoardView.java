@@ -1,48 +1,121 @@
 package battleship;
 
+import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import java.util.List;
 
+/**
+ * Representa a visualização gráfica de um tabuleiro de Batalha Naval utilizando JavaFX.
+ * Esta classe estende {@link GridPane} para organizar as células, letras e números
+ * numa grelha bidimensional.
+ * * O tabuleiro inclui coordenadas (A-J e 1-10) e diferencia visualmente entre a
+ * visão da frota própria e a visão do radar (inimigo).</p>
+ */
 public class BoardView extends GridPane {
-    private final int ROWS = 8;
-    private final int COLS = 8;
-    private final double CELL_SIZE = 50.0;
 
-    public BoardView() {
-        renderBoard();
+    /** Tamanho padrão do tabuleiro (10x10). */
+    private final int SIZE = 10;
+
+    /** Tamanho em pixels de cada célula quadrada. */
+    private final double CELL_SIZE = 35.0;
+
+    /**
+     * Constrói uma nova visualização do tabuleiro e renderiza o seu conteúdo inicial.
+     *
+     * @param fleet       A frota a ser exibida (pode ser nula se for apenas visualização de ataques).
+     * @param moves       A lista de jogadas (movimentos) realizados para exibir os tiros efetuados.
+     * @param isEnemyView Se verdadeiro, oculta os navios que ainda não foram atingidos (visão de radar).
+     */
+    public BoardView(IFleet fleet, List<IMove> moves, boolean isEnemyView) {
+        renderBoard(fleet, moves, isEnemyView);
     }
 
-    // Método principal para desenhar o tabuleiro
-    public void renderBoard() {
-        this.getChildren().clear(); // Limpa antes de redesenhar
+    /**
+     * Responsável por desenhar todos os componentes do tabuleiro, incluindo as etiquetas
+     * de coordenadas e as células de jogo.
+     *
+     * @param fleet       A frota de navios para determinar as posições ocupadas.
+     * @param moves       O histórico de movimentos para determinar os tiros (água ou acerto).
+     * @param isEnemyView Define se a renderização deve seguir as regras de visualização do adversário.
+     */
+    public void renderBoard(IFleet fleet, List<IMove> moves, boolean isEnemyView) {
+        this.getChildren().clear();
+        this.setAlignment(Pos.CENTER);
 
-        for (int row = 0; row < ROWS; row++) {
-            for (int col = 0; col < COLS; col++) {
-                StackPane cell = createCell(row, col);
-                this.add(cell, col, row);
+        // 1. Adicionar números no topo (1 a 10)
+        for (int col = 0; col < SIZE; col++) {
+            Text label = new Text(String.valueOf(col + 1));
+            label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+            StackPane container = new StackPane(label);
+            container.setPrefSize(CELL_SIZE, CELL_SIZE / 2);
+            this.add(container, col + 1, 0);
+        }
+
+        // 2. Adicionar letras na esquerda (A a J) e as células do tabuleiro
+        for (int row = 0; row < SIZE; row++) {
+            // Letra da linha
+            Text label = new Text(String.valueOf((char) ('A' + row)));
+            label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+            StackPane container = new StackPane(label);
+            container.setPrefSize(CELL_SIZE / 2, CELL_SIZE);
+            this.add(container, 0, row + 1);
+
+            for (int col = 0; col < SIZE; col++) {
+                Position currentPos = new Position(row, col);
+                this.add(createCell(currentPos, fleet, moves, isEnemyView), col + 1, row + 1);
             }
         }
     }
 
-    private StackPane createCell(int row, int col) {
+    /**
+     * Cria uma célula individual (StackPane) contendo a representação visual de uma posição.
+     * A cor da célula muda conforme o estado: água, navio, tiro certeiro ou falhado.
+     *
+     * @param pos         A posição correspondente na quadrícula.
+     * @param fleet       A frota para verificar ocupação por navios.
+     * @param moves       Os movimentos para verificar se a posição foi atingida.
+     * @param isEnemyView Se verdadeiro, não pinta os navios (cinzento) se não houver dano.
+     * @return Um {@link StackPane} configurado com a cor e bordas adequadas.
+     */
+    private StackPane createCell(Position pos, IFleet fleet, List<IMove> moves, boolean isEnemyView) {
         StackPane pane = new StackPane();
+        Rectangle rect = new Rectangle(CELL_SIZE, CELL_SIZE);
+        rect.setStroke(Color.DARKBLUE);
+        rect.setFill(Color.LIGHTBLUE); // Cor base: Água
 
-        // Cria o fundo da casa (Alternando cores como um xadrez)
-        Rectangle background = new Rectangle(CELL_SIZE, CELL_SIZE);
-        background.setFill((row + col) % 2 == 0 ? Color.LIGHTGRAY : Color.GRAY);
-        background.setStroke(Color.BLACK);
+        // Lógica de cores para Navios
+        if (fleet != null && fleet.getShips() != null) {
+            for (IShip ship : fleet.getShips()) {
+                if (ship.occupies(pos)) {
+                    // Se não for visão do inimigo, mostramos o navio (cinzento)
+                    if (!isEnemyView) rect.setFill(Color.GRAY);
+                }
+            }
+        }
 
-        pane.getChildren().add(background);
-
-        // Exemplo: Adicionar um evento de clique na célula
-
-      /*  pane.setOnMouseClicked(e -> {
-            System.out.println("Clicou na posição: " + row + "," + col);
-            // Aqui você chamaria a lógica do seu Controller/Jogo
-        });*/
+        // Lógica de cores para Tiros (sobrepõe a cor do navio se houver impacto)
+        if (moves != null) {
+            for (IMove move : moves) {
+                List<IPosition> shots = move.getShots();
+                List<IGame.ShotResult> results = move.getShotResults();
+                for (int i = 0; i < shots.size(); i++) {
+                    if (shots.get(i).equals(pos)) {
+                        if (results.get(i).ship() != null) {
+                            rect.setFill(Color.RED); // Acerto num navio
+                        } else {
+                            rect.setFill(Color.WHITE); // Tiro na água
+                        }
+                    }
+                }
+            }
+        }
+        pane.getChildren().add(rect);
         return pane;
     }
 }
