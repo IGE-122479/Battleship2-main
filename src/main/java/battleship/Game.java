@@ -156,6 +156,7 @@ public class Game implements IGame
 	private Integer countHits;
 	private Integer countSinks;
 	private int moveNumber;
+	private int myMoveNumber;   // contador das minhas jogadas sobre o adversário
 
 	/** Cronómetro para medir o tempo de cada jogada. */
 	private final MoveTimer moveTimer;
@@ -163,12 +164,14 @@ public class Game implements IGame
 	//------------------------------------------------------------------
 	public Game(IFleet myFleet)
 	{
+
+		this.myMoveNumber = 1;
 		this.moveNumber = 1;
 
 		this.alienMoves = new ArrayList<IMove>();
 		this.myMoves = new ArrayList<IMove>();
 
-		this.alienFleet = new Fleet();
+		this.alienFleet = Fleet.createRandom();
 		this.myFleet = myFleet;
 
 		this.countInvalidShots = 0;
@@ -194,7 +197,7 @@ public class Game implements IGame
 	@Override
 	public IFleet getAlienFleet()
 	{
-		return myFleet;
+		return alienFleet;
 	}
 
 	@Override
@@ -203,14 +206,14 @@ public class Game implements IGame
 		return myMoves;
 	}
 
+
+
 	/**
-	 * Simulates a random firing action by the enemy, generating a set of unique shot coordinates
-	 * and serializing them into a JSON string. The method ensures that the random shots are valid
-	 * and do not duplicate existing shots in the game or previous enemy moves. After generating
-	 * the shots, it applies the firing logic and serializes the result for further processing.
+	 * Gera uma rajada de tiros aleatórios inteligentes por parte do inimigo.
+	 * O método evita posições adjacentes a navios já afundados e posições já atacadas.
+	 * Após gerar os tiros, processa-os contra a frota do jogador e devolve os resultados.
 	 *
-	 * @return A JSON string representing the list of randomly generated enemy shots.
-	 * @throws RuntimeException if there is an error during the JSON serialization of the shots.
+	 * @return String JSON com os resultados da rajada (hits, misses, sinks).
 	 */
 	public String randomEnemyFire() {
 
@@ -258,64 +261,110 @@ public class Game implements IGame
 			System.out.print(shot + " ");
 		System.out.println();
 
-		this.fireShots(shots);
-
-		return Game.jsonShots(shots);
+		// Serializar os tiros em JSON e delegar no método readEnemyFire
+		String shotsJson = Game.jsonShots(shots);
+		return readEnemyFire(shotsJson);
 	}
 
-
 	/**
-	 * Reads and processes the enemy fire input from the specified scanner.
-	 * The method expects input describing positions for enemy shots. It verifies
-	 * the format, ensures the correct number of positions are provided, and then fires
-	 * on those positions.
+	 * Recebe os meus tiros sobre a frota do adversário em formato JSON,
+	 * processa-os e devolve um JSON com os resultados.
 	 *
-	 * @param in the scanner object to read the enemy fire positions from, input must
-	 *           be formatted either as a single token combining the column and row
-	 *           (e.g., "A3") or as separate tokens (e.g., "A" followed by "3").
-	 * @throws IllegalArgumentException if the provided positions are incomplete,
-	 *                                  incorrectly formatted, or do not match the
-	 *                                  required number of shots (NUMBER_SHOTS).
+	 * Formato de entrada esperado:
+	 * [ {"row":"A","column":3}, {"row":"B","column":7}, {"row":"C","column":1} ]
+	 *
+	 * @param json   string JSON com a lista dos meus tiros
+	 * @return string JSON com os resultados (via Move.processEnemyFire)
 	 */
-	public String readEnemyFire(Scanner in) {
+	public String sendMyShotsJson(String json) {
 
-		assert in != null;
+		assert json != null;
 
-		// Iniciar o cronómetro assim que se pede a jogada ao jogador
-		moveTimer.start();
-
-		String input = in.nextLine().trim();
-
-		// Criar lista para armazenar os tiros
+		ObjectMapper mapper = new ObjectMapper();
 		List<IPosition> shots = new ArrayList<>();
 
-		Scanner inputScanner = new Scanner(input);
-		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
-			// Lê a próxima parte e constrói uma posição
-			String token = inputScanner.next();
+		try {
+			List<Map<String, Object>> parsed = mapper.readValue(json,
+					mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
 
-			if (token.matches("[A-Za-z]")) {
-				// Caso seja somente uma coluna ("A", "B", etc.), esperar o próximo número
-				if (inputScanner.hasNextInt()) {
-					int row = inputScanner.nextInt();
-					shots.add(new Position(token.toUpperCase().charAt(0), row));
-				} else {
-					throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
-				}
-			} else {
-				// Caso o token já contenha a coluna e a linha juntas (ex.: "A3")
-				Scanner singleScanner = new Scanner(token);
-				shots.add(Tasks.readClassicPosition(singleScanner));
+			for (Map<String, Object> entry : parsed) {
+				char row    = ((String) entry.get("row")).charAt(0);
+				int  column = (Integer) entry.get("column");
+				shots.add(new Position(row, column));
 			}
+		} catch (Exception e) {
+			throw new RuntimeException("Erro ao interpretar JSON dos meus tiros: " + e.getMessage(), e);
 		}
 
-		if (shots.size() != NUMBER_SHOTS) {
-			throw new IllegalArgumentException("Você deve inserir exatamente " + NUMBER_SHOTS + " posições!");
+		if (shots.size() != NUMBER_SHOTS)
+			throw new IllegalArgumentException("O JSON deve conter exactamente " + NUMBER_SHOTS + " tiros.");
+
+		List<ShotResult> shotResults = new ArrayList<>();
+		List<IPosition> alreadyShot  = new ArrayList<>();
+		for (IPosition pos : shots) {
+			shotResults.add(fireMyShot(pos, alreadyShot.contains(pos)));
+			alreadyShot.add(pos);
 		}
 
-		this.fireShots(shots);
+		// Parar o cronómetro e guardar o tempo na jogada
+		long elapsed = moveTimer.stop();
 
-		return Game.jsonShots(shots);
+		Move move = new Move(myMoveNumber, shots, shotResults);
+		move.setDuration(elapsed);
+		move.processEnemyFire(true);
+		myMoves.add(move);
+		myMoveNumber++;
+
+		// Devolver JSON com os resultados da jogada
+		return move.processEnemyFire(false);
+	}
+
+	/**
+	 * Processa os tiros disparados pelo inimigo recebidos em formato JSON.
+	 * O método desserializa o JSON, valida as posições e aplica o tiro à frota do jogador,
+	 * registando os resultados (acerto, água, ou navio afundado).
+	 *
+	 * @param json String JSON contendo a lista de tiros (ex: [{"row":"A","column":1}, ...])
+	 * @return Uma String JSON com o relatório detalhado dos resultados de cada tiro.
+	 * @throws RuntimeException se ocorrer um erro na interpretação do JSON.
+	 */
+	public String readEnemyFire(String json) {
+
+		assert json != null;
+
+		ObjectMapper mapper = new ObjectMapper();
+		List<IPosition> shots = new ArrayList<>();
+
+		try {
+			List<Map<String, Object>> parsed = mapper.readValue(json,
+					mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+
+			for (Map<String, Object> entry : parsed) {
+				char row    = ((String) entry.get("row")).charAt(0);
+				int  column = (Integer) entry.get("column");
+				shots.add(new Position(row, column));
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Erro ao interpretar JSON dos tiros do inimigo: " + e.getMessage(), e);
+		}
+
+		List<ShotResult> shotResults = new ArrayList<>();
+		List<IPosition> alreadyShot  = new ArrayList<>();
+		for (IPosition pos : shots) {
+			shotResults.add(fireSingleShot(pos, alreadyShot.contains(pos)));
+			alreadyShot.add(pos);
+		}
+
+		long elapsed = moveTimer.stop();
+
+		Move move = new Move(moveNumber, shots, shotResults);
+		move.setDuration(elapsed);
+		move.processEnemyFire(true);
+		alienMoves.add(move);
+		moveNumber++;
+
+		// Devolver JSON com os resultados da jogada
+		return move.processEnemyFire(false);
 	}
 
 	/**
@@ -334,29 +383,13 @@ public class Game implements IGame
 	{
 		assert shots != null;
 
-		List<ShotResult> shotResults = new ArrayList<ShotResult>();
+		//List<ShotResult> shotResults = new ArrayList<ShotResult>();
 		if (shots.size() != NUMBER_SHOTS) {
 			throw new IllegalArgumentException("Must fire exactly " + NUMBER_SHOTS + " shots per move.");
 		}
+		// Delegar em receiveEnemyShotsJson para evitar lógica duplicada
+		readEnemyFire(Game.jsonShots(shots));
 
-		List<IPosition> alreadyShot = new ArrayList<IPosition>();
-		for (IPosition pos : shots) {
-			shotResults.add(fireSingleShot(pos, alreadyShot.contains(pos)));
-			alreadyShot.add(pos);
-		}
-
-		// Parar o cronómetro e guardar o tempo na jogada
-		long elapsed = moveTimer.stop();
-
-		Move move = new Move(moveNumber, shots, shotResults);
-		move.setDuration(elapsed);
-//		System.out.println(move);
-
-		move.processEnemyFire(true);
-
-		alienMoves.add(move);
-
-		moveNumber++;
 	}
 
 	/**
@@ -395,6 +428,231 @@ public class Game implements IGame
 			}
 			return new ShotResult(true, false, ship, !ship.stillFloating());
 		}
+	}
+
+	// ==================== OS MEUS TIROS SOBRE O ADVERSÁRIO ====================
+
+	/**
+	 * Lê a rajada do jogador sobre a frota do adversário a partir do scanner.
+	 *
+	 * @param in o scanner para ler as posições dos tiros
+	 * @return string JSON com as posições dos tiros efectuados
+	 */
+	public String readMyFire(Scanner in) {
+
+		assert in != null;
+
+		// Iniciar o cronómetro
+		moveTimer.start();
+
+		String input = in.nextLine().trim();
+
+		// Se a linha lida ficou vazia (o utilizador carregou Enter após "rajada"),
+		// aguardamos a linha seguinte com os tiros — é aqui que está a demora real.
+		if (input.isEmpty()) {
+			input = in.nextLine().trim();
+		}
+
+		List<IPosition> shots = new ArrayList<>();
+
+		Scanner inputScanner = new Scanner(input);
+		while (shots.size() < NUMBER_SHOTS && inputScanner.hasNext()) {
+			String token = inputScanner.next();
+
+			if (token.matches("[A-Za-z]")) {
+				if (inputScanner.hasNextInt()) {
+					int row = inputScanner.nextInt();
+					shots.add(new Position(token.toUpperCase().charAt(0), row));
+				} else {
+					throw new IllegalArgumentException("Posição incompleta! A coluna '" + token + "' não é seguida por uma linha.");
+				}
+			} else {
+				Scanner singleScanner = new Scanner(token);
+				shots.add(Tasks.readClassicPosition(singleScanner));
+			}
+		}
+
+		if (shots.size() != NUMBER_SHOTS) {
+			throw new IllegalArgumentException("Deve inserir exactamente " + NUMBER_SHOTS + " posições!");
+		}
+
+		// Serializar para JSON e delegar no método sendMyShotsJson
+		String shotsJson = Game.jsonShots(shots);
+		return sendMyShotsJson(shotsJson);
+
+	}
+
+	/**
+	 * Efectua um único tiro do jogador sobre a frota do adversário.
+	 *
+	 * @param pos        a posição onde efectuar o tiro
+	 * @param isRepeated true se o tiro for uma repetição
+	 * @return o resultado do tiro
+	 */
+	public ShotResult fireMyShot(IPosition pos, boolean isRepeated) {
+
+		assert pos != null;
+
+		if (!pos.isInside())
+			return new ShotResult(false, false, null, false);
+
+		if (isRepeated || myRepeatedShot(pos))
+			return new ShotResult(true, true, null, false);
+
+		IShip ship = alienFleet.shipAt(pos);
+		if (ship == null)
+			return new ShotResult(true, false, null, false);
+		else {
+			ship.shoot(pos);
+			if (!ship.stillFloating())
+				System.out.println("*** Afundaste um(a) " + ship.getCategory() + "! ***");
+			return new ShotResult(true, false, ship, !ship.stillFloating());
+		}
+	}
+
+	/**
+	 * Verifica se a posição já foi alvo de um tiro meu anteriormente.
+	 *
+	 * @param pos a posição a verificar
+	 * @return true se a posição já foi atacada por mim
+	 */
+	public boolean myRepeatedShot(IPosition pos) {
+		assert pos != null;
+
+		for (IMove move : myMoves)
+			if (move.getShots().contains(pos))
+				return true;
+		return false;
+	}
+
+	/**
+	 * Imprime o tabuleiro do adversário de forma "escondida", mostrando apenas
+	 * onde o jogador já disparou e o número da jogada correspondente.
+	 * * @param showLegend se true, exibe a legenda dos símbolos no final.
+	 */
+	private void printAlienBoardHidden(boolean showLegend) {
+		// Usamos String para suportar números de jogadas no mapa
+		String[][] map = new String[BOARD_SIZE][BOARD_SIZE];
+
+		// Inicializar o tabuleiro com o marcador de água
+		for (int r = 0; r < BOARD_SIZE; r++) {
+			for (int c = 0; c < BOARD_SIZE; c++) {
+				map[r][c] = String.valueOf(EMPTY_MARKER);
+			}
+		}
+
+		// Preencher o tabuleiro com o número da jogada (usamos o resto da divisão por 10
+		// para garantir que o tabuleiro mantém o alinhamento visual com apenas 1 caractere)
+		for (IMove move : myMoves) {
+			for (IPosition shot : move.getShots()) {
+				if (shot.isInside()) {
+					map[shot.getRow()][shot.getColumn()] = String.valueOf(move.getNumber() % 10);
+				}
+			}
+		}
+
+		// Impressão do cabeçalho das colunas (1 2 3...)
+		System.out.println();
+		System.out.print("    ");
+		for (int col = 0; col < BOARD_SIZE; col++) {
+			System.out.print(" " + (col + 1));
+		}
+		System.out.println();
+
+		System.out.print("   +-");
+		for (int col = 0; col < BOARD_SIZE; col++) {
+			System.out.print("--");
+		}
+		System.out.println("+");
+
+		// Impressão das linhas (A, B, C...) e conteúdo do mapa
+		for (int row = 0; row < BOARD_SIZE; row++) {
+			char rowLabel = (char) ('A' + row);
+			System.out.print(" " + rowLabel + " |");
+			for (int col = 0; col < BOARD_SIZE; col++) {
+				System.out.print(" " + map[row][col]);
+			}
+			System.out.println(" |");
+		}
+
+		System.out.print("   +");
+		for (int col = 0; col < BOARD_SIZE; col++) {
+			System.out.print("--");
+		}
+		System.out.println("-+");
+
+		if (showLegend) {
+			System.out.println("          LEGENDA");
+			System.out.println("'" + EMPTY_MARKER + "'->água, 'N'->tiro efetuado na jogada nº N (mostra apenas último dígito)");
+		}
+		System.out.println();
+
+		// Chamar a visualização da frota logo abaixo do mapa
+		printAlienFleetHealth();
+	}
+
+	/**
+	 * Mostra o estado de saúde da frota adversária.
+	 * Revela coordenadas e jogadas apenas para partes já atingidas.
+	 */
+	private void printAlienFleetHealth() {
+		System.out.println("=== ESTADO DE DANOS DA FROTA ADVERSÁRIA ===");
+
+		// Percorre todos os navios da frota inimiga
+		for (IShip ship : alienFleet.getShips()) {
+			System.out.printf("%-15s ", ship.getCategory());
+
+			// Primeiro: mostrar as células atingidas (na ordem em que foram atingidas)
+			// Segundo: mostrar [.] para as células ainda não atingidas
+			// Desta forma o jogador vê os hits à esquerda mas não sabe a posição real do navio
+
+			List<String> hitCells = new ArrayList<>();
+			int unknownCount = 0;
+
+			// Percorre cada célula individual do navio
+			for (IPosition pos : ship.getPositions()) {
+				IMove hittingMove = null;
+
+				// Verifica se este ponto específico foi atingido por algum tiro meu
+				for (IMove move : myMoves) {
+					if (move.getShots().contains(pos)) {
+						hittingMove = move;
+						break;
+					}
+				}
+
+				if (hittingMove != null) {
+					// Se foi atingido: Mostra a coordenada (ex: A5) e o número da jogada
+					String coord = pos.getClassicRow() + "" + pos.getClassicColumn();
+					hitCells.add(String.format("[%s:%d]", coord, hittingMove.getNumber()));
+				} else {
+					unknownCount++;
+				}
+			}
+
+			// Mostrar hits primeiro
+			for (String cell : hitCells)
+				System.out.print(cell + " ");
+
+			// Depois as células desconhecidas
+			for (int i = 0; i < unknownCount; i++)
+				System.out.print("[.] ");
+
+			if (!ship.stillFloating()) {
+				System.out.print(" -> AFUNDADO!");
+			}
+			System.out.println();
+		}
+		System.out.println("===========================================");
+	}
+
+	/**
+	 * Devolve o número de navios do adversário ainda a flutuar.
+	 *
+	 * @return número de navios do adversário por afundar
+	 */
+	public int getAlienRemainingShips() {
+		return alienFleet.getFloatingShips().size();
 	}
 
 	@Override
@@ -440,12 +698,14 @@ public class Game implements IGame
 
 	public void printMyBoard(boolean show_shots, boolean show_legend)
 	{
+		System.out.println("=== O MEU TABULEIRO ===");
 		Game.printBoard(this.myFleet, this.alienMoves, show_shots, show_legend);
 	}
 
 	public void printAlienBoard(boolean show_shots, boolean show_legend)
 	{
-		Game.printBoard(this.alienFleet, this.myMoves, show_shots, show_legend);
+		System.out.println("=== TABULEIRO DO ADVERSÁRIO ===");
+		printAlienBoardHidden(show_legend);
 	}
 
 	/**
@@ -453,7 +713,7 @@ public class Game implements IGame
 	 * incluindo o total, a média, a jogada mais rápida e a mais lenta.
 	 */
 	public void printTimingStats() {
-		if (alienMoves.isEmpty()) {
+		if (myMoves.isEmpty()) {
 			System.out.println("Nenhuma jogada registada.");
 			return;
 		}
@@ -468,7 +728,7 @@ public class Game implements IGame
 		long slowest = Long.MIN_VALUE;
 		int fastestMove = 0, slowestMove = 0;
 
-		for (IMove iMove : alienMoves) {
+		for (IMove iMove : myMoves) {
 			if (iMove instanceof Move move) {
 				long d = move.getDuration();
 				total += d;
@@ -483,7 +743,7 @@ public class Game implements IGame
 
 		System.out.println("+------------+-----------------------------+");
 
-		long count = alienMoves.size();
+		long count = myMoves.size();
 		long avg = count > 0 ? total / count : 0L;
 
 		System.out.printf("| %-10s | %-28s |%n", "TOTAL", MoveTimer.format(total));
@@ -498,9 +758,22 @@ public class Game implements IGame
 	public void over() {
 			// Mostrar o relógio das jogadas antes da mensagem de fim de jogo
 			printTimingStats();
+			PdfExporter.exportGameToPdf(this);
 			System.out.println();
 			System.out.println("+--------------------------------------------------------------+");
 			System.out.println("| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |");
 			System.out.println("+--------------------------------------------------------------+");
+	}
+
+	/**
+	 * Mensagem de vitória do jogador.
+	 */
+	public void win() {
+		printTimingStats();
+		PdfExporter.exportGameToPdf(this);
+		System.out.println();
+		System.out.println("+--------------------------------------------------------------+");
+		System.out.println("|       Parabéns! Afundaste toda a frota do adversário!        |");
+		System.out.println("+--------------------------------------------------------------+");
 	}
 }

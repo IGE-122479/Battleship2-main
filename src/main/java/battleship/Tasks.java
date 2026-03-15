@@ -37,6 +37,9 @@ public class Tasks {
 	private static final String SIMULA = "simula";
 	private static final String GUARDAPDF = "guardapdf";
 	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
+	private static final String SCOREBOARD = "scoreboard";
+	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
+
 	private static final String GUI = "gui";
 	/**
 	 * This task also tests the fighting element of a round of three shots
@@ -56,6 +59,7 @@ public class Tasks {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
+					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
 					try {
 						// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
@@ -76,16 +80,42 @@ public class Tasks {
 					game.printMyBoard(false, true);
 					break;
 				case STATUS:
-					if (myFleet != null)
+					// Mostra o estado das duas frotas
+					if (game != null) {
+						System.out.print("A minha frota  -> ");
 						myFleet.printStatus();
+						System.out.print("Adversário     -> ");
+						game.getAlienFleet().printStatus();
+					}
 					break;
 				case MAPA:
 					if (myFleet != null)
 						game.printMyBoard(false, true);
 					break;
+				case MAPAADV:
+					// Mostra o tabuleiro do adversário (apenas os meus tiros — não revela os navios)
+					if (game instanceof Game g)
+						g.printAlienBoard(true, true);
+					else
+						System.out.println("Nenhum jogo em curso.");
+					break;
 				case RAJADA:
-					if (game != null) {
-						game.readEnemyFire(in);
+					// O jogador ataca o adversário
+					if (game instanceof Game g) {
+						System.out.println("--- O teu ataque ---");
+						g.readMyFire(in);
+						game.getAlienFleet().printStatus();
+						g.printAlienBoard(true, false);
+
+						// Verificar se o jogador ganhou
+						if (g.getAlienRemainingShips() == 0) {
+							g.win();
+							System.exit(0);
+						}
+
+						// Resposta do adversário
+						System.out.println("--- Ataque do adversário ---");
+						game.randomEnemyFire();
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
 						GameGui.update();
@@ -94,6 +124,8 @@ public class Tasks {
 							game.over();
 							System.exit(0);
 						}
+					} else {
+						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
 					break;
 				case SIMULA:
@@ -142,7 +174,7 @@ public class Tasks {
                     break;
 				case GUARDAPDF:
 					if (game != null)
-						PdfExporter.exportGameToPdf(game.getAlienMoves());
+						PdfExporter.exportGameToPdf(game);
 					else
 						System.out.println("Nenhum jogo em andamento para exportar.");
 					break;
@@ -164,6 +196,10 @@ public class Tasks {
 					});
 				}
 				break;*/
+					break;
+				case SCOREBOARD:
+					ScoreboardManager.printScoreboard();
+					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
@@ -183,6 +219,7 @@ public class Tasks {
 		System.out.println("- " + LEFROTA + ": Permite criar e carregar uma frota personalizada.");
 		System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
 		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
+		System.out.println("- " + MAPAADV    + ": Exibe o tabuleiro do adversário (só os teus tiros).");
 		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
@@ -190,6 +227,7 @@ public class Tasks {
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
 		//System.out.println("- " + GUI + ": Gui do jogo");
 		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
+		System.out.println("- " + SCOREBOARD + ": Mostra o scoreboard dos jogos passados. ");
 		System.out.println("===============================================================");
 	}
 	/**

@@ -35,7 +35,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- JUnit Jupiter API -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -43,7 +42,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- JUnit Jupiter Engine -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
@@ -66,9 +64,11 @@
 		</dependency>
 
 		<dependency>
+            <!-- novo -->
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
+
 		</dependency>
 
 		<dependency>

@@ -1,0 +1,13 @@
+[ {
+  "dateTime" : "2026-03-13 20:40:04",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-03-13 20:42:21",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+} ]
