@@ -44,6 +44,9 @@ public class GameGui {
     /** Painel dinâmico da legenda de navios (estado da frota). */
     private VBox shipStatusBox;
 
+    /** Painel dinâmico do relógio das jogadas. */
+    private VBox timingBox;
+
     /** Layout principal reutilizável. */
     private VBox mainLayout;
 
@@ -131,7 +134,12 @@ public class GameGui {
         shipStatusBox.setAlignment(Pos.CENTER);
         renderShipStatus();
 
-        mainLayout.getChildren().addAll(boardsLayout, colorLegend, shipStatusBox);
+        // --- Relógio das jogadas ---
+        timingBox = new VBox(6);
+        timingBox.setAlignment(Pos.CENTER);
+        renderTiming();
+
+        mainLayout.getChildren().addAll(boardsLayout, colorLegend, shipStatusBox, timingBox);
 
         ScrollPane scroll = new ScrollPane(mainLayout);
         scroll.setFitToWidth(true);
@@ -154,6 +162,7 @@ public class GameGui {
         myBoard.renderBoard(game.getMyFleet(), game.getAlienMoves(), false);
         radarBoard.renderBoard(game.getAlienFleet(), game.getMyMoves(), true);
         renderShipStatus();
+        renderTiming();
     }
 
     // -------------------------------------------------------------------------
@@ -218,6 +227,80 @@ public class GameGui {
     }
 
     // -------------------------------------------------------------------------
+    // Relógio das jogadas
+    // -------------------------------------------------------------------------
+
+    /**
+     * Atualiza o painel do relógio mostrando o tempo gasto em cada jogada.
+     * Só é exibido se existirem jogadas registadas.
+     */
+    private void renderTiming() {
+        timingBox.getChildren().clear();
+
+        List<IMove> moves = game.getMyMoves().isEmpty() ? game.getAlienMoves() : game.getMyMoves();
+        if (moves.isEmpty()) return;
+
+        Text title = new Text("⏱  RELÓGIO DAS JOGADAS");
+        title.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        title.setFill(Color.WHITE);
+        timingBox.getChildren().add(title);
+
+        // Tabela de jogadas
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(20);
+        grid.setVgap(4);
+        grid.setAlignment(Pos.CENTER);
+
+        // Cabeçalho
+        addTimingCell(grid, "Jogada", 0, 0, true);
+        addTimingCell(grid, "Tempo", 1, 0, true);
+
+        long total = 0;
+        long fastest = Long.MAX_VALUE;
+        long slowest = Long.MIN_VALUE;
+        int fastestIdx = 0, slowestIdx = 0;
+
+        for (int i = 0; i < moves.size(); i++) {
+            IMove move = moves.get(i);
+            long duration = (move instanceof Move m) ? m.getDuration() : 0;
+            total += duration;
+            if (duration < fastest) { fastest = duration; fastestIdx = i + 1; }
+            if (duration > slowest) { slowest = duration; slowestIdx = i + 1; }
+
+            addTimingCell(grid, "Jogada " + move.getNumber(), 0, i + 1, false);
+            addTimingCell(grid, MoveTimer.format(duration), 1, i + 1, false);
+        }
+
+        timingBox.getChildren().add(grid);
+
+        // Resumo
+        long avg = moves.size() > 0 ? total / moves.size() : 0;
+        String summary = String.format(
+                "Total: %s  |  Média: %s  |  Mais rápida: Jog.%d (%s)  |  Mais lenta: Jog.%d (%s)",
+                MoveTimer.format(total), MoveTimer.format(avg),
+                fastestIdx, MoveTimer.format(fastest),
+                slowestIdx, MoveTimer.format(slowest)
+        );
+        Text summaryText = new Text(summary);
+        summaryText.setFont(Font.font("Arial", 11));
+        summaryText.setFill(Color.LIGHTCYAN);
+        timingBox.getChildren().add(summaryText);
+    }
+
+    /**
+     * Adiciona uma célula de texto à grelha do relógio.
+     */
+    private void addTimingCell(javafx.scene.layout.GridPane grid, String text, int col, int row, boolean bold) {
+        Text t = new Text(text);
+        t.setFont(bold ? Font.font("Arial", FontWeight.BOLD, 11) : Font.font("Arial", 11));
+        t.setFill(bold ? Color.WHITE : Color.LIGHTGRAY);
+        javafx.scene.layout.StackPane cell = new javafx.scene.layout.StackPane(t);
+        cell.setPrefWidth(col == 0 ? 80 : 120);
+        cell.setAlignment(Pos.CENTER_LEFT);
+        grid.add(cell, col, row);
+    }
+
+    // -------------------------------------------------------------------------
     // Scoreboard
     // -------------------------------------------------------------------------
 
@@ -234,11 +317,11 @@ public class GameGui {
         scorePanel.setAlignment(Pos.CENTER);
         scorePanel.setPadding(new Insets(16));
         scorePanel.setStyle(
-            "-fx-background-color: #16213e;" +
-            "-fx-border-color: #e94560;" +
-            "-fx-border-width: 2;" +
-            "-fx-border-radius: 8;" +
-            "-fx-background-radius: 8;"
+                "-fx-background-color: #16213e;" +
+                        "-fx-border-color: #e94560;" +
+                        "-fx-border-width: 2;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 8;"
         );
         scorePanel.setMaxWidth(700);
 
