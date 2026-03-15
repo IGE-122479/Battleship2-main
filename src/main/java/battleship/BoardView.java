@@ -14,8 +14,9 @@ import java.util.List;
  * Representa a visualização gráfica de um tabuleiro de Batalha Naval utilizando JavaFX.
  * Esta classe estende {@link GridPane} para organizar as células, letras e números
  * numa grelha bidimensional.
- * * O tabuleiro inclui coordenadas (A-J e 1-10) e diferencia visualmente entre a
- * visão da frota própria e a visão do radar (inimigo).</p>
+ *
+ * O tabuleiro inclui coordenadas (A-J e 1-10) e diferencia visualmente entre a
+ * visão da frota própria e a visão do radar (inimigo).
  */
 public class BoardView extends GridPane {
 
@@ -59,7 +60,6 @@ public class BoardView extends GridPane {
 
         // 2. Adicionar letras na esquerda (A a J) e as células do tabuleiro
         for (int row = 0; row < SIZE; row++) {
-            // Letra da linha
             Text label = new Text(String.valueOf((char) ('A' + row)));
             label.setFont(Font.font("Arial", FontWeight.BOLD, 12));
             StackPane container = new StackPane(label);
@@ -76,6 +76,7 @@ public class BoardView extends GridPane {
     /**
      * Cria uma célula individual (StackPane) contendo a representação visual de uma posição.
      * A cor da célula muda conforme o estado: água, navio, tiro certeiro ou falhado.
+     * Navios completamente afundados são pintados a cor diferente (laranja escuro).
      *
      * @param pos         A posição correspondente na quadrícula.
      * @param fleet       A frota para verificar ocupação por navios.
@@ -87,14 +88,24 @@ public class BoardView extends GridPane {
         StackPane pane = new StackPane();
         Rectangle rect = new Rectangle(CELL_SIZE, CELL_SIZE);
         rect.setStroke(Color.DARKBLUE);
-        rect.setFill(Color.LIGHTBLUE); // Cor base: Água
+        rect.setFill(Color.LIGHTBLUE); // Cor base: desconhecido
+
+        // Verifica se a posição pertence a um navio afundado
+        boolean isSunkShipCell = false;
 
         // Lógica de cores para Navios
         if (fleet != null && fleet.getShips() != null) {
             for (IShip ship : fleet.getShips()) {
                 if (ship.occupies(pos)) {
-                    // Se não for visão do inimigo, mostramos o navio (cinzento)
-                    if (!isEnemyView) rect.setFill(Color.GRAY);
+                    if (!isEnemyView) {
+                        // Navio afundado → cor especial (laranja escuro)
+                        if (!ship.stillFloating()) {
+                            rect.setFill(Color.DARKORANGE);
+                            isSunkShipCell = true;
+                        } else {
+                            rect.setFill(Color.GRAY); // Navio intacto
+                        }
+                    }
                 }
             }
         }
@@ -106,8 +117,13 @@ public class BoardView extends GridPane {
                 List<IGame.ShotResult> results = move.getShotResults();
                 for (int i = 0; i < shots.size(); i++) {
                     if (shots.get(i).equals(pos)) {
-                        if (results.get(i).ship() != null) {
-                            rect.setFill(Color.RED); // Acerto num navio
+                        IGame.ShotResult result = results.get(i);
+                        if (result.ship() != null) {
+                            if (result.sunk()) {
+                                rect.setFill(Color.DARKORANGE); // Navio afundado
+                            } else {
+                                rect.setFill(Color.RED); // Tiro certeiro (não afundado)
+                            }
                         } else {
                             rect.setFill(Color.WHITE); // Tiro na água
                         }
@@ -115,6 +131,7 @@ public class BoardView extends GridPane {
                 }
             }
         }
+
         pane.getChildren().add(rect);
         return pane;
     }
