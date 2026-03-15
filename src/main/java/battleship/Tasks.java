@@ -196,7 +196,6 @@ public class Tasks {
 					});
 				}
 				break;*/
-					break;
 				case SCOREBOARD:
 					ScoreboardManager.printScoreboard();
 					break;
