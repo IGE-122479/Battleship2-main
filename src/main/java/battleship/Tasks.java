@@ -39,6 +39,7 @@ public class Tasks {
 	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
 	private static final String SCOREBOARD = "scoreboard";
 	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
+	private static final String RAJADAIA = "rajadaia"; // jogar contra uma IA
 
 	private static final String GUI = "gui";
 	/**
@@ -48,6 +49,7 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		AiGame aiadversario = null;
 		menuHelp();
 
 		System.out.print("> ");
@@ -59,6 +61,7 @@ public class Tasks {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
+					aiadversario = new AiGame();
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
 					try {
@@ -124,6 +127,7 @@ public class Tasks {
 							game.over();
 							System.exit(0);
 						}
+
 					} else {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
@@ -196,6 +200,36 @@ public class Tasks {
 					});
 				}
 				break;*/
+				case RAJADAIA:
+					if (game instanceof Game g) {
+						if (aiadversario == null) {
+							System.out.println("API_KEY não definida. Define-a nas Run Configurations.");
+							break;
+						}
+
+						System.out.println("--- O teu ataque ---");
+						g.readMyFire(in);
+						game.getAlienFleet().printStatus();
+						g.printAlienBoard(true, false);
+
+						if (g.getAlienRemainingShips() == 0) { g.win(); System.exit(0); }
+
+						System.out.println("--- Ataque do AI ---");
+						try {
+							aiadversario.generateShots(game); // LLM decide os tiros
+						} catch (RuntimeException e) {
+							System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
+							game.randomEnemyFire();
+						}
+						myFleet.printStatus();
+						game.printMyBoard(true, false);
+						GameGui.update();
+
+						if (game.getRemainingShips() == 0) { game.over(); System.exit(0); }
+					} else {
+						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
+					}
+					break;
 				case SCOREBOARD:
 					ScoreboardManager.printScoreboard();
 					break;
@@ -227,6 +261,7 @@ public class Tasks {
 		//System.out.println("- " + GUI + ": Gui do jogo");
 		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
 		System.out.println("- " + SCOREBOARD + ": Mostra o scoreboard dos jogos passados. ");
+		System.out.println("- " + RAJADAIA + ": Jogas contra a IA");
 		System.out.println("===============================================================");
 	}
 	/**
