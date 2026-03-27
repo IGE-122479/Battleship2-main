@@ -1,4 +1,8 @@
 name: "Long Method – Quality Gate"
+# Operacionalização do Long Method (Fowler) seguindo a detection
+# strategy Brain Method (Lanza & Marinescu, Cap. 5):
+#   LOC > HIGH/2  → MethodTooLong
+#   CYCLO >= HIGH → OverlyComplexMethod
 
 on:
   push:
@@ -23,14 +27,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Criar qodana.yaml com inspeções do Long Method
+      - name: Criar qodana.yaml com detection strategy do Long Method
         run: |
           cat > qodana.yaml << 'EOF'
           version: "1.0"
           linter: jetbrains/qodana-jvm
           include:
-            - name: MethodTooLong
-            - name: OverlyComplexMethod
+            - name: MethodTooLong        # LOC > HIGH/2
+            - name: OverlyComplexMethod  # CYCLO >= HIGH
           failThreshold: 0
           EOF
 
