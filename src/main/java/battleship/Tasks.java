@@ -37,7 +37,9 @@ public class Tasks {
 	private static final String SIMULA = "simula";
 	private static final String GUARDAPDF = "guardapdf";
 	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
+	private static final String SCOREBOARD = "scoreboard";
 	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
+	private static final String RAJADAIA = "rajadaia"; // jogar contra uma IA
 
 	private static final String GUI = "gui";
 	/**
@@ -47,6 +49,7 @@ public class Tasks {
 
 		IFleet myFleet = null;
 		IGame game = null;
+		AiGame aiadversario = null;
 		menuHelp();
 
 		System.out.print("> ");
@@ -58,8 +61,21 @@ public class Tasks {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
+					aiadversario = new AiGame();
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
+					try {
+						// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
+						Platform.startup(() -> {});
+					} catch (IllegalStateException e) {
+						// Toolkit já estava iniciado, podemos continuar
+					}
+
+					final IGame currentGame = game;
+					Platform.runLater(() -> {
+						GameGui.show(currentGame);
+					});
+
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
@@ -105,32 +121,45 @@ public class Tasks {
 						game.randomEnemyFire();
 						myFleet.printStatus();
 						game.printMyBoard(true, false);
+						GameGui.update();
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
 							System.exit(0);
 						}
+
 					} else {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
 					break;
 				case SIMULA:
 					if (game != null) {
-						while (game.getRemainingShips() > 0){
+						final IGame gameParaGUI = game;
+						try {
+							Platform.startup(() -> {});
+						} catch (IllegalStateException e) {
+						}
+						Platform.runLater(() -> GameGui.show(gameParaGUI));
+						while (game.getRemainingShips() > 0) {
 							game.randomEnemyFire();
+							GameGui.update();
 							myFleet.printStatus();
 							game.printMyBoard(true, false);
+
 							try {
 								Thread.sleep(3000);
 							} catch (InterruptedException e) {
-								Thread.currentThread().interrupt(); // Best practice: restore interrupt status
+								Thread.currentThread().interrupt();
+								break;
 							}
 						}
 
 						if (game.getRemainingShips() == 0) {
 							game.over();
-							System.exit(0);
+							// Removido o System.exit para não fechar a GUI imediatamente no fim
 						}
+					} else {
+						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
 					break;
 				case TIROS:
@@ -149,22 +178,60 @@ public class Tasks {
                     break;
 				case GUARDAPDF:
 					if (game != null)
-						PdfExporter.exportGameToPdf(game.getAlienMoves());
+						PdfExporter.exportGameToPdf(game);
 					else
 						System.out.println("Nenhum jogo em andamento para exportar.");
 					break;
 				// Dentro do switch/case ou if/else dos comandos:
-				case GUI:
-					Platform.startup(() -> {
-						Stage stage = new Stage();
-						// Passa a instância atual do jogo para a View
-						BoardView boardView = new BoardView();
+				/*case GUI:
+				if (game == null) {
+					System.out.println("Nenhum jogo em curso. Gera uma frota primeiro!");
+				} else {
+					try {
+						// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
+						Platform.startup(() -> {});
+					} catch (IllegalStateException e) {
+						// Toolkit já estava iniciado, podemos continuar
+					}
 
-						Scene scene = new Scene(boardView, 400, 400);
-						stage.setTitle("Visualização Gráfica do Tabuleiro");
-						stage.setScene(scene);
-						stage.show();
+					final IGame currentGame = game;
+					Platform.runLater(() -> {
+						GameGui.show(currentGame);
 					});
+				}
+				break;*/
+				case RAJADAIA:
+					if (game instanceof Game g) {
+						if (aiadversario == null) {
+							System.out.println("API_KEY não definida. Define-a nas Run Configurations.");
+							break;
+						}
+
+						System.out.println("--- O teu ataque ---");
+						g.readMyFire(in);
+						game.getAlienFleet().printStatus();
+						g.printAlienBoard(true, false);
+
+						if (g.getAlienRemainingShips() == 0) { g.win(); System.exit(0); }
+
+						System.out.println("--- Ataque do AI ---");
+						try {
+							aiadversario.generateShots(game); // LLM decide os tiros
+						} catch (RuntimeException e) {
+							System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
+							game.randomEnemyFire();
+						}
+						myFleet.printStatus();
+						game.printMyBoard(true, false);
+						GameGui.update();
+
+						if (game.getRemainingShips() == 0) { game.over(); System.exit(0); }
+					} else {
+						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
+					}
+					break;
+				case SCOREBOARD:
+					ScoreboardManager.printScoreboard();
 					break;
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
@@ -191,8 +258,10 @@ public class Tasks {
 		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
 		System.out.println("- " + TEMPO     + ": Mostra o relógio com o tempo gasto em cada jogada.");
 		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
-		System.out.println("- " + GUI + ": Gui do jogo");
+		//System.out.println("- " + GUI + ": Gui do jogo");
 		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
+		System.out.println("- " + SCOREBOARD + ": Mostra o scoreboard dos jogos passados. ");
+		System.out.println("- " + RAJADAIA + ": Jogas contra a IA");
 		System.out.println("===============================================================");
 	}
 	/**

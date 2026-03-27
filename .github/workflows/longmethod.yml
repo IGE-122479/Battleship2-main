@@ -1,0 +1,73 @@
+name: "Long Method – Quality Gate"
+# Operacionalização do Long Method (Fowler) seguindo a detection
+# strategy Brain Method (Lanza & Marinescu, Cap. 5):
+#   LOC > HIGH/2  → MethodTooLong      (limiar: 30 linhas)
+#   CYCLO >= HIGH → OverlyComplexMethod (limiar: 10)
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  qodana:
+    name: "Qodana – Long Method gate"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Criar perfil XML com limiares das métricas
+        run: |
+          mkdir -p .idea/inspectionProfiles
+          cat > .idea/inspectionProfiles/qodana.xml << 'EOF'
+          <component name="InspectionProjectProfileManager">
+            <profile version="1.0">
+              <option name="myName" value="qodana" />
+              <!-- LOC > HIGH/2 : método longo demais (limiar: 30 linhas) -->
+              <inspection_tool class="MethodTooLong"
+                               enabled="true"
+                               level="WARNING"
+                               enabled_by_default="true">
+                <option name="myMaxLength" value="30" />
+                <option name="myIgnoreConstructors" value="false" />
+                <option name="myIgnoreGettersAndSetters" value="false" />
+              </inspection_tool>
+              <!-- CYCLO >= HIGH : complexidade ciclomática elevada (limiar: 10) -->
+              <inspection_tool class="OverlyComplexMethod"
+                               enabled="true"
+                               level="WARNING"
+                               enabled_by_default="true">
+                <option name="myLimit" value="10" />
+              </inspection_tool>
+            </profile>
+          </component>
+          EOF
+
+      - name: Criar qodana.yaml referenciando o perfil XML
+        run: |
+          cat > qodana.yaml << 'EOF'
+          version: "1.0"
+          linter: jetbrains/qodana-jvm
+          profile:
+            path: .idea/inspectionProfiles/qodana.xml
+          failThreshold: 0
+          EOF
+
+      - name: Run Qodana for JVM
+        uses: JetBrains/qodana-action@v2024.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          upload-result: true
+          post-pr-comment: true
