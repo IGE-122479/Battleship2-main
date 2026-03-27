@@ -1,15 +1,31 @@
 # ============================================================
-# Workflow: Feature Envy Detection via Qodana Quality Gate
-# Fundamentação: Lanza & Marinescu - "Object-Oriented Metrics
-# in Practice" - Detection Strategy para Feature Envy:
-#   - ATFD (Access To Foreign Data) > FEW (threshold: 4)
-#   - LAA  (Locality of Attribute Accesses) < 1/3 (0.33)
-#   - FDP  (Foreign Data Providers) <= FEW (threshold: 4)
+# Aluno: 99328 Vicu Mindru
 #
-# ITERAÇÃO: Se não encontrar instâncias, relaxar thresholds:
-#   - ATFD: 4 → 3 → 2 → 1
-#   - LAA:  0.33 → 0.5 → 0.66
-#   - FDP:  4 → 3 → 2 → 1
+# Cheiro no Código: Feature Envy (Martin Fowler)
+# Definição: Um método que usa mais features de outra classe
+#            do que da sua própria classe.
+#
+# Limiares utilizados:
+#   - ATFD (Access To Foreign Data) > FEW
+#     Limiar: 4
+#     Significado: O método acede a dados de outras classes
+#     mais de 4 vezes — indica dependência excessiva de
+#     dados externos.
+#
+#   - LAA (Locality of Attribute Accesses) < ONE THIRD
+#     Limiar: 0.33
+#     Significado: Menos de 1/3 dos acessos a atributos são
+#     da própria classe — o método "vive" mais noutra classe
+#     do que na sua.
+#
+#   - FDP (Foreign Data Providers) <= FEW
+#     Limiar: 4
+#     Significado: Os dados externos acedidos estão
+#     concentrados em poucas classes — confirma que o método
+#     tem "inveja" de uma classe específica.
+#
+# Todas as condições devem ser verdadeiras simultaneamente.
+# Valores iniciais propostos pelo livro (página 84).
 # ============================================================
 
 name: Feature Envy Detection (Qodana)
