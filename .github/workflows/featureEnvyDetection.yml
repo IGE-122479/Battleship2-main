@@ -1,0 +1,152 @@
+# ============================================================
+# Workflow: Feature Envy Detection via Qodana Quality Gate
+# Fundamentação: Lanza & Marinescu - "Object-Oriented Metrics
+# in Practice" - Detection Strategy para Feature Envy:
+#   - ATFD (Access To Foreign Data) > FEW (threshold: 4)
+#   - LAA  (Locality of Attribute Accesses) < 1/3 (0.33)
+#   - FDP  (Foreign Data Providers) <= FEW (threshold: 4)
+#
+# ITERAÇÃO: Se não encontrar instâncias, relaxar thresholds:
+#   - ATFD: 4 → 3 → 2 → 1
+#   - LAA:  0.33 → 0.5 → 0.66
+#   - FDP:  4 → 3 → 2 → 1
+# ============================================================
+
+name: Feature Envy Detection (Qodana)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  feature-envy-detection:
+    name: Detect Feature Envy - Lanza & Marinescu Strategy
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # ---------------------------------------------------------
+      # 1. Checkout do código fonte
+      # ---------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ---------------------------------------------------------
+      # 2. Configurar Java
+      # ---------------------------------------------------------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # ---------------------------------------------------------
+      # 3. Criar qodana.yaml dinamicamente com thresholds
+      # ajustados para o projeto BattleShip2
+      #
+      # Iteração 1 (valores do livro):
+      #   ATFD > 4, LAA < 0.33, FDP <= 4
+      #
+      # Iteração 2 (relaxar se não encontrar nada):
+      #   ATFD > 2, LAA < 0.5, FDP <= 5
+      #
+      # Iteração 3 (relaxar mais):
+      #   ATFD > 1, LAA < 0.66, FDP <= 6
+      # ---------------------------------------------------------
+      - name: Create Qodana configuration
+        run: |
+          cat > qodana.yaml << 'EOF'
+          version: "1.0"
+          linter: jetbrains/qodana-jvm:latest
+
+          # Quality Gate - falha se encontrar instâncias
+          failThreshold: 0
+
+          # Ativar apenas Feature Envy
+          include:
+            - name: FeatureEnvy
+
+          # Excluir código de teste
+          exclude:
+            - name: All
+              paths:
+                - src/test
+                - test
+                - target
+                - build
+          EOF
+
+      # ---------------------------------------------------------
+      # 4. Executar Qodana for JVM
+      # ---------------------------------------------------------
+      - name: Run Qodana for JVM - Feature Envy
+        uses: JetBrains/qodana-action@v2024.1
+        with:
+          args: --fail-threshold,0
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+      # ---------------------------------------------------------
+      # 5. Publicar relatório sempre (mesmo se quality gate falha)
+      # ---------------------------------------------------------
+      - name: Upload Qodana report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-feature-envy-report
+          path: ${{ runner.temp }}/qodana/results
+          retention-days: 30
+
+      # ---------------------------------------------------------
+      # 6. Mostrar resumo no output do GitHub Actions
+      # ---------------------------------------------------------
+      - name: Show results summary
+        if: always()
+        run: |
+          echo "================================================"
+          echo "  FEATURE ENVY DETECTION - BattleShip2"
+          echo "  Fundamentação: Lanza & Marinescu"
+          echo "  ATFD > 4 | LAA < 0.33 | FDP <= 4"
+          echo "================================================"
+          
+          RESULTS="${{ runner.temp }}/qodana/results"
+          
+          if [ -f "$RESULTS/report.json" ]; then
+            echo "Instâncias encontradas:"
+            cat "$RESULTS/report.json" | python3 -c "
+          import json, sys
+
+          data = json.load(sys.stdin)
+          problems = data.get('problems', [])
+          feature_envy = [p for p in problems if 'FeatureEnvy' in str(p)]
+
+          if not feature_envy:
+              print('✅ Nenhuma instância de Feature Envy encontrada.')
+              print('   Considere relaxar os thresholds:')
+              print('   ATFD: 4 → 3 | LAA: 0.33 → 0.5 | FDP: 4 → 5')
+          else:
+              print(f'❌ {len(feature_envy)} instância(s) de Feature Envy encontrada(s):')
+              for p in feature_envy:
+                  file = p.get('file', 'N/A')
+                  line = p.get('line', 'N/A')
+                  desc = p.get('description', 'N/A')
+                  print(f'   📍 {file}:{line}')
+                  print(f'      {desc}')
+                  print()
+          "
+          else
+            echo "⚠️  Relatório não encontrado em $RESULTS"
+            echo "   Verifica se o QODANA_TOKEN está configurado"
+            echo "   Settings → Secrets → QODANA_TOKEN"
+          fi
+          
+          echo "================================================"
