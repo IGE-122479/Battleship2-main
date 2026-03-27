@@ -69,14 +69,12 @@ jobs:
           version: "1.0"
           linter: jetbrains/qodana-jvm:latest
 
-          # Quality Gate - falha se encontrar instâncias
-          failThreshold: 0
+          profile:
+            name: empty
 
-          # Ativar apenas Feature Envy
           include:
             - name: FeatureEnvy
 
-          # Excluir código de teste
           exclude:
             - name: All
               paths:
@@ -89,7 +87,7 @@ jobs:
       # ---------------------------------------------------------
       # 4. Executar Qodana for JVM
       # ---------------------------------------------------------
-      - name: Run Qodana for JVM - Feature Envy
+      - name: Run Qodana for JVM - Feature Envy Only
         uses: JetBrains/qodana-action@v2024.1
         with:
           args: --fail-threshold,0
@@ -106,48 +104,3 @@ jobs:
           name: qodana-feature-envy-report
           path: ${{ runner.temp }}/qodana/results
           retention-days: 30
-
-      # ---------------------------------------------------------
-      # 6. Mostrar resumo no output do GitHub Actions
-      # ---------------------------------------------------------
-      - name: Show results summary
-        if: always()
-        run: |
-          echo "================================================"
-          echo "  FEATURE ENVY DETECTION - BattleShip2"
-          echo "  Fundamentação: Lanza & Marinescu"
-          echo "  ATFD > 4 | LAA < 0.33 | FDP <= 4"
-          echo "================================================"
-          
-          RESULTS="${{ runner.temp }}/qodana/results"
-          
-          if [ -f "$RESULTS/report.json" ]; then
-            echo "Instâncias encontradas:"
-            cat "$RESULTS/report.json" | python3 -c "
-          import json, sys
-
-          data = json.load(sys.stdin)
-          problems = data.get('problems', [])
-          feature_envy = [p for p in problems if 'FeatureEnvy' in str(p)]
-
-          if not feature_envy:
-              print('✅ Nenhuma instância de Feature Envy encontrada.')
-              print('   Considere relaxar os thresholds:')
-              print('   ATFD: 4 → 3 | LAA: 0.33 → 0.5 | FDP: 4 → 5')
-          else:
-              print(f'❌ {len(feature_envy)} instância(s) de Feature Envy encontrada(s):')
-              for p in feature_envy:
-                  file = p.get('file', 'N/A')
-                  line = p.get('line', 'N/A')
-                  desc = p.get('description', 'N/A')
-                  print(f'   📍 {file}:{line}')
-                  print(f'      {desc}')
-                  print()
-          "
-          else
-            echo "⚠️  Relatório não encontrado em $RESULTS"
-            echo "   Verifica se o QODANA_TOKEN está configurado"
-            echo "   Settings → Secrets → QODANA_TOKEN"
-          fi
-          
-          echo "================================================"
