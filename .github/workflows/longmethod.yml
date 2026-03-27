@@ -1,0 +1,42 @@
+name: "Long Method – Quality Gate"
+# Operacionalização da detection strategy Brain Method
+# (Lanza & Marinescu, "Object-Oriented Metrics in Practice", Cap. 5)
+#
+# Long Method (Fowler) formalizado com:
+#   LOC > HIGH/2  → MethodTooLong      (limiar: 30 linhas)
+#   CYCLO >= HIGH → OverlyComplexMethod (limiar: 10)
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+  workflow_dispatch:
+
+jobs:
+  qodana:
+    name: "Qodana – Long Method gate"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Qodana for JVM
+        uses: JetBrains/qodana-action@v2024.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          args: >-
+            --linter,jetbrains/qodana-jvm,
+            --enable-inspections,MethodTooLong:OverlyComplexMethod,
+            --fail-threshold,0
+          upload-result: true
+          post-pr-comment: true
