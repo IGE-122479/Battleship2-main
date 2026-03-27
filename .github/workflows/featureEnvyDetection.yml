@@ -28,7 +28,7 @@ on:
 
 jobs:
   feature-envy-detection:
-    name: Detect Feature Envy - Lanza & Marinescu Strategy
+    name: Detect Feature Envy
     runs-on: ubuntu-latest
 
     steps:
