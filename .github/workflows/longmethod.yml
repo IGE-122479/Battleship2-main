@@ -18,8 +18,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 2. Criar o Perfil XML e o YAML de override
-      # O XML permite definir os "m_limit" sem dar erro de sintaxe
+      # 2. Criar o Perfil XML e o YAML de override dinamicamente
+      # O include no YAML e o all enabled="false" no XML vão limpar os 4220 erros
       - name: Create Qodana Profile
         run: |
           mkdir -p .qodana
@@ -46,17 +46,27 @@ jobs:
           </profile>
           EOF
 
-          # Criar o qodana.yaml que aponta para o XML acima
+          # Criar o qodana.yaml que força apenas estas inspeções
           cat > qodana.yaml << 'EOF'
           version: "1.0"
           linter: jetbrains/qodana-jvm:latest
+          
           profile:
             path: .qodana/custom-profile.xml
+          
+          # Esta secção include é fundamental para ignorar os 4220 erros de lixo
+          include:
+            - name: OverlyLongMethod
+            - name: OverlyComplexMethod
+            - name: MethodWithTooManyParameters
+            - name: LongLine
+          
           exclude:
             - name: All
               paths:
                 - src/test
                 - target
+                - .qodana
           EOF
 
       # 3. Executar o Qodana Scan
@@ -67,10 +77,11 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
-      # 4. Publicar o relatório
+      # 4. Publicar o relatório (sempre disponível nos Artifacts do GitHub)
       - name: Upload Qodana report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qodana-long-method-report
           path: ${{ runner.temp }}/qodana/results
+          retention-days: 7
