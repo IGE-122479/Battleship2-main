@@ -5,155 +5,53 @@
   Perfil de inspeção Qodana para deteção do cheiro "Long Method" (Fowler, 1999)
   operacionalizado através da estratégia Brain Method.
  
-  Fundamentação teórica:
-    Lanza, M. & Marinescu, R. (2006). Object-Oriented Metrics in Practice.
-    Springer. Capítulo 5.6 — Brain Method, pp. 92-95.
- 
-  Os quatro critérios de deteção do Brain Method e os limiares correspondentes:
- 
+  Limiares derivados do livro:
   ┌─────────────────────────────────────────────────────────────────────────┐
-  │ Critério 1 — Método excessivamente longo (LOC)                         │
-  │   LOC > HIGH(LOC/Class) / 2  →  130 / 2 = 65  (Tabela 2.2, Java)      │
-  │   Limiar de aviso:  LOC > 13  (High,      Tabela 2.1, Java)            │
-  │   Limiar de erro:   LOC > 20  (Very High, Tabela 2.1, Java ≈ 19.5)     │
+  │ Critério 1 — LOC/Method excessivo                                       │
+  │   Very High = 20 LOC  (Tabela 2.1, Java)                               │
+  │   Brain Method = 65 LOC  (HIGH(LOC/Class)/2 = 130/2, Tabela 2.2)       │
   │                                                                         │
-  │ Critério 2 — Complexidade ciclomática elevada (CYCLO)                  │
-  │   CYCLO ≥ HIGH  →  10  (Tabela 2.1, Java)                              │
+  │ Critério 2 — Complexidade ciclomática (CYCLO)                          │
+  │   High = 10  (Tabela 2.1, Java)                                         │
   │                                                                         │
   │ Critério 3 — Aninhamento profundo (MAXNESTING)                         │
-  │   MAXNESTING ≥ SEVERAL  →  > 3  (Tabela 2.4)                           │
+  │   SEVERAL = 3  (Tabela 2.4)                                             │
   │                                                                         │
-  │ Critério 4 — Muitas variáveis acedidas (NOAV)                          │
-  │   NOAV > MANY  →  > 7  (Short Memory Capacity, Tabela 2.4)             │
+  │ Critério 4 — Variáveis acedidas (NOAV)                                 │
+  │   Short Memory Capacity = 7  (Tabela 2.4)                              │
   └─────────────────────────────────────────────────────────────────────────┘
- 
-  Invocado pelo workflow via:
-    --profile-path,.qodana/long-method-thresholds.xml
   =============================================================================
 -->
 <profile version="1.0" name="Long-Method-Profile">
  
-  <!--
-    ═══════════════════════════════════════════════════════════════════════════
-    BLOCO BASE — Partir do perfil recomendado e desativar o que não é relevante
-    ═══════════════════════════════════════════════════════════════════════════
-  -->
-  <option name="myName" value="Long-Method-Profile"/>
-  <option name="myBaseProfile" value="qodana.recommended"/>
- 
-  <!-- Desativar inspeções não relacionadas com o Long Method para reduzir ruído -->
-  <inspection_tool class="ALL" enabled="false" level="WARNING" enabled_by_default="false"/>
- 
- 
-  <!--
-    ═══════════════════════════════════════════════════════════════════════════
-    CRITÉRIO 1 — LOC/Method excessivo
-    Fonte: Tabelas 2.1 e 2.2 (Lanza & Marinescu, 2006)
- 
-    Tabela 2.1 (Java):
-      High      = 13 LOC/Method  → WARNING
-      Very High = 20 LOC/Method  → ERROR
- 
-    Tabela 2.2 (Java) — Brain Method:
-      HIGH(LOC/Class) = 130  →  130/2 = 65 LOC/Method  → ERROR
-    ═══════════════════════════════════════════════════════════════════════════
-  -->
- 
-  <!-- Java / Kotlin: método longo (Very High threshold — Tabela 2.1) -->
+  <!-- Critério 1 — Método longo: Very High threshold (Tabela 2.1, Java = 19.5 ≈ 20) -->
   <inspection_tool class="MethodTooLong" enabled="true" level="ERROR" enabled_by_default="true">
     <option name="maxLength" value="20"/>
-    <!-- 20 ≈ Very High (19.5) da Tabela 2.1 para Java LOC/Method -->
   </inspection_tool>
  
-  <!-- IntelliJ built-in Long Method (limiar Brain Method — Tabela 2.2) -->
+  <!-- Critério 1 — Brain Method threshold (Tabela 2.2: HIGH(LOC/Class)/2 = 130/2 = 65) -->
   <inspection_tool class="LongMethod" enabled="true" level="ERROR" enabled_by_default="true">
     <option name="m_limit" value="65"/>
-    <!-- 65 = HIGH(LOC/Class) / 2 = 130 / 2, Tabela 2.2, Java -->
   </inspection_tool>
  
- 
-  <!--
-    ═══════════════════════════════════════════════════════════════════════════
-    CRITÉRIO 2 — Complexidade ciclomática elevada (CYCLO)
-    Fonte: Tabela 2.1 (Lanza & Marinescu, 2006)
- 
-    Tabela 2.1 (Java):
-      High = 10 para CYCLO/Method (i.e., CYCLO médio por LOC × LOC do método)
-      Usado diretamente como limiar de CYCLO absoluto por método.
-    ═══════════════════════════════════════════════════════════════════════════
-  -->
- 
-  <!-- Java / Kotlin: complexidade ciclomática -->
+  <!-- Critério 2 — Complexidade ciclomática alta (Tabela 2.1, Java High = 10) -->
   <inspection_tool class="CyclomaticComplexity" enabled="true" level="ERROR" enabled_by_default="true">
     <option name="m_limit" value="10"/>
-    <!-- 10 = High threshold para CYCLO/Method, Tabela 2.1, Java -->
   </inspection_tool>
  
-  <!-- Alternativa para projetos multi-linguagem -->
-  <inspection_tool class="OverlyComplexMethod" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="10"/>
-  </inspection_tool>
- 
-  <!-- NPath Complexity (complementar ao CYCLO) -->
-  <inspection_tool class="NPathComplexity" enabled="true" level="WARNING" enabled_by_default="true">
-    <option name="m_limit" value="200"/>
-    <!-- 200 é o threshold tradicional para NPath; funciona como aviso complementar -->
-  </inspection_tool>
- 
- 
-  <!--
-    ═══════════════════════════════════════════════════════════════════════════
-    CRITÉRIO 3 — Aninhamento profundo (MAXNESTING)
-    Fonte: Tabela 2.4 (Lanza & Marinescu, 2006)
- 
-    Tabela 2.4 — Thresholds com semântica aceite:
-      SEVERAL = 2–5  →  limiar adotado: 3
-      "Se o nível de aninhamento máximo for superior a isso, o fluxo de
-       controlo torna-se difícil de seguir." (p. 17)
-    ═══════════════════════════════════════════════════════════════════════════
-  -->
- 
+  <!-- Critério 3 — Aninhamento profundo (Tabela 2.4: SEVERAL → limiar = 3) -->
   <inspection_tool class="OverlyNestedMethod" enabled="true" level="ERROR" enabled_by_default="true">
     <option name="m_limit" value="3"/>
-    <!-- 3 = SEVERAL (Tabela 2.4); aninhamento > 3 é considerado profundo -->
   </inspection_tool>
  
- 
-  <!--
-    ═══════════════════════════════════════════════════════════════════════════
-    CRITÉRIO 4 — Muitas variáveis acedidas (NOAV)
-    Fonte: Tabela 2.4 (Lanza & Marinescu, 2006)
- 
-    Tabela 2.4 — Short Memory Capacity = 7–8
-    "O método usa mais variáveis do que a memória de curto prazo humana
-     consegue gerir. Exceder este limite aumenta o risco de introduzir bugs."
-     (p. 94, Cap. 5.6)
-    ═══════════════════════════════════════════════════════════════════════════
-  -->
- 
-  <!-- Variáveis locais excessivas -->
+  <!-- Critério 4 — Muitas variáveis locais (Tabela 2.4: Short Memory Capacity = 7) -->
   <inspection_tool class="MethodWithTooManyLocalVariables" enabled="true" level="ERROR" enabled_by_default="true">
     <option name="m_limit" value="7"/>
-    <!-- 7 = Short Memory Capacity (Tabela 2.4) -->
   </inspection_tool>
  
-  <!-- Parâmetros excessivos (componente de NOAV) -->
+  <!-- Critério 4 — Muitos parâmetros (componente de NOAV, Tabela 2.4 = 7) -->
   <inspection_tool class="MethodWithTooManyParameters" enabled="true" level="WARNING" enabled_by_default="true">
     <option name="m_limit" value="7"/>
-    <!-- Mesmo limiar NOAV — Tabela 2.4 -->
   </inspection_tool>
- 
- 
-  <!--
-    ═══════════════════════════════════════════════════════════════════════════
-    EXCLUSÕES — não analisar código gerado, testes ou dependências
-    ═══════════════════════════════════════════════════════════════════════════
-  -->
-  <scope name="Project Files" pattern="!file[*]:**/test/**/*"     />
-  <scope name="Project Files" pattern="!file[*]:**/*Test.java"    />
-  <scope name="Project Files" pattern="!file[*]:**/*Tests.java"   />
-  <scope name="Project Files" pattern="!file[*]:**/generated/**/*"/>
-  <scope name="Project Files" pattern="!file[*]:**/build/**/*"    />
-  <scope name="Project Files" pattern="!file[*]:**/target/**/*"   />
  
 </profile>
