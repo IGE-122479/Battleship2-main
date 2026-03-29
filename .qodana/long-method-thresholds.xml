@@ -1,20 +1,22 @@
-<profile version="1.0">
-  <option name="myName" value="LanzaMarinescuLongMethod" />
-  <all enabled="false" />
-  
-  <inspection_tool class="OverlyLongMethod" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="20" />
-  </inspection_tool>
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="brain-method-quality-gate" />
 
-  <inspection_tool class="OverlyComplexMethod" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="10" />
-  </inspection_tool>
+    <inspection_tool class="MethodLength" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_limit" value="65" />
+    </inspection_tool>
 
-  <inspection_tool class="NestedConditionalDepth" enabled="true" level="WARNING" enabled_by_default="true">
-    <option name="m_limit" value="3" />
-  </inspection_tool>
+    <inspection_tool class="CyclomaticComplexity" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_limit" value="5" />
+    </inspection_tool>
 
-  <inspection_tool class="MethodWithTooManyParameters" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="7" />
-  </inspection_tool>
-</profile>
+    <inspection_tool class="OverlyNestedMethod" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_limit" value="3" />
+    </inspection_tool>
+
+    <inspection_tool class="MethodWithTooManyLocals" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_limit" value="5" />
+    </inspection_tool>
+
+  </profile>
+</component>
