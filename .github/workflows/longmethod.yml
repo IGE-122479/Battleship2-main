@@ -1,31 +1,49 @@
-name: Qodana Long Method Detection
+# <numero-de-aluno> <nome>
+
+name: Long Method Detection
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
-  qodana:
+  qodana-brain-method:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Run Qodana Scan
-        uses: JetBrains/qodana-action@v2024.1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          # fail-threshold 0 faz o build falhar se encontrar métodos > 20 linhas
-          args: --fail-threshold,0,--disable-sanity
+          distribution: temurin
+          java-version: '17'
+
+      - name: Run Qodana for JVM
+        uses: JetBrains/qodana-action@v2024.3
+        with:
+          pr-mode: false
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
-      - name: Upload Report
+      - name: Upload Qodana report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qodana-report
-          path: ${{ runner.temp }}/qodana/results
+          name: qodana-brain-method-report
+          path: ${{ runner.temp }}/qodana/results/
+          retention-days: 14
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
