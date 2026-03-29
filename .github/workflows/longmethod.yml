@@ -11,8 +11,13 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
-  qodana-brain-method:
+  qodana-long-method:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,12 +43,12 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qodana-brain-method-report
+          name: qodana-long-method-report
           path: ${{ runner.temp }}/qodana/results/
           retention-days: 14
 
       - name: Upload SARIF to GitHub Code Scanning
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
