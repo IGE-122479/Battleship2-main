@@ -22,9 +22,6 @@ jobs:
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
-         args: >-
-            --profile-path .qodana/long-method-thresholds.xml
-            --fail-threshold 0
-            --property=qodana.override.profile.path=.qodana/long-method-thresholds.xml
+         args: --profile-path,.qodana/long-method-thresholds.xml,--fail-threshold,0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
