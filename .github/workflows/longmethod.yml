@@ -2,9 +2,14 @@ name: Qodana Detecção de Long Method
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
   workflow_dispatch:
+  
+permissions:
+  contents: write
+  pull-requests: write
+  checks: write
 
 jobs:
   qodana:
@@ -19,8 +24,7 @@ jobs:
         with:
           # Apontar para o ficheiro XML que criou
           args: >
-            --profile-path,.qodana/long-method-thresholds.xml,
-            --fail-threshold,0,
-            --apply-fixes=false
+            --profile-path .qodana/long-method-thresholds.xml
+            --fail-threshold 0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
