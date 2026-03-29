@@ -1,27 +1,66 @@
-name: Qodana Detecção de Long Method
+name: Qodana Detecção de Long Method (Lanza & Marinescu)
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
   workflow_dispatch:
-  
-permissions:
-  contents: write
-  pull-requests: write
-  checks: write
 
 jobs:
-  qodana:
+  long-method-detection:
+    name: Detect Long Method
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      # 1. Checkout do código
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-         fetch-depth: 0
-         
-      - name: Qodana Scan
+          fetch-depth: 0
+
+      # 2. Criar qodana.yaml dinamicamente (Sobrescreve o da raiz)
+      # Aqui definimos os limites do livro: LOC > 20 e CYCLO > 10
+      - name: Create Qodana configuration
+        run: |
+          cat > qodana.yaml << 'EOF'
+          version: "1.0"
+          linter: jetbrains/qodana-jvm:latest
+
+          profile:
+            name: empty  # Começa do zero, sem regras padrão
+
+          include:
+            - name: OverlyLongMethod
+              panel:
+                m_limit: 20  # Limite do livro Lanza & Marinescu
+            
+            - name: OverlyComplexMethod
+              panel:
+                m_limit: 10  # Limite de Complexidade Ciclomática (pág. 94)
+
+            - name: MethodWithTooManyParameters
+              panel:
+                m_limit: 7   # Limite de Argumentos
+
+          exclude:
+            - name: All
+              paths:
+                - src/test
+                - target
+          EOF
+
+      # 3. Executar Qodana
+      - name: Run Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
-          args: -p,.qodana/long-method-thresholds.xml,--fail-threshold,0
+          args: --fail-threshold,0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+      # 4. Upload do Relatório
+      - name: Upload Qodana report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-long-method-report
+          path: ${{ runner.temp }}/qodana/results
