@@ -18,48 +18,48 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 2. Criar qodana.yaml dinamicamente com os 4 critérios do livro
-      # Esta etapa limpa os erros padrão e foca na métrica LOC > 20
-      - name: Create Qodana Override Configuration
+      # 2. Criar o Perfil XML e o YAML de override
+      # O XML permite definir os "m_limit" sem dar erro de sintaxe
+      - name: Create Qodana Profile
         run: |
+          mkdir -p .qodana
+          cat > .qodana/custom-profile.xml << 'EOF'
+          <profile version="1.0">
+            <option name="myName" value="LanzaMarinescuProfile" />
+            <all enabled="false" />
+            
+            <inspection_tool class="OverlyLongMethod" enabled="true" level="ERROR" enabled_by_default="true">
+              <option name="m_limit" value="20" />
+            </inspection_tool>
+
+            <inspection_tool class="OverlyComplexMethod" enabled="true" level="ERROR" enabled_by_default="true">
+              <option name="m_limit" value="10" />
+            </inspection_tool>
+
+            <inspection_tool class="MethodWithTooManyParameters" enabled="true" level="ERROR" enabled_by_default="true">
+              <option name="m_limit" value="7" />
+            </inspection_tool>
+
+            <inspection_tool class="LongLine" enabled="true" level="ERROR" enabled_by_default="true">
+              <option name="m_maxLineLength" value="120" />
+            </inspection_tool>
+          </profile>
+          EOF
+
+          # Criar o qodana.yaml que aponta para o XML acima
           cat > qodana.yaml << 'EOF'
           version: "1.0"
           linter: jetbrains/qodana-jvm:latest
-
           profile:
-            name: empty  # Remove os milhares de erros de estilo/ortografia
-
-          include:
-            - name: OverlyLongMethod
-            - name: OverlyComplexMethod
-            - name: MethodWithTooManyParameters
-            - name: LongLine
-
-          # Configuração dos limites (Thresholds) baseados no livro
-          inspections:
-            - inspection: OverlyLongMethod
-              options:
-                m_limit: 20  # Mais de 20 linhas de código
-            - inspection: OverlyComplexMethod
-              options:
-                m_limit: 10  # Complexidade Ciclomática > 10
-            - inspection: MethodWithTooManyParameters
-              options:
-                m_limit: 7   # Mais de 7 argumentos/parâmetros
-            - inspection: LongLine
-              options:
-                m_maxLineLength: 120 # Linhas demasiado compridas
-
+            path: .qodana/custom-profile.xml
           exclude:
             - name: All
               paths:
                 - src/test
                 - target
-                - .qodana
           EOF
 
       # 3. Executar o Qodana Scan
-      # Ele lerá automaticamente o qodana.yaml que criámos no passo anterior
       - name: Run Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
@@ -67,11 +67,10 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
-      # 4. Publicar o relatório (sempre, mesmo que o teste falhe)
+      # 4. Publicar o relatório
       - name: Upload Qodana report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: qodana-long-method-report
           path: ${{ runner.temp }}/qodana/results
-          retention-days: 7
