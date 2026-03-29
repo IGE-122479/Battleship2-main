@@ -18,8 +18,9 @@ jobs:
         uses: JetBrains/qodana-action@v2024.1
         with:
           # Apontar para o ficheiro XML que criou
-          args: "--profile-path,.qodana/long-method-thresholds.xml"
-          # Quality Gate: falha se encontrar qualquer violação (Long Method > 20 LOC)
-          fail-threshold: 0 
+          args: >
+            --profile-path,.qodana/long-method-thresholds.xml,
+            --fail-threshold,0,
+            --apply-fixes=false
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
