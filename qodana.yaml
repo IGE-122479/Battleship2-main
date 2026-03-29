@@ -1,5 +1,4 @@
 version: "1.0"
-disable-sanity: true
 profile:
   path: .qodana/long-method-thresholds.xml
 projectJDK: "25"
