@@ -22,6 +22,6 @@ jobs:
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
-         args: -n,LanzaMarinescuLongMethod,-p,.qodana/long-method-thresholds.xml,--fail-threshold,0
+          args: -p,.qodana/long-method-thresholds.xml,--fail-threshold,0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
