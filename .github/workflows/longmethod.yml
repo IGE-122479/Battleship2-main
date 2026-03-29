@@ -18,13 +18,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
          fetch-depth: 0
-
+         
       - name: Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
-          # Apontar para o ficheiro XML que criou
-          args: >-
-            --profile-path .qodana/long-method-thresholds.xml
-            --fail-threshold 0
+         args: --profile-path,.qodana/long-method-thresholds.xml,--fail-threshold,0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
