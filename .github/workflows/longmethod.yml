@@ -1,4 +1,4 @@
-name: Qodana Detecção de Long Method (Lanza & Marinescu)
+name: Qodana Detecção de Long Method
 
 on:
   push:
@@ -6,22 +6,20 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-  checks: write
-
 jobs:
   long-method-detection:
     name: Detect Long Method
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout do código fonte
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
+      # 2. Criar qodana.yaml dinamicamente com os 4 critérios do livro
+      # Esta etapa limpa os erros padrão e foca na métrica LOC > 20
       - name: Create Qodana Override Configuration
         run: |
           cat > qodana.yaml << 'EOF'
@@ -29,15 +27,39 @@ jobs:
           linter: jetbrains/qodana-jvm:latest
 
           profile:
-            path: .qodana/long-method-thresholds.xml
+            name: empty  # Remove os milhares de erros de estilo/ortografia
+
+          include:
+            - name: OverlyLongMethod
+            - name: OverlyComplexMethod
+            - name: MethodWithTooManyParameters
+            - name: LongLine
+
+          # Configuração dos limites (Thresholds) baseados no livro
+          inspections:
+            - inspection: OverlyLongMethod
+              options:
+                m_limit: 20  # Mais de 20 linhas de código
+            - inspection: OverlyComplexMethod
+              options:
+                m_limit: 10  # Complexidade Ciclomática > 10
+            - inspection: MethodWithTooManyParameters
+              options:
+                m_limit: 7   # Mais de 7 argumentos/parâmetros
+            - inspection: LongLine
+              options:
+                m_maxLineLength: 120 # Linhas demasiado compridas
 
           exclude:
             - name: All
               paths:
                 - src/test
                 - target
+                - .qodana
           EOF
 
+      # 3. Executar o Qodana Scan
+      # Ele lerá automaticamente o qodana.yaml que criámos no passo anterior
       - name: Run Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
@@ -45,6 +67,7 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
+      # 4. Publicar o relatório (sempre, mesmo que o teste falhe)
       - name: Upload Qodana report
         if: always()
         uses: actions/upload-artifact@v4
