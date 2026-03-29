@@ -1,9 +1,9 @@
 version: "1.0"
 
-linter: jetbrains/qodana-jvm:latest
+linter: jetbrains/qodana-jvm:2024.3
 
 profile:
-  name: brain-method-quality-gate
+  path: .qodana/long-method-thresholds.xml
 
 include:
   - name: MethodLength
@@ -17,16 +17,6 @@ exclude:
       - "**/*Test*.java"
       - "**/test/**"
       - "**/tests/**"
-
-inspectionParameters:
-  MethodLength:
-    maxLength: 65
-  CyclomaticComplexity:
-    threshold: 5
-  OverlyNestedMethod:
-    nestingDepth: 3
-  MethodWithTooManyLocals:
-    maxCount: 5
 
 failureConditions:
   severityThresholds:
