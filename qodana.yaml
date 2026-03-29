@@ -4,3 +4,12 @@ linter: jetbrains/qodana-jvm:2024.3
 
 profile:
   path: .qodana/long-method-thresholds.xml
+
+exclude:
+  - name: All
+ 
+include:
+  - name: MethodLength
+  - name: CyclomaticComplexity
+  - name: OverlyNestedMethod
+  - name: MethodWithTooManyLocals
