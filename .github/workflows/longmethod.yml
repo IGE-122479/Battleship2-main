@@ -1,4 +1,4 @@
-name: Qodana Detecção de Long Method
+name: Qodana Long Method Detection
 
 on:
   push:
@@ -7,81 +7,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  long-method-detection:
-    name: Detect Long Method
+  qodana:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout do código fonte
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2. Criar o Perfil XML e o YAML de override dinamicamente
-      # O include no YAML e o all enabled="false" no XML vão limpar os 4220 erros
-      - name: Create Qodana Profile
-        run: |
-          mkdir -p .qodana
-          cat > .qodana/custom-profile.xml << 'EOF'
-          <profile version="1.0">
-            <option name="myName" value="LanzaMarinescuProfile" />
-            <all enabled="false" />
-            
-            <inspection_tool class="OverlyLongMethod" enabled="true" level="ERROR" enabled_by_default="true">
-              <option name="m_limit" value="20" />
-            </inspection_tool>
-
-            <inspection_tool class="OverlyComplexMethod" enabled="true" level="ERROR" enabled_by_default="true">
-              <option name="m_limit" value="10" />
-            </inspection_tool>
-
-            <inspection_tool class="MethodWithTooManyParameters" enabled="true" level="ERROR" enabled_by_default="true">
-              <option name="m_limit" value="7" />
-            </inspection_tool>
-
-            <inspection_tool class="LongLine" enabled="true" level="ERROR" enabled_by_default="true">
-              <option name="m_maxLineLength" value="120" />
-            </inspection_tool>
-          </profile>
-          EOF
-
-          # Criar o qodana.yaml que força apenas estas inspeções
-          cat > qodana.yaml << 'EOF'
-          version: "1.0"
-          linter: jetbrains/qodana-jvm:latest
-          
-          profile:
-            path: .qodana/custom-profile.xml
-          
-          # Esta secção include é fundamental para ignorar os 4220 erros de lixo
-          include:
-            - name: OverlyLongMethod
-            - name: OverlyComplexMethod
-            - name: MethodWithTooManyParameters
-            - name: LongLine
-          
-          exclude:
-            - name: All
-              paths:
-                - src/test
-                - target
-                - .qodana
-          EOF
-
-      # 3. Executar o Qodana Scan
       - name: Run Qodana Scan
         uses: JetBrains/qodana-action@v2024.1
         with:
+          # fail-threshold 0 faz o build falhar se encontrar métodos > 20 linhas
           args: --fail-threshold,0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
-      # 4. Publicar o relatório (sempre disponível nos Artifacts do GitHub)
-      - name: Upload Qodana report
+      - name: Upload Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qodana-long-method-report
+          name: qodana-report
           path: ${{ runner.temp }}/qodana/results
-          retention-days: 7
