@@ -1,57 +1,19 @@
-<!--
-  =============================================================================
-  .qodana/long-method-thresholds.xml
-  =============================================================================
-  Perfil de inspeção Qodana para deteção do cheiro "Long Method" (Fowler, 1999)
-  operacionalizado através da estratégia Brain Method.
- 
-  Limiares derivados do livro:
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │ Critério 1 — LOC/Method excessivo                                       │
-  │   Very High = 20 LOC  (Tabela 2.1, Java)                               │
-  │   Brain Method = 65 LOC  (HIGH(LOC/Class)/2 = 130/2, Tabela 2.2)       │
-  │                                                                         │
-  │ Critério 2 — Complexidade ciclomática (CYCLO)                          │
-  │   High = 10  (Tabela 2.1, Java)                                         │
-  │                                                                         │
-  │ Critério 3 — Aninhamento profundo (MAXNESTING)                         │
-  │   SEVERAL = 3  (Tabela 2.4)                                             │
-  │                                                                         │
-  │ Critério 4 — Variáveis acedidas (NOAV)                                 │
-  │   Short Memory Capacity = 7  (Tabela 2.4)                              │
-  └─────────────────────────────────────────────────────────────────────────┘
-  =============================================================================
--->
-<profile version="1.0" name="Long-Method-Profile">
- 
-  <!-- Critério 1 — Método longo: Very High threshold (Tabela 2.1, Java = 19.5 ≈ 20) -->
-  <inspection_tool class="MethodTooLong" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="maxLength" value="20"/>
+<profile version="1.0">
+  <option name="myName" value="LanzaMarinescuLongMethod" />
+  
+  <inspection_tool class="OverlyLongMethod" enabled="true" level="ERROR" enabled_by_default="true">
+    <option name="m_limit" value="20" />
   </inspection_tool>
- 
-  <!-- Critério 1 — Brain Method threshold (Tabela 2.2: HIGH(LOC/Class)/2 = 130/2 = 65) -->
-  <inspection_tool class="LongMethod" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="65"/>
+
+  <inspection_tool class="OverlyComplexMethod" enabled="true" level="ERROR" enabled_by_default="true">
+    <option name="m_limit" value="10" />
   </inspection_tool>
- 
-  <!-- Critério 2 — Complexidade ciclomática alta (Tabela 2.1, Java High = 10) -->
-  <inspection_tool class="CyclomaticComplexity" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="10"/>
+
+  <inspection_tool class="NestedConditionalDepth" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="m_limit" value="3" />
   </inspection_tool>
- 
-  <!-- Critério 3 — Aninhamento profundo (Tabela 2.4: SEVERAL → limiar = 3) -->
-  <inspection_tool class="OverlyNestedMethod" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="3"/>
+
+  <inspection_tool class="MethodWithTooManyParameters" enabled="true" level="ERROR" enabled_by_default="true">
+    <option name="m_limit" value="7" />
   </inspection_tool>
- 
-  <!-- Critério 4 — Muitas variáveis locais (Tabela 2.4: Short Memory Capacity = 7) -->
-  <inspection_tool class="MethodWithTooManyLocalVariables" enabled="true" level="ERROR" enabled_by_default="true">
-    <option name="m_limit" value="7"/>
-  </inspection_tool>
- 
-  <!-- Critério 4 — Muitos parâmetros (componente de NOAV, Tabela 2.4 = 7) -->
-  <inspection_tool class="MethodWithTooManyParameters" enabled="true" level="WARNING" enabled_by_default="true">
-    <option name="m_limit" value="7"/>
-  </inspection_tool>
- 
 </profile>
