@@ -1,113 +1,25 @@
-# ==============================================================================
-# .github/workflows/qodana-long-method.yml
-# ==============================================================================
-# Qodana Quality Gate — Deteção de Long Method / Brain Method
-#
-# Os limiares são definidos em .qodana/long-method-thresholds.xml e
-# invocados por este workflow via --profile-path.
-# ==============================================================================
- 
-name: "Qodana — Long Method Quality Gate"
- 
+name: Qodana Detecção de Long Method (Lanza/Marinescu)
+
 on:
   push:
-    branches: [main, master, develop]
+    branches: [ main ]
   pull_request:
-    branches: [main, master, develop]
-  workflow_dispatch:
- 
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
-  security-events: write
- 
+
 jobs:
-  qodana-long-method:
-    name: "Long Method Detection"
+  qodana:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
- 
     steps:
-      - name: "Checkout do repositório"
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
- 
-      - name: "Cache Qodana"
-        uses: actions/cache@v4
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@v2023.2
         with:
-          path: ~/.qodana/cache
-          key: ${{ runner.os }}-qodana-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-qodana-
- 
-      # O perfil XML em .qodana/long-method-thresholds.xml define os limiares
-      # derivados de Lanza & Marinescu (2006), Tabelas 2.1, 2.2 e 2.4.
-      - name: "Executar Qodana com perfil Long Method"
-        uses: JetBrains/qodana-action@v2024.3
+          # Apontar para o ficheiro XML que criou
+          args: "--profile-path,long-method-thresholds.xml"
+          # Quality Gate: falha se encontrar qualquer violação (Long Method > 20 LOC)
+          fail-threshold: 0 
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-        with:
-          args: >-
-            --linter,jetbrains/qodana-jvm:2025.3,
-            --profile-path,.qodana/long-method-thresholds.xml,
-            --fail-threshold,0,
-            --save-report,
-            --report-dir,qodana-report
-          results-dir: qodana-report
-          upload-result: true
-          artifact-name: qodana-long-method-report
-          pr-mode: ${{ github.event_name == 'pull_request' }}
- 
-      - name: "Upload SARIF para GitHub Security"
-        if: always()
-        continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: qodana-report/qodana.sarif.json
-          category: "long-method"
- 
-      - name: "Resumo no GitHub Actions"
-        if: always()
-        run: |
-          echo "## 📊 Long Method Quality Gate — Resultado" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Perfil de inspeção: \`.qodana/long-method-thresholds.xml\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Métrica | Limiar | Fonte (Lanza & Marinescu, 2006) |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|--------|---------------------------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| LOC/Method (erro) | > 20 | Tabela 2.1 — Java Very High |" >> $GITHUB_STEP_SUMMARY
-          echo "| LOC/Method (Brain Method) | > 65 | Tabela 2.2 — HIGH(LOC/Class)/2 |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cyclomatic Complexity | ≥ 10 | Tabela 2.1 — Java High |" >> $GITHUB_STEP_SUMMARY
-          echo "| Max Nesting Level | > 3 | Tabela 2.4 — SEVERAL |" >> $GITHUB_STEP_SUMMARY
-          echo "| Variáveis acedidas (NOAV) | > 7 | Tabela 2.4 — Short Memory |" >> $GITHUB_STEP_SUMMARY
- 
-      - name: "Comentar no PR em caso de falha"
-        if: failure() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: [
-                "## ❌ Quality Gate Falhou — Long Method Detetado",
-                "",
-                "O Qodana detetou métodos que excedem os limiares definidos em",
-                "`.qodana/long-method-thresholds.xml`, baseados em:",
-                "> Lanza & Marinescu (2006), *Object-Oriented Metrics in Practice*",
-                "",
-                "| Métrica | Limiar | Fonte |",
-                "|---------|--------|-------|",
-                "| LOC/Method | > 20 (erro) / > 65 (Brain Method) |",
-                "| Cyclomatic Complexity | ≥ 10 |",
-                "| Max Nesting Level | > 3 (SEVERAL) |",
-                "| Variáveis acedidas | > 7 (MANY) |",
-                "",
-                "**Refactoring recomendado:** *Extract Method* (Fowler, 1999, p. 110)",
-                "",
-                "Consulte o relatório completo no separador **Artifacts** deste workflow."
-              ].join("\n")
-            })
