@@ -31,17 +31,17 @@ jobs:
 
           include:
             - name: OverlyLongMethod
-              panel:
-                m_limit: 20  # Limite do livro Lanza & Marinescu
-            
             - name: OverlyComplexMethod
-              panel:
-                m_limit: 10  # Limite de Complexidade Ciclomática (pág. 94)
-
             - name: MethodWithTooManyParameters
-              panel:
-                m_limit: 7   # Limite de Argumentos
-
+            
+          options:
+            OverlyLongMethod:
+              m_limit: 20
+            OverlyComplexMethod:
+              m_limit: 10
+            MethodWithTooManyParameters:
+              m_limit: 7       
+              
           exclude:
             - name: All
               paths:
