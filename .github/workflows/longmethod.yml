@@ -3,9 +3,6 @@
 # ==============================================================================
 # Qodana Quality Gate — Deteção de Long Method / Brain Method
 #
-# Fundamentação teórica: Lanza & Marinescu, "Object-Oriented Metrics in
-# Practice" (Springer, 2006), Cap. 5.6 — Brain Method.
-#
 # Os limiares são definidos em .qodana/long-method-thresholds.xml e
 # invocados por este workflow via --profile-path.
 # ==============================================================================
@@ -27,7 +24,7 @@ permissions:
  
 jobs:
   qodana-long-method:
-    name: "Long Method Detection (Lanza & Marinescu, 2006)"
+    name: "Long Method Detection"
     runs-on: ubuntu-latest
     timeout-minutes: 30
  
@@ -35,7 +32,7 @@ jobs:
       - name: "Checkout do repositório"
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # necessário para análise incremental em PRs
+          fetch-depth: 0
  
       - name: "Cache Qodana"
         uses: actions/cache@v4
@@ -69,7 +66,7 @@ jobs:
  
       - name: "Upload SARIF para GitHub Security"
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: qodana-report/qodana.sarif.json
           category: "long-method"
@@ -83,7 +80,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Métrica | Limiar | Fonte (Lanza & Marinescu, 2006) |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|--------|---------------------------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| LOC/Method (aviso) | > 13 | Tabela 2.1 — Java High |" >> $GITHUB_STEP_SUMMARY
           echo "| LOC/Method (erro) | > 20 | Tabela 2.1 — Java Very High |" >> $GITHUB_STEP_SUMMARY
           echo "| LOC/Method (Brain Method) | > 65 | Tabela 2.2 — HIGH(LOC/Class)/2 |" >> $GITHUB_STEP_SUMMARY
           echo "| Cyclomatic Complexity | ≥ 10 | Tabela 2.1 — Java High |" >> $GITHUB_STEP_SUMMARY
@@ -104,14 +100,14 @@ jobs:
                 "",
                 "O Qodana detetou métodos que excedem os limiares definidos em",
                 "`.qodana/long-method-thresholds.xml`, baseados em:",
-                "> Lanza & Marinescu (2006), *Object-Oriented Metrics in Practice*, Cap. 5.6 — Brain Method",
+                "> Lanza & Marinescu (2006), *Object-Oriented Metrics in Practice*",
                 "",
                 "| Métrica | Limiar | Fonte |",
                 "|---------|--------|-------|",
-                "| LOC/Method | > 20 (erro) / > 65 (Brain Method) | Tabelas 2.1 e 2.2 |",
-                "| Cyclomatic Complexity | ≥ 10 | Tabela 2.1 |",
-                "| Max Nesting Level | > 3 (SEVERAL) | Tabela 2.4 |",
-                "| Variáveis acedidas | > 7 (MANY) | Tabela 2.4 |",
+                "| LOC/Method | > 20 (erro) / > 65 (Brain Method) |",
+                "| Cyclomatic Complexity | ≥ 10 |",
+                "| Max Nesting Level | > 3 (SEVERAL) |",
+                "| Variáveis acedidas | > 7 (MANY) |",
                 "",
                 "**Refactoring recomendado:** *Extract Method* (Fowler, 1999, p. 110)",
                 "",
