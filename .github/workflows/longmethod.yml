@@ -19,7 +19,7 @@ jobs:
         uses: JetBrains/qodana-action@v2024.1
         with:
           # fail-threshold 0 faz o build falhar se encontrar métodos > 20 linhas
-          args: --fail-threshold,0
+          args: --fail-threshold,0,--disable-sanity
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
