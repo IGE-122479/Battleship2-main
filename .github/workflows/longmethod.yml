@@ -49,12 +49,11 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          linter: jetbrains/qodana-jvm:2025.3
           args: >-
-            --no-qodana-yaml
-            --profile-path,.qodana/long-method-thresholds.xml
-            --fail-threshold,0
-            --save-report
+            --linter,jetbrains/qodana-jvm:2025.3,
+            --profile-path,.qodana/long-method-thresholds.xml,
+            --fail-threshold,0,
+            --save-report,
             --report-dir,qodana-report
           results-dir: qodana-report
           upload-result: true
