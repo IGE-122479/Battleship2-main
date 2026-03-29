@@ -1,19 +1,33 @@
 version: "1.0"
+
+linter: jetbrains/qodana-jvm:latest
+
 profile:
-  path: .qodana/long-method-thresholds.xml
-projectJDK: "25"
-linter: jetbrains/qodana-jvm:2025.3
+  name: brain-method-quality-gate
+
 include:
-  - name: CheckDependencyLicenses
-  - name: DuplicateBranchesInSwitch
-  - name: JavadocDeclaration
-  - name: OverlyLongMethod
-  - name: OverlyComplexMethod
-  - name: MethodWithTooManyParameters
-  - name: LongLine
+  - name: MethodLength
+  - name: CyclomaticComplexity
+  - name: OverlyNestedMethod
+  - name: MethodWithTooManyLocals
 
 exclude:
   - name: All
     paths:
-      - src/test
-      - target
+      - "**/*Test*.java"
+      - "**/test/**"
+      - "**/tests/**"
+
+inspectionParameters:
+  MethodLength:
+    maxLength: 65
+  CyclomaticComplexity:
+    threshold: 5
+  OverlyNestedMethod:
+    nestingDepth: 3
+  MethodWithTooManyLocals:
+    maxCount: 5
+
+failureConditions:
+  severityThresholds:
+    any: 1
