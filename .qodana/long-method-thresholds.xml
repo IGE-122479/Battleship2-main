@@ -1,6 +1,5 @@
 <profile version="1.0">
   <option name="myName" value="LanzaMarinescuLongMethod" />
-
   <all enabled="false" />
   
   <inspection_tool class="OverlyLongMethod" enabled="true" level="ERROR" enabled_by_default="true">
