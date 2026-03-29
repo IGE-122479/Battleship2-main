@@ -1,9 +1,19 @@
 version: "1.0"
 profile:
-  name: qodana.recommended
+  path: .qodana/long-method-thresholds.xml
 projectJDK: "25"
 linter: jetbrains/qodana-jvm:2025.3
 include:
   - name: CheckDependencyLicenses
   - name: DuplicateBranchesInSwitch
   - name: JavadocDeclaration
+  - name: OverlyLongMethod
+  - name: OverlyComplexMethod
+  - name: MethodWithTooManyParameters
+  - name: LongLine
+
+exclude:
+  - name: All
+    paths:
+      - src/test
+      - target
