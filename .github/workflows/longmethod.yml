@@ -23,7 +23,7 @@ jobs:
         uses: JetBrains/qodana-action@v2024.1
         with:
           # Apontar para o ficheiro XML que criou
-          args: >
+          args: >-
             --profile-path .qodana/long-method-thresholds.xml
             --fail-threshold 0
         env:
