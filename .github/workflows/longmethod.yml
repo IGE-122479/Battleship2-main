@@ -1,6 +1,7 @@
-name: Qodana Detecção de Long Method (Lanza/Marinescu)
+name: Qodana Detecção de Long Method
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
