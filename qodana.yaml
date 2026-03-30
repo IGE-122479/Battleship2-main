@@ -2,8 +2,8 @@ version: "1.0"
 
 linter: jetbrains/qodana-jvm:2024.3
 
-profile:
-  path: .qodana/long-method-thresholds.xml
+#profile:
+#  path: .qodana/long-method-thresholds.xml
 
 exclude:
   - name: All
