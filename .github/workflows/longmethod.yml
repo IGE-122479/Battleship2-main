@@ -53,6 +53,7 @@ jobs:
       - name: Run Qodana for JVM
         uses: JetBrains/qodana-action@v2024.3
         with:
+          args: --profile-path,.qodana/long-method-thresholds.xml,--fail-threshold,0,--disable-sanity
           pr-mode: false
           use-caches: false
         env:
