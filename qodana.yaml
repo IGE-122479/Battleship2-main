@@ -9,7 +9,7 @@ exclude:
   - name: All
  
 include:
-  - name: MethodLength
+  - name: OverlyLongMethod
   - name: CyclomaticComplexity
   - name: OverlyNestedMethod
   - name: MethodWithTooManyLocals
