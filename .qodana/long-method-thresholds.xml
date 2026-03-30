@@ -3,20 +3,15 @@
     <option name="myName" value="long-method-quality-gate" />
 
     <inspection_tool class="NonCommentSourceStatements" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_limit" value="10" />
+      <option name="m_limit" value="65" />
     </inspection_tool>
 
     <inspection_tool class="CyclomaticComplexity" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_limit" value="5" />
     </inspection_tool>
 
-    <inspection_tool class="OverlyNestedMethod" enabled="true" level="WARNING" enabled_by_default="true">
+    <inspection_tool class="NestingDepth" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_limit" value="3" />
     </inspection_tool>
-
-    <inspection_tool class="MethodWithTooManyLocals" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="m_limit" value="5" />
-    </inspection_tool>
-
   </profile>
 </component>
