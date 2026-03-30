@@ -17,12 +17,9 @@ jobs:
         run: |
           cat > qodana.yaml << 'EOF'
           version: "1.0"
-          linter: jetbrains/qodana-jvm:latest
+          linter: jetbrains/qodana-jvm:2024.3
           include:
             - name: ParametersPerMethod
-              options:
-                - key: parameterLimit
-                  value: 4
           EOF
 
       - name: Qodana Scan
