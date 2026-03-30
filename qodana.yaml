@@ -11,5 +11,4 @@ exclude:
 include:
   - name: NonCommentSourceStatements
   - name: CyclomaticComplexity
-  - name: OverlyNestedMethod
-  - name: MethodWithTooManyLocals
+  - name: NestingDepth
