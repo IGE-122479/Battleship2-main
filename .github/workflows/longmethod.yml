@@ -1,4 +1,22 @@
-# <numero-de-aluno> <nome>
+# Numero: 99845 Nome: Marin Mindru
+# Smell Code: Long Method(Brain Method pelo livro)
+# O Long Method do Fowler é referido no livro como Brain Method, definido pela
+# conjunção das seguintes 4 métricas (todas têm de se verificar simultaneamente):
+#
+# 1. LOC: Lines of Code
+#    Limiar: > 65, pois é metade do valor que esta na tabela 2.2(pg.12) do livro de Lanza e Marinescu
+#
+# 2. CYCLO: Indica a complexidade do metodo
+#    Limiar: >= 5
+# 
+# 3. MAXNESTING: Profundidade máxima de aninhamento de estruturas de controlo dentro de um método
+#    Limiar: >= 3
+#
+# 4. NOAV: Numero de variaveis acedidas
+#    Limiar: > 5
+#    Nota: esta métrica não tem inspeção equivalente no motor do Qodana/IntelliJ,
+#          pelo que a deteção é feita com base nas 3 métricas disponíveis acima.
+#
 
 name: Long Method Detection
 
