@@ -50,6 +50,30 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Create Qodana configuration
+        run: |
+          cat > qodana.yaml << 'EOF'
+          version: "1.0"
+          linter: jetbrains/qodana-jvm:latest
+
+          profile:
+            name: empty
+
+          include:
+            - name: NonCommentSourceStatements
+            - name: CyclomaticComplexity
+            - name: NestingDepth
+
+          exclude:
+            - name: ALL
+              paths:
+                - src/test
+                - test
+                - target
+                - build
+                
+          EOF
+          
       - name: Run Qodana for JVM
         uses: JetBrains/qodana-action@v2024.3
         with:
