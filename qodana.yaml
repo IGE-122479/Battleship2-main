@@ -12,3 +12,4 @@ include:
   - name: NonCommentSourceStatements
   - name: CyclomaticComplexity
   - name: NestingDepth
+  - name: FeatureEnvy
