@@ -9,7 +9,7 @@ jobs:
   qodana:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -26,7 +26,7 @@ jobs:
           EOF
 
       - name: Qodana Scan
-        uses: JetBrains/qodana-action@v2024.1
+        uses: JetBrains/qodana-action@v2024.3
         with:
           args: --fail-threshold,0
         env:
