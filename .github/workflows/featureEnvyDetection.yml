@@ -84,7 +84,9 @@ jobs:
       - name: Run Qodana for JVM - Feature Envy Only
         uses: JetBrains/qodana-action@v2024.1
         with:
-          args: --profile-path,.qodana/feature-envy.xml,--fail-threshold 0
+          args: |
+            -p .qodana/feature-envy.xml
+            --fail-threshold 0
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
