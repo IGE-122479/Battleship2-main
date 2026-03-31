@@ -25,6 +25,7 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mvn clean verify sonar:sonar \
             -Dsonar.projectKey=IGE-122479_Battleship2-main \
