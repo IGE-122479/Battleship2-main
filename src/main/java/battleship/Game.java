@@ -706,6 +706,7 @@ public class Game implements IGame
 	{
 		System.out.println("=== TABULEIRO DO ADVERSÁRIO ===");
 		printAlienBoardHidden(show_legend);
+		int teste = 10;
 	}
 
 	/**
