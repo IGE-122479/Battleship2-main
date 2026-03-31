@@ -18,15 +18,15 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: '25-ea'
+          distribution: 'oracle'
           cache: maven
 
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn verify sonar:sonar \
+          mvn clean verify sonar:sonar \
             -Dsonar.projectKey=IGE-122479_Battleship2-main \
             -Dsonar.organization=ige-122479 \
             -Dsonar.host.url=https://sonarcloud.io
