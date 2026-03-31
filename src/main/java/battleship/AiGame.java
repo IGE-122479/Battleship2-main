@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//useocl
+
 /**
  * Classe que gerencia o jogo de Batalha Naval contra uma IA baseada em LLM (Large Language Model).
  * A IA comunica com a API Hugging Face para decidir onde disparar os tiros.
@@ -42,7 +44,7 @@ public class AiGame {
     public AiGame(){
         this.apiKey = System.getenv("API_TOKEN");
         if (this.apiKey == null || this.apiKey.isEmpty()) {
-            throw new IllegalStateException("API_KEY environment variable is not set.");
+           throw new IllegalStateException("API_KEY environment variable is not set.");
         }
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))
@@ -58,6 +60,7 @@ public class AiGame {
      */
     public String generateShots(IGame game){
         assert game != null;
+        int teste = 2;
 
         String userMessage = buildUserMessage(game);
         String shotsJson = askLlmForShots(userMessage);
