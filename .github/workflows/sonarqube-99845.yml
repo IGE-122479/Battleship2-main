@@ -2,24 +2,31 @@ name: SonarQube Analysis
 
 on:
   push:
-    branches:
-      - main
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
+          cache: maven
 
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
+      - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn verify sonar:sonar \
+            -Dsonar.projectKey=IGE-122479_Battleship2-main \
+            -Dsonar.organization=ige-122479 \
+            -Dsonar.host.url=https://sonarcloud.io
