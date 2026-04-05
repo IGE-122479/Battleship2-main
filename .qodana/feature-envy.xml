@@ -1,0 +1,8 @@
+<profile version="1.0">
+  <option name="myName" value="FeatureEnvyProfile" />
+  <inspection_tool class="FeatureEnvy" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="atfdThreshold" value="4" />
+    <option name="laaThreshold" value="0.33" />
+    <option name="fdpThreshold" value="4" />
+  </inspection_tool>
+</profile>

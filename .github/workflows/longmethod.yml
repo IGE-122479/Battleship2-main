@@ -1,0 +1,74 @@
+# Numero: 99845 Nome: Marin Mindru
+# Smell Code: Long Method(Brain Method pelo livro)
+# O Long Method do Fowler é referido no livro como Brain Method, definido pela
+# conjunção das seguintes 4 métricas (todas têm de se verificar simultaneamente):
+#
+# 1. LOC: Lines of Code
+#    Limiar: > 65, pois é metade do valor que esta na tabela 2.2(pg.12) do livro de Lanza e Marinescu
+#
+# 2. CYCLO: Indica a complexidade do metodo
+#    Limiar: >= 5
+# 
+# 3. MAXNESTING: Profundidade máxima de aninhamento de estruturas de controlo dentro de um método
+#    Limiar: >= 3
+#
+# 4. NOAV: Numero de variaveis acedidas
+#    Limiar: > 5
+#    Nota: esta métrica não tem inspeção equivalente no motor do Qodana/IntelliJ,
+#          pelo que a deteção é feita com base nas 3 métricas disponíveis acima.
+#
+
+name: Long Method Detection
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  qodana-long-method:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          
+      - name: Run Qodana for JVM
+        uses: JetBrains/qodana-action@v2024.3
+        with:
+          args: --profile-path,.qodana/long-method-thresholds.xml,--fail-threshold,0,--disable-sanity
+          pr-mode: false
+          use-caches: false
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+      - name: Upload Qodana report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-long-method-report
+          path: ${{ runner.temp }}/qodana/results/
+          retention-days: 14
+
+      - name: Upload SARIF to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json

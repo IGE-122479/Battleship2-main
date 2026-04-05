@@ -1,0 +1,30 @@
+# 113190 Pedro Leite
+name: Qodana - Long Parameter List Detection
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create Qodana configuration
+        run: |
+          cat > qodana.yaml << 'EOF'
+          version: "1.0"
+          linter: jetbrains/qodana-jvm:2024.3
+          include:
+            - name: ParametersPerMethod
+          EOF
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@v2024.3
+        with:
+          args: --fail-threshold,0
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}

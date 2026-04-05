@@ -1,0 +1,30 @@
+# 113190 Pedro Leite
+name: SonarQube Cloud Analysis
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_113190 }}
+        run: mvn verify sonar:sonar
+          -Dsonar.projectKey=IGE-122479_Battleship2-main
+          -Dsonar.organization=ige-122479
+          -Dsonar.host.url=https://sonarcloud.io
