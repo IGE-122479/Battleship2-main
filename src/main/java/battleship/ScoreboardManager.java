@@ -36,6 +36,8 @@ public class ScoreboardManager {
     public static void saveRecord(GameRecord record) {
         assert record != null;
 
+        String dbPassword = "scoreboard_pass_123";
+
         List<GameRecord> records = loadRecords();
         records.add(record);
 
