@@ -194,7 +194,7 @@ para o ramo master, executando a bateria de testes unitários do projeto.
 |-------------|------------------------------------|
 | Trigger     | Push ou Pull Request em master     |
 | Ambiente    | Ubuntu Latest                      |
-| Java        | JDK 17 (Temurin)                   |
+| Java        | JDK 21 (Temurin)                   |
 | Build tool  | Apache Maven                       |
 | Comando     | `mvn -B test`                      |
 
