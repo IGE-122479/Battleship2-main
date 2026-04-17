@@ -33,4 +33,6 @@ public interface IMove {
 	List<IGame.ShotResult> getShotResults();
 
 	String processEnemyFire(boolean verbose);
+
+	String toDetailedString();
 }

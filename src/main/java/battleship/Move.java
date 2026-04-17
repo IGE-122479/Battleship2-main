@@ -220,10 +220,52 @@ public class Move implements IMove {
 			throw new RuntimeException("Erro ao serializar o JSON dos resultados da jogada", e);
 		}
 
-//		System.out.println(jsonString);
-//		System.out.println();
+        System.out.println(jsonString);
+        System.out.println();
 
 		// Retornar o JSON
 		return jsonString;
+	}
+
+	@Override
+	public String toDetailedString() {
+		StringBuilder sb = new StringBuilder();
+		int validCount = 0, hitCount = 0, missCount = 0, sunkCount = 0;
+
+		for (int i = 0; i < shots.size() && i < shotResults.size(); i++) {
+			IPosition pos = shots.get(i);
+			IGame.ShotResult result = shotResults.get(i);
+
+			String coord = "" + pos.getClassicRow() + pos.getClassicColumn();
+
+			sb.append("- ").append(coord).append(" → ");
+
+			if (!result.valid()) {
+				sb.append("Tiro Inválido(fora do tabuleiro)\n");
+			} else if (result.repeated()) {
+				sb.append("Tiro Repetido\n");
+			} else if (result.ship() == null) {
+				sb.append("Água\n");
+				validCount++;
+				missCount++;
+			} else if (result.sunk()) {
+				sb.append("Acertou numa ").append(result.ship().getCategory()).append(" (AFUNDADA!)\n");
+				validCount++;
+				hitCount++;
+				sunkCount++;
+			} else {
+				sb.append("Acertou numa ").append(result.ship().getCategory()).append("(ainda a flutuar)\n");
+				validCount++;
+				hitCount++;
+			}
+		}
+
+		sb.append("Resumo: ").append(validCount).append(" tiros válidos");
+		if (hitCount > 0) sb.append(", ").append(hitCount).append(" acerto(s)");
+		if (sunkCount > 0) sb.append(" (").append(sunkCount).append(" afundado(s))");
+		if (missCount > 0) sb.append(", ").append(missCount).append(" na água");
+		sb.append(".");
+
+		return sb.toString();
 	}
 }
