@@ -181,6 +181,29 @@ Controlo de fim de jogo:
 
 ---
 
+## CI/CD — GitHub Actions
+
+Este repositório utiliza integração contínua com **GitHub Actions**.
+
+### Workflow: Java CI with Maven
+
+O workflow é ativado automaticamente em cada **Push** ou **Pull Request** 
+para o ramo master, executando a bateria de testes unitários do projeto.
+
+| Campo       | Valor                              |
+|-------------|------------------------------------|
+| Trigger     | Push ou Pull Request em master     |
+| Ambiente    | Ubuntu Latest                      |
+| Java        | JDK 17 (Temurin)                   |
+| Build tool  | Apache Maven                       |
+| Comando     | `mvn -B test`                      |
+
+### O que é verificado
+
+Em cada execução, o workflow garante que:
+- o projeto compila sem erros;
+- todos os testes unitários passam com sucesso.
+
 ## 📄 License
 Distributed under the MIT License. See `LICENSE` for more information.
 
