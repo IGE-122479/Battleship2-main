@@ -19,6 +19,7 @@ public class Caravel extends Ship {
 	public Caravel(Compass bearing, IPosition pos) {
 		super("Caravela", bearing, pos, 2);
 
+
 		switch (bearing) {
 			case NORTH:
 				for (int r = 0; r < this.getSize(); r++)
