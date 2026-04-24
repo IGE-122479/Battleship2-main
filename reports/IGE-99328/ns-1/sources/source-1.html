@@ -1,0 +1,586 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiGame</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: AiGame (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiGame</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86,7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67,1%
+  </span>
+  <span class="absValue">
+    (47/70)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89,3%
+  </span>
+  <span class="absValue">
+    (109/122)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.http.HttpClient;
+&nbsp;import java.net.http.HttpRequest;
+&nbsp;import java.net.http.HttpResponse;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.*;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;//useocl
+&nbsp;
+&nbsp;/**
+&nbsp; * Classe que gerencia o jogo de Batalha Naval contra uma IA baseada em LLM (Large Language Model).
+&nbsp; * A IA comunica com a API Hugging Face para decidir onde disparar os tiros.
+&nbsp; */
+<b class="fc">&nbsp;public class AiGame {</b>
+&nbsp;
+&nbsp;    // Configurações da API e modelo LLM
+&nbsp;    private static final String MODEL_ID = &quot;meta-llama/Llama-3.3-70B-Instruct&quot;;
+&nbsp;    private static final String API_URL = &quot;https://router.huggingface.co/v1/chat/completions&quot;;
+&nbsp;    private static final int MAX_OUTPUT_TOKENS    = 256;      // Máximo de tokens na resposta da IA
+&nbsp;    private static final int HTTP_TIMEOUT_SECONDS = 45;       // Tempo máximo para resposta da API
+&nbsp;    private static final int MAX_RETRIES          = 3;        // Tentativas máximas se a IA responder mal
+&nbsp;
+&nbsp;    // Cliente HTTP e ferramentas de manipulação JSON
+&nbsp;    private final HttpClient   httpClient;
+&nbsp;    private final ObjectMapper objectMapper;
+&nbsp;    private final String apiKey;
+&nbsp;
+&nbsp;    // Histórico de mensagens para manter contexto na conversa com a IA
+<b class="fc">&nbsp;    private final List&lt;Map&lt;String, Object&gt;&gt; conversationHistory = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;    private boolean firstMove = true;  // Flag para saber se é o primeiro tiro</b>
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construtor: inicializa o cliente HTTP e carrega a chave de API das variáveis de ambiente.
+&nbsp;     * Se a chave não estiver definida, lança uma exceção.
+&nbsp;     */
+<b class="fc">&nbsp;    public AiGame(){</b>
+<b class="fc">&nbsp;        this.apiKey = System.getenv(&quot;API_TOKEN&quot;);</b>
+<b class="pc">&nbsp;        if (this.apiKey == null || this.apiKey.isEmpty()) {</b>
+<b class="nc">&nbsp;           throw new IllegalStateException(&quot;API_KEY environment variable is not set.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.httpClient = HttpClient.newBuilder()</b>
+<b class="fc">&nbsp;                .connectTimeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))</b>
+<b class="fc">&nbsp;                .build();</b>
+<b class="fc">&nbsp;        this.objectMapper = new ObjectMapper();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Método principal: gera os tiros da IA consultando o LLM.
+&nbsp;     * @param game Estado atual do jogo
+&nbsp;     * @return Resposta processada do jogo com os resultados dos tiros
+&nbsp;     */
+&nbsp;    public String generateShots(IGame game){
+<b class="pc">&nbsp;        assert game != null;</b>
+<b class="fc">&nbsp;        int teste = 2;</b>
+&nbsp;
+<b class="fc">&nbsp;        String userMessage = buildUserMessage(game);</b>
+<b class="fc">&nbsp;        String shotsJson = askLlmForShots(userMessage);</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Tiros decididos pelo LLM: &quot; + shotsJson);</b>
+&nbsp;
+<b class="fc">&nbsp;        return game.readEnemyFire(shotsJson);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constrói o prompt do sistema que instruir a IA sobre as regras do jogo e estratégias.
+&nbsp;     * Este é um prompt detalhado que explica à IA como jogar Batalha Naval.
+&nbsp;     * @return String contendo o prompt completo do sistema
+&nbsp;     */
+&nbsp;    private String buildSystemPrompt() {
+<b class="fc">&nbsp;        return &quot;&quot;&quot;</b>
+&nbsp;            És um perito na Batalha Naval, versão dos Descobrimentos Portugueses.
+&nbsp;            O teu objetivo é afundar toda a frota inimiga da forma mais eficiente possível.
+&nbsp; 
+&nbsp;            === TABULEIRO ===
+&nbsp;            Grelha 10x10. Linhas: A a J. Colunas: 1 a 10.
+&nbsp; 
+&nbsp;            === FROTA INIMIGA (que tens de afundar) ===
+&nbsp;            - 4 Barcas      (1 posição)
+&nbsp;            - 3 Caravelas   (2 posições, orientação N-S ou E-W)
+&nbsp;            - 2 Naus        (3 posições, orientação N-S ou E-W)
+&nbsp;            - 1 Fragata     (4 posições, orientação N-S ou E-W)
+&nbsp;            - 1 Galeão      (5 posições, forma de T: corpo de 3 + 1 asa em cada extremidade)
+&nbsp;            Os navios NUNCA se tocam, nem nas diagonais.
+&nbsp; 
+&nbsp;            === PROTOCOLO DE COMUNICAÇÃO (JSON) ===
+&nbsp;            Cada rajada tua tem EXATAMENTE 3 tiros neste formato:
+&nbsp;            [{&quot;row&quot;:&quot;A&quot;,&quot;column&quot;:5},{&quot;row&quot;:&quot;C&quot;,&quot;column&quot;:10},{&quot;row&quot;:&quot;F&quot;,&quot;column&quot;:5}]
+&nbsp; 
+&nbsp;            Após cada rajada, receberás o resultado com CADA COORDENADA associada
+&nbsp;            ao seu resultado específico, por exemplo:
+&nbsp; 
+&nbsp;            EXEMPLO 1:
+&nbsp;            Resultado da tua rajada:
+&nbsp;            - A5 → Água
+&nbsp;            - C10 → Acerto numa Barca (AFUNDADA!)
+&nbsp;            - F5 → Água
+&nbsp;            Resumo: 3 tiros válidos, 1 navio afundado (Barca), 2 na água.
+&nbsp; 
+&nbsp;            EXEMPLO 2:
+&nbsp;            Resultado da tua rajada:
+&nbsp;            - B3 → Água
+&nbsp;            - E7 → Acerto numa Nau (ainda a flutuar)
+&nbsp;            - H2 → Água
+&nbsp;            Resumo: 3 tiros válidos, 1 acerto (Nau), 2 na água.
+&nbsp; 
+&nbsp;            EXEMPLO 3:
+&nbsp;            Resultado da tua rajada:
+&nbsp;            - D4 → Acerto numa Fragata (ainda a flutuar)
+&nbsp;            - D5 → Acerto numa Fragata (ainda a flutuar)
+&nbsp;            - D6 → Acerto numa Fragata (ainda a flutuar)
+&nbsp;            Resumo: 3 tiros válidos, 3 acertos (Fragata), 0 na água.
+&nbsp; 
+&nbsp;            === ESTRATÉGIA OBRIGATÓRIA ===
+&nbsp;            1. DIÁRIO DE BORDO: Mantém internamente o registo de TODOS os tiros já
+&nbsp;               disparados e os seus resultados exatos (coordenada + resultado).
+&nbsp;               Nunca dispares para uma coordenada já utilizada.
+&nbsp; 
+&nbsp;            2. SEM REPETIÇÕES: Verifica SEMPRE o teu Diário antes de escolher tiros.
+&nbsp;               Tiros repetidos são um desperdício absoluto.
+&nbsp; 
+&nbsp;            3. PERSEGUIÇÃO (Hunt &amp; Target):
+&nbsp;               - Se acertares numa coordenada (ex: E7 → Nau), na próxima rajada
+&nbsp;                 dispara nas posições adjacentes cardinais: E6, E8, D7, F7.
+&nbsp;               - Se acertares em E7 e E8, o navio é horizontal — continua em E6 e E9.
+&nbsp;               - Se acertares em E7 e F7, o navio é vertical — continua em D7 e G7.
+&nbsp;               - Quando o navio for afundado, para de disparar nessa zona, pois os navios nao podem estar colados.
+&nbsp; 
+&nbsp;            4. HALO DE SEGURANÇA: Quando um navio for afundado, todas as posições
+&nbsp;               adjacentes a ele são garantidamente água — nunca dispares lá.
+&nbsp; 
+&nbsp;            5. VARRIMENTO EFICIENTE: Quando não há navios em perseguição, usa um
+&nbsp;               padrão de quadrícula — dispara em casas onde (número_linha + coluna)
+&nbsp;               é par (ex: A1, A3, B2, B4...). Isso encontra qualquer navio com
+&nbsp;               metade dos tiros.
+&nbsp;            6. ADAPTAÇÃO CONTÍNUA: Ajusta a tua estratégia com base nos resultados anteriores.
+&nbsp;               Se um navio grande for afundado, o padrão de varrimento pode ser
+&nbsp;               temporariamente alterado para focar nas áreas restantes.
+&nbsp;            7. PRIORIDADE: Perseguição &gt; Varrimento sempre.
+&nbsp; 
+&nbsp;            === FORMATO DA TUA RESPOSTA ===
+&nbsp;            Responde SEMPRE com JSON PURO de exactamente 3 tiros, SEM texto adicional,
+&nbsp;            SEM markdown, SEM explicações. Apenas:
+&nbsp;            [{&quot;row&quot;:&quot;X&quot;,&quot;column&quot;:N},{&quot;row&quot;:&quot;X&quot;,&quot;column&quot;:N},{&quot;row&quot;:&quot;X&quot;,&quot;column&quot;:N}]
+&nbsp; 
+&nbsp;            Confirma que entendeste respondendo apenas com: &quot;Pronto para combate!&quot;
+&nbsp;            &quot;&quot;&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constrói a mensagem do utilizador para enviar à IA.
+&nbsp;     * Na primeira jogada, envia o prompt do sistema e instruções iniciais.
+&nbsp;     * Nas jogadas seguintes, envia o resultado da última rajada e pede novos tiros.
+&nbsp;     * @param game Estado atual do jogo
+&nbsp;     * @return String contendo a mensagem para enviar à IA
+&nbsp;     */
+&nbsp;    private String buildUserMessage(IGame game) {
+&nbsp;        // Obtém o histórico de movimentos feitos pela IA
+<b class="fc">&nbsp;        List&lt;IMove&gt; alienMoves = game.getAlienMoves();</b>
+&nbsp;
+&nbsp;        // Se for o primeiro tiro, envia instruções iniciais
+<b class="fc">&nbsp;        if (firstMove) {</b>
+<b class="fc">&nbsp;            firstMove = false;</b>
+<b class="fc">&nbsp;            return buildSystemPrompt() + &quot;O jogo começa agora. &quot; +</b>
+&nbsp;                    &quot;Raciocinio antes de escolher os tiros:\n&quot; +
+&nbsp;                    &quot;1. Modo: VARRIMENTO checkerboard\n&quot; +
+&nbsp;                    &quot;2. Escolhe 3 casas onde (linha + coluna) é par\n\n&quot; +
+&nbsp;                    &quot;Envia a tua primeira rajada de exactamente 3 tiros. &quot; +
+&nbsp;                    &quot;Responde APENAS com o JSON puro, sem texto adicional.&quot;;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Para jogadas seguintes, constrói mensagem com resultado anterior
+<b class="fc">&nbsp;        IMove lastMove = alienMoves.get(alienMoves.size() - 1);</b>
+<b class="fc">&nbsp;        int remaining = game.getRemainingShips();</b>
+<b class="fc">&nbsp;        String detailedResult = lastMove.toDetailedString();</b>
+<b class="fc">&nbsp;        String alreadyShotList = buildAlreadyShotList(alienMoves);</b>
+&nbsp;
+<b class="fc">&nbsp;        return &quot;Resultado da tua última rajada (nº&quot; + lastMove.getNumber() + &quot;):\n&quot;</b>
+&nbsp;                + detailedResult
+&nbsp;                +&quot;\n&quot;
+&nbsp;                + alreadyShotList
+&nbsp;                + &quot;\nNavios inimigos ainda a flutuar: &quot; + remaining + &quot;.\n\n&quot;
+&nbsp;                + &quot;Atualiza o teu Diário de Bordo\n\n&quot;
+&nbsp;                + &quot;RACIOCÍNIO obrigatório antes de responder:\n&quot;
+&nbsp;                + &quot;1. Quais coordenadas acertei em navios ainda não afundados?\n&quot;
+&nbsp;                + &quot;2. Modo atual: PERSEGUIÇÃO ou VARRIMENTO?\n&quot;
+&nbsp;                + &quot;3. Se PERSEGUIÇÃO: orientação do navio? Próximos alvos?\n&quot;
+&nbsp;                + &quot;4. Se VARRIMENTO: 3 casas do checkerboard ainda não disparadas?\n&quot;
+&nbsp;                + &quot;5. Confirmar que nenhum tiro foi já disparado.\n\n&quot;
+&nbsp;                + &quot;Depois do raciocínio envia a próxima rajada. &quot;
+&nbsp;                + &quot;Responde APENAS com o JSON puro de 3 tiros.&quot;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constrói uma lista com todas as coordenadas já disparadas.
+&nbsp;     * Isto ajuda a IA a evitar disparar para o mesmo local duas vezes.
+&nbsp;     * @param alienMoves Lista de movimentos anteriores da IA
+&nbsp;     * @return String formatada com as coordenadas já disparadas
+&nbsp;     */
+&nbsp;    private String buildAlreadyShotList(List&lt;IMove&gt; alienMoves) {
+<b class="fc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc">&nbsp;        sb.append(&quot;COORDENADAS JÁ DISPARADAS (NUNCA repitas nenhuma destas):\n&quot;);</b>
+&nbsp;
+&nbsp;        // Coleta todas as coordenadas disparadas em movimentos anteriores
+<b class="fc">&nbsp;        List&lt;String&gt; coords = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (IMove move : alienMoves) {</b>
+<b class="fc">&nbsp;            for (IPosition pos : move.getShots()) {</b>
+<b class="fc">&nbsp;                coords.add(&quot;&quot; + pos.getClassicRow() + pos.getClassicColumn());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Formata a resposta
+<b class="pc">&nbsp;        if (coords.isEmpty()) {</b>
+<b class="nc">&nbsp;            sb.append(&quot;Nenhuma ainda.\n&quot;);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            sb.append(String.join(&quot;, &quot;, coords)).append(&quot;\n&quot;);</b>
+<b class="fc">&nbsp;            sb.append(&quot;Total: &quot;).append(coords.size()).append(&quot; coordenadas bloqueadas.\n&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pergunta à IA os próximos tiros, com suporte a múltiplas tentativas.
+&nbsp;     * Se a IA responder algo inválido, tenta novamente até MAX_RETRIES vezes.
+&nbsp;     * Se todas as tentativas falharem, usa um fallback aleatório.
+&nbsp;     * @param userMessage Mensagem para enviar à IA
+&nbsp;     * @return JSON com os 3 tiros decididos
+&nbsp;     */
+&nbsp;    private String askLlmForShots(String userMessage) {
+&nbsp;        // Adiciona a pergunta ao histórico
+<b class="fc">&nbsp;        addToHistory(&quot;user&quot;, userMessage);</b>
+&nbsp;
+&nbsp;        // Tenta obter uma resposta válida da IA
+<b class="fc">&nbsp;        for (int attempt = 1; attempt &lt;= MAX_RETRIES; attempt++) {</b>
+<b class="fc">&nbsp;            String llmResponse = callApi();</b>
+&nbsp;
+<b class="fc">&nbsp;            addToHistory(&quot;assistant&quot;, llmResponse);</b>
+&nbsp;
+<b class="fc">&nbsp;            String extracted = extractShotsJson(llmResponse);</b>
+<b class="pc">&nbsp;            if (extracted != null &amp;&amp; isValidShotsJson(extracted)) {</b>
+<b class="fc">&nbsp;                return extracted;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Se falhou, mostra o erro
+<b class="fc">&nbsp;            System.out.println(&quot;Tentativa &quot; + attempt + &quot;/&quot; + MAX_RETRIES</b>
+&nbsp;                    + &quot; — resposta inválida: &quot;
+<b class="fc">&nbsp;                    + llmResponse.substring(0, Math.min(80, llmResponse.length())));</b>
+&nbsp;
+&nbsp;            // Se não é a última tentativa, pede para tentar de novo
+<b class="fc">&nbsp;            if (attempt &lt; MAX_RETRIES) {</b>
+<b class="fc">&nbsp;                addToHistory(&quot;user&quot;,</b>
+&nbsp;                        &quot;Resposta inválida. Deves responder APENAS com um array JSON de &quot; +
+&nbsp;                                &quot;EXACTAMENTE 3 tiros, sem texto adicional. Exemplo:\n&quot; +
+&nbsp;                                &quot;[{\&quot;row\&quot;:\&quot;A\&quot;,\&quot;column\&quot;:1},{\&quot;row\&quot;:\&quot;E\&quot;,\&quot;column\&quot;:5},{\&quot;row\&quot;:\&quot;J\&quot;,\&quot;column\&quot;:10}]\n&quot; +
+&nbsp;                                &quot;Tenta novamente:&quot;
+&nbsp;                );
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Se todas as tentativas falharam, usa tiros aleatórios como fallback
+<b class="fc">&nbsp;        System.out.println(&quot;Todas as tentativas falharam. A usar fallback aleatório.&quot;);</b>
+<b class="fc">&nbsp;        return buildRandomFallbackJson();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Faz uma chamada HTTP à API da Hugging Face para obter a resposta da IA.
+&nbsp;     * Envia o histórico da conversa e recebe a próxima mensagem.
+&nbsp;     * @return Resposta processada da IA (apenas o texto da mensagem)
+&nbsp;     * @throws RuntimeException Se houver erro na chamada ou timeout
+&nbsp;     */
+&nbsp;    private String callApi() {
+&nbsp;        try {
+&nbsp;            // Prepara o corpo da requisição com o modelo e histórico
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; requestBody = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;            requestBody.put(&quot;model&quot;, MODEL_ID);</b>
+<b class="fc">&nbsp;            requestBody.put(&quot;messages&quot;, conversationHistory);</b>
+<b class="fc">&nbsp;            requestBody.put(&quot;max_tokens&quot;, MAX_OUTPUT_TOKENS);</b>
+<b class="fc">&nbsp;            requestBody.put(&quot;temperature&quot;, 0.2);</b>
+&nbsp;
+<b class="fc">&nbsp;            String requestJson = objectMapper.writeValueAsString(requestBody);</b>
+&nbsp;
+&nbsp;            // Constrói a requisição HTTP
+<b class="fc">&nbsp;            HttpRequest request = HttpRequest.newBuilder()</b>
+<b class="fc">&nbsp;                    .uri(URI.create(API_URL))</b>
+<b class="fc">&nbsp;                    .header(&quot;Authorization&quot;, &quot;Bearer &quot; + apiKey)  // Bearer token no header</b>
+<b class="fc">&nbsp;                    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)</b>
+<b class="fc">&nbsp;                    .timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))</b>
+<b class="fc">&nbsp;                    .POST(HttpRequest.BodyPublishers.ofString(requestJson))</b>
+<b class="fc">&nbsp;                    .build();</b>
+&nbsp;
+&nbsp;            // Envia a requisição e processa a resposta
+<b class="fc">&nbsp;            HttpResponse&lt;String&gt; response = httpClient.send(request,</b>
+<b class="fc">&nbsp;                    HttpResponse.BodyHandlers.ofString());</b>
+&nbsp;
+&nbsp;            // Verifica se a requisição foi bem-sucedida
+<b class="fc">&nbsp;            if (response.statusCode() != 200) {</b>
+<b class="fc">&nbsp;                throw new RuntimeException(&quot;Erro HTTP &quot; + response.statusCode()</b>
+<b class="fc">&nbsp;                        + &quot;: &quot; + response.body());</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            return parseAiResponse(response.body());</b>
+&nbsp;
+&nbsp;        } catch (InterruptedException e) {
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Chamada interrompida&quot;, e);</b>
+&nbsp;        } catch (RuntimeException e) {
+&nbsp;            throw e;
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Erro na API: &quot; + e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Interpreta a resposta JSON da API da Hugging Face.
+&nbsp;     * Extrai o texto da mensagem da IA do objeto de resposta complexo.
+&nbsp;     * @param responseBody String JSON com a resposta completa da API
+&nbsp;     * @return Texto da mensagem da IA
+&nbsp;     * @throws RuntimeException Se a estrutura da resposta for inesperada
+&nbsp;     */
+&nbsp;    private String parseAiResponse(String responseBody) {
+&nbsp;        try {
+&nbsp;            // Parse do JSON e extração do conteúdo
+<b class="fc">&nbsp;            JsonNode root    = objectMapper.readTree(responseBody);</b>
+<b class="fc">&nbsp;            JsonNode choices = root.path(&quot;choices&quot;);</b>
+&nbsp;
+&nbsp;            // Valida se choices existe e não está vazio
+<b class="pc">&nbsp;            if (choices.isArray() &amp;&amp; !choices.isEmpty()) {</b>
+<b class="fc">&nbsp;                JsonNode content = choices.get(0)</b>
+<b class="fc">&nbsp;                        .path(&quot;message&quot;)</b>
+<b class="fc">&nbsp;                        .path(&quot;content&quot;);</b>
+&nbsp;
+<b class="pc">&nbsp;                if (!content.isMissingNode()) {</b>
+<b class="fc">&nbsp;                    return content.asText().trim();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Estrutura inesperada: &quot; + responseBody);</b>
+&nbsp;
+&nbsp;        } catch (RuntimeException e) {
+&nbsp;            throw e;
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Erro ao interpretar resposta: &quot;</b>
+<b class="nc">&nbsp;                    + e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extrai o JSON dos tiros da resposta da IA.
+&nbsp;     * Tenta múltiplas estratégias de extração (código, arrays, texto direto).
+&nbsp;     * @param llmResponse Resposta completa da IA (pode conter texto extra)
+&nbsp;     * @return String com o JSON dos tiros, ou null se não encontrou
+&nbsp;     */
+&nbsp;    private String extractShotsJson(String llmResponse) {
+<b class="pc">&nbsp;        if (llmResponse == null || llmResponse.isBlank()) return null;</b>
+&nbsp;
+&nbsp;        // Tenta extrair JSON dentro de blocos de código (```json ... ```)
+<b class="fc">&nbsp;        Pattern codeBlock = Pattern.compile(</b>
+&nbsp;                &quot;```(?:json)?\\s*(\\[.*?])\\s*```&quot;,
+&nbsp;                Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+<b class="fc">&nbsp;        Matcher m = codeBlock.matcher(llmResponse);</b>
+<b class="pc">&nbsp;        if (m.find()) {</b>
+<b class="nc">&nbsp;            String c = m.group(1).trim();</b>
+<b class="nc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Tenta extrair um array JSON diretamente
+<b class="fc">&nbsp;        Pattern arrayPat = Pattern.compile(&quot;(\\[\\s*\\{.*?}\\s*])&quot;, Pattern.DOTALL);</b>
+<b class="fc">&nbsp;        Matcher m2 = arrayPat.matcher(llmResponse);</b>
+<b class="fc">&nbsp;        while (m2.find()) {</b>
+<b class="fc">&nbsp;            String c = m2.group(1).trim();</b>
+<b class="fc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Tenta usar a resposta inteira se começar com [
+<b class="fc">&nbsp;        String trimmed = llmResponse.trim();</b>
+<b class="pc">&nbsp;        if (trimmed.startsWith(&quot;[&quot;) &amp;&amp; isValidShotsJson(trimmed)) return trimmed;</b>
+&nbsp;
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Valida se o JSON contém exatamente 3 tiros com coordenadas válidas.
+&nbsp;     * Verifica se é um array, tem 3 elementos, e cada tiro tem linha (A-J) e coluna (1-10) válidas.
+&nbsp;     * @param json String com o JSON a validar
+&nbsp;     * @return true se for válido, false caso contrário
+&nbsp;     */
+&nbsp;    private boolean isValidShotsJson(String json) {
+&nbsp;        try {
+<b class="fc">&nbsp;            JsonNode root = objectMapper.readTree(json);</b>
+&nbsp;            // Verifica se é um array com exatamente NUMBER_SHOTS elementos
+<b class="pc">&nbsp;            if (!root.isArray() || root.size() != Game.NUMBER_SHOTS) return false;</b>
+&nbsp;
+&nbsp;            // Valida cada tiro individualmente
+<b class="fc">&nbsp;            for (JsonNode shot : root) {</b>
+<b class="fc">&nbsp;                JsonNode rowNode = shot.get(&quot;row&quot;);</b>
+<b class="fc">&nbsp;                JsonNode colNode = shot.get(&quot;column&quot;);</b>
+<b class="pc">&nbsp;                if (rowNode == null || colNode == null) return false;</b>
+&nbsp;
+&nbsp;                // Verifica se a linha é A-J e a coluna é 1-10
+<b class="fc">&nbsp;                String row = rowNode.asText().toUpperCase();</b>
+<b class="fc">&nbsp;                int    col = colNode.asInt();</b>
+<b class="pc">&nbsp;                if (row.length() != 1 || row.charAt(0) &lt; &#39;A&#39; || row.charAt(0) &gt; &#39;J&#39;) return false;</b>
+<b class="pc">&nbsp;                if (col &lt; 1 || col &gt; 10) return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gera um fallback com 3 tiros aleatórios quando a IA falha.
+&nbsp;     * Cria uma lista de todas as posições possíveis, embaralha e pega nos primeiros 3.
+&nbsp;     * @return JSON formatado com 3 tiros aleatórios
+&nbsp;     */
+&nbsp;    private String buildRandomFallbackJson() {
+&nbsp;        // Cria lista com todas as posições do tabuleiro
+<b class="fc">&nbsp;        List&lt;IPosition&gt; available = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (int r = 0; r &lt; Game.BOARD_SIZE; r++)</b>
+<b class="fc">&nbsp;            for (int c = 0; c &lt; Game.BOARD_SIZE; c++)</b>
+<b class="fc">&nbsp;                available.add(new Position(r, c));</b>
+&nbsp;
+&nbsp;        // Embaralha e pega nos primeiros 3
+<b class="fc">&nbsp;        Collections.shuffle(available, new Random());</b>
+&nbsp;
+<b class="fc">&nbsp;        return Game.jsonShots(available.subList(0, Game.NUMBER_SHOTS));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adiciona uma mensagem ao histórico de conversa.
+&nbsp;     * Usa um mapa para armazenar o papel (role) e o conteúdo de cada mensagem.
+&nbsp;     * @param role &quot;user&quot; ou &quot;assistant&quot;
+&nbsp;     * @param content Texto da mensagem
+&nbsp;     */
+&nbsp;    private void addToHistory(String role, String content) {
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; message = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        message.put(&quot;role&quot;, role);</b>
+<b class="fc">&nbsp;        message.put(&quot;content&quot;, content);</b>
+<b class="fc">&nbsp;        conversationHistory.add(message);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retorna o número de mensagens no histórico de conversa.
+&nbsp;     * @return Tamanho do histórico de conversação
+&nbsp;     */
+&nbsp;    public int getConversationLength() {
+<b class="nc">&nbsp;        return conversationHistory.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indica se a IA já fez pelo menos um movimento (ou seja, se o jogo já começou).
+&nbsp;     * @return true se a IA já começou a jogar
+&nbsp;     */
+&nbsp;    public boolean isInitialized() {
+<b class="nc">&nbsp;        return !firstMove;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-24 18:41</div>
+</div>
+</body>
+</html>
