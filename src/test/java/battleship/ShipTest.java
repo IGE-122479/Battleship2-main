@@ -29,16 +29,23 @@ import java.util.List;
 public class ShipTest {
 
     private Ship ship;
+    private Ship shipBorder;
+    private Ship shipCaravel;
+
 
     @BeforeEach
     void setUp() {
         // Since Ship is abstract, instantiate it with a concrete subclass (e.g., Barge)
         ship = new Barge(Compass.NORTH, new Position(5, 5));
+        shipBorder = new Barge(Compass.NORTH, new Position(0, 0));
+        shipCaravel = new Caravel(Compass.NORTH, new Position(3, 3));
     }
 
     @AfterEach
     void tearDown() {
         ship = null;
+        shipBorder = null;
+        shipCaravel = null;
     }
 
     /**
@@ -195,8 +202,21 @@ public class ShipTest {
      * Cyclomatic Complexity: 2
      */
     @Test
-    void testGetTopMostPos() {
+    void testGetTopMostPos1() {
         assertEquals(5, ship.getTopMostPos(), "Error: The topmost position should be 5.");
+    }
+
+    @Test
+    @DisplayName("[Ship] getTopMostPos2 – posições em ordem DECRESCENTE de linha: o if é acionado e top é atualizado")
+    void testGetTopMostPos2() {
+        Ship navioOrdemInversa = new Ship("Teste", Compass.NORTH, new Position(5, 0), 3) {};
+        navioOrdemInversa.getPositions().add(new Position(5, 0));
+        navioOrdemInversa.getPositions().add(new Position(3, 0));
+        navioOrdemInversa.getPositions().add(new Position(1, 0));
+
+        assertEquals(1, navioOrdemInversa.getTopMostPos(),
+                "Erro: com posições [linha 5, 3, 1], getTopMostPos() deve devolver 1 " +
+                        "(o ramo if deve ser acionado e top actualizado de 5 → 3 → 1).");
     }
 
     /**
@@ -225,4 +245,129 @@ public class ShipTest {
     void testGetRightMostPos() {
         assertEquals(5, ship.getRightMostPos(), "Error: The rightmost position should be 5.");
     }
+
+    /**
+     * Test for the getAdjacentPositions method.
+     * Cyclomatic Complexity: 4
+     */
+    @Test
+    @DisplayName("testGetAdjacentPositions1 – contem a quantidade certas de posições adjacentes.")
+    void testGetAdjacentPositions1() {
+        assertEquals(8, ship.getAdjacentPositions().size(), "Erro: getAdjacentePositions() deve devolver 3 posições e devolveu " + ship.getAdjacentPositions().size() + " .");
+        assertEquals(3, shipBorder.getAdjacentPositions().size(), "Erro: getAdjacentePositions() deve devolver 3 posições e devolveu " + shipBorder.getAdjacentPositions().size() + " .");
+    }
+
+    @Test
+    @DisplayName("testGetAdjacentPositions2 – posição do próprio navio não é adicionada.")
+    void testGetAdjacentPositions2() {
+        List<IPosition> adjacentes = shipBorder.getAdjacentPositions();
+        assertFalse(adjacentes.contains(shipBorder.getPosition()),
+                "Erro: a posição (0,0) pertence ao navio e NÃO deve constar na lista de adjacentes.");
+    }
+
+    @Test
+    @DisplayName("testGetAdjacentPositions3 – adjacente já existente não é duplicado.")
+    void testGetAdjacentPositions3() {
+        List<IPosition> adjacentes = shipCaravel.getAdjacentPositions();
+        long contagem = adjacentes.stream()
+                .filter(p -> p.getRow() == 2 && p.getColumn() == 3)
+                .count();
+        assertEquals(1, contagem,
+                "Erro: a posição (2,3) é partilhada por ambas as células mas deve aparecer exactamente 1 vez.");
+    }
+
+    /**
+     * Test for the getPosition method.
+     * Cyclomatic Complexity: 1
+     */
+    @Test
+    @DisplayName("testGetPosition – devolve a posição inicial correcta")
+    void testGetPosition() {
+        IPosition pos = new Position(0, 0);
+        assertEquals(pos, shipBorder.getPosition(), "Erro: getPosition() deve devolver " + pos + " e devolveu " + shipBorder.getPosition() + " .");
+    }
+
+    /**
+     * Test for the toString method.
+     * Cyclomatic Complexity: 1
+     */
+    @Test
+    @DisplayName("[Ship] testToString – toString devolve uma string com as informações do ship.")
+    void testToString() {
+        String string = "[" + ship.getCategory() + " " + ship.getBearing() + " " + ship.getPosition() + "]";
+        assertEquals(string, ship.toString(), "Erro: toString() deve devolver " + string + " e devolveu " + shipBorder.toString() + " .");
+    }
+
+    /**
+     * Test for the buildShip method.
+     * Cyclomatic Complexity: 6
+     */
+    @Test
+    @DisplayName("[buildShip] buildShip1 – 'barca' devolve uma instância de Barge")
+    void buildShip1() {
+        Ship s = Ship.buildShip("barca", Compass.NORTH, new Position(0, 0));
+        assertAll(
+                () -> assertNotNull(s,
+                        "Erro: buildShip('barca') não deve devolver null."),
+                () -> assertInstanceOf(Barge.class, s,
+                        "Erro: buildShip('barca') deve devolver uma instância de Barge.")
+        );
+    }
+
+    @Test
+    @DisplayName("[buildShip] buildShip2 – 'caravela' devolve uma instância de Caravel")
+    void buildShip2() {
+        Ship s = Ship.buildShip("caravela", Compass.NORTH, new Position(0, 0));
+        assertAll(
+                () -> assertNotNull(s,
+                        "Erro: buildShip('caravela') não deve devolver null."),
+                () -> assertInstanceOf(Caravel.class, s,
+                        "Erro: buildShip('caravela') deve devolver uma instância de Caravel.")
+        );
+    }
+
+    @Test
+    @DisplayName("[buildShip] buildShip3 – 'nau' devolve uma instância de Carrack")
+    void buildShip3() {
+        Ship s = Ship.buildShip("nau", Compass.NORTH, new Position(0, 0));
+        assertAll(
+                () -> assertNotNull(s,
+                        "Erro: buildShip('nau') não deve devolver null."),
+                () -> assertInstanceOf(Carrack.class, s,
+                        "Erro: buildShip('nau') deve devolver uma instância de Carrack.")
+        );
+    }
+
+    @Test
+    @DisplayName("[buildShip] buildShip4 – 'fragata' devolve uma instância de Frigate")
+    void buildShip4() {
+        Ship s = Ship.buildShip("fragata", Compass.NORTH, new Position(0, 0));
+        assertAll(
+                () -> assertNotNull(s,
+                        "Erro: buildShip('fragata') não deve devolver null."),
+                () -> assertInstanceOf(Frigate.class, s,
+                        "Erro: buildShip('fragata') deve devolver uma instância de Frigate.")
+        );
+    }
+
+    @Test
+    @DisplayName("[buildShip] buildShip5 – 'galeao' devolve uma instância de Galleon")
+    void buildShip5() {
+        Ship s = Ship.buildShip("galeao", Compass.NORTH, new Position(0, 0));
+        assertAll(
+                () -> assertNotNull(s,
+                        "Erro: buildShip('galeao') não deve devolver null."),
+                () -> assertInstanceOf(Galleon.class, s,
+                        "Erro: buildShip('galeao') deve devolver uma instância de Galleon.")
+        );
+    }
+
+    @Test
+    @DisplayName("[buildShip] buildShip6 – tipo desconhecido percorre o ramo default e devolve null")
+    void buildShip6() {
+        Ship s = Ship.buildShip("submarino", Compass.NORTH, new Position(0, 0));
+        assertNull(s,
+                "Erro: buildShip() com tipo desconhecido deve devolver null (ramo default).");
+    }
+
 }
