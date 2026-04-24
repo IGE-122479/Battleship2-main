@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ScoreboardManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: ScoreboardManager (battleship)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ScoreboardManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62,5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85,3%
+  </span>
+  <span class="absValue">
+    (29/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ScoreboardManager$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62,5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85,7%
+  </span>
+  <span class="absValue">
+    (30/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.type.TypeReference;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.SerializationFeature;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Manages the game scoreboard by saving and loading {@link GameRecord} objects
+&nbsp; * to/from a JSON file, and displaying the scoreboard in the console.
+&nbsp; *
+&nbsp; * &lt;p&gt;Usage example at the end of a game:
+&nbsp; * &lt;pre&gt;
+&nbsp; *     ScoreboardManager.saveRecord(new GameRecord(game, true));
+&nbsp; *     ScoreboardManager.printScoreboard();
+&nbsp; * &lt;/pre&gt;
+&nbsp; */
+<b class="fc">&nbsp;public class ScoreboardManager {</b>
+&nbsp;
+&nbsp;    /** Path to the JSON file where game records are persisted. */
+&nbsp;    private static final String SCOREBOARD_FILE = &quot;scoreboard.json&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final ObjectMapper mapper = new ObjectMapper()</b>
+<b class="fc">&nbsp;            .enable(SerializationFeature.INDENT_OUTPUT);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Saves a new {@link GameRecord} to the scoreboard JSON file.
+&nbsp;     * If the file does not exist, it is created automatically.
+&nbsp;     *
+&nbsp;     * @param record the game record to save; must not be null
+&nbsp;     */
+&nbsp;    public static void saveRecord(GameRecord record) {
+<b class="pc">&nbsp;        assert record != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        String dbPassword = &quot;scoreboard_pass_123&quot;;</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;GameRecord&gt; records = loadRecords();</b>
+<b class="fc">&nbsp;        records.add(record);</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            mapper.writeValue(new File(SCOREBOARD_FILE), records);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;[Scoreboard] Jogo guardado com sucesso.&quot;);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            System.err.println(&quot;[Scoreboard] Erro ao guardar o jogo: &quot; + e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads all game records from the JSON file.
+&nbsp;     * Returns an empty list if the file does not exist or cannot be read.
+&nbsp;     *
+&nbsp;     * @return a list of {@link GameRecord} objects, never null
+&nbsp;     */
+&nbsp;    public static List&lt;GameRecord&gt; loadRecords() {
+<b class="fc">&nbsp;        File file = new File(SCOREBOARD_FILE);</b>
+<b class="pc">&nbsp;        if (!file.exists()) return new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            return mapper.readValue(file, new TypeReference&lt;List&lt;GameRecord&gt;&gt;() {});</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            System.err.println(&quot;[Scoreboard] Erro ao ler o scoreboard: &quot; + e.getMessage());</b>
+<b class="nc">&nbsp;            return new ArrayList&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints the full scoreboard to the console, showing all past games
+&nbsp;     * ordered from oldest to most recent (order of insertion).
+&nbsp;     * If no games have been recorded yet, a message is shown instead.
+&nbsp;     */
+&nbsp;    public static void printScoreboard() {
+<b class="fc">&nbsp;        List&lt;GameRecord&gt; records = loadRecords();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+=====================================================================+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;|                     SCOREBOARD - JOGOS PASSADOS                    |&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+=====================================================================+&quot;);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (records.isEmpty()) {</b>
+<b class="nc">&nbsp;            System.out.println(&quot;|              Ainda não existem jogos registados.                   |&quot;);</b>
+<b class="nc">&nbsp;            System.out.println(&quot;+=====================================================================+&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;| Data/Hora            | Jogadas | Acertos    | Navios Afund.| Resultado|&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+---------------------+---------+------------+--------------+----------+&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (GameRecord r : records)</b>
+<b class="fc">&nbsp;            System.out.println(r);</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;+---------------------+---------+------------+--------------+----------+&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        long wins   = records.stream().filter(r -&gt; r.getResult().equals(&quot;VITÓRIA&quot;)).count();</b>
+<b class="fc">&nbsp;        long losses = records.stream().filter(r -&gt; r.getResult().equals(&quot;DERROTA&quot;)).count();</b>
+<b class="fc">&nbsp;        System.out.printf(&quot;|  Total de jogos: %-3d    Vitórias: %-3d    Derrotas: %-3d              |%n&quot;,</b>
+<b class="fc">&nbsp;                records.size(), wins, losses);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+=====================================================================+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-24 18:41</div>
+</div>
+</body>
+</html>

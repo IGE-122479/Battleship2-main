@@ -1,0 +1,903 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Game</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: Game (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Game</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96,7%
+  </span>
+  <span class="absValue">
+    (29/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75,8%
+  </span>
+  <span class="absValue">
+    (138/182)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83,8%
+  </span>
+  <span class="absValue">
+    (269/321)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonProcessingException;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.SerializationFeature;
+&nbsp;
+&nbsp;import java.util.*;
+&nbsp;
+<b class="fc">&nbsp;public class Game implements IGame</b>
+&nbsp;{
+&nbsp;    /**
+&nbsp;     * Prints the game board by representing the positions of ships, adjacent tiles,
+&nbsp;     * shots, and other game elements onto the console. The method also optionally
+&nbsp;     * displays shot positions and a legend explaining the symbols used on the board.
+&nbsp;     *
+&nbsp;     * @param fleet       the fleet of ships to be displayed on the board. Ships are marked
+&nbsp;     *                    and their positions are shown according to their placement.
+&nbsp;     * @param moves       the list of moves containing shots. If shot positions are shown,
+&nbsp;     *                    they will be rendered based on their outcome (hit, miss, etc.).
+&nbsp;     * @param show_shots  if true, displays the shots taken during the game and marks
+&nbsp;     *                    their result (hit or miss) on the board.
+&nbsp;     * @param showLegend  if true, displays an explanatory legend of the symbols used
+&nbsp;     *                    to represent various elements such as ships, misses, hits, etc.
+&nbsp;     */
+&nbsp;    public static void printBoard(IFleet fleet, List&lt;IMove&gt; moves, boolean show_shots, boolean showLegend) {
+&nbsp;
+<b class="pc">&nbsp;        assert fleet != null;</b>
+<b class="pc">&nbsp;        assert moves != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        char[][] map = new char[BOARD_SIZE][BOARD_SIZE];</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int r = 0; r &lt; BOARD_SIZE; r++)</b>
+<b class="fc">&nbsp;            for (int c = 0; c &lt; BOARD_SIZE; c++)</b>
+<b class="fc">&nbsp;                map[r][c] = EMPTY_MARKER;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (IShip ship : fleet.getShips()) {</b>
+<b class="fc">&nbsp;            for (IPosition ship_pos : ship.getPositions())</b>
+<b class="fc">&nbsp;                map[ship_pos.getRow()][ship_pos.getColumn()] = SHIP_MARKER;</b>
+<b class="fc">&nbsp;            if (!ship.stillFloating())</b>
+<b class="fc">&nbsp;                for (IPosition adjacent_pos : ship.getAdjacentPositions())</b>
+<b class="fc">&nbsp;                    map[adjacent_pos.getRow()][adjacent_pos.getColumn()] = SHIP_ADJACENT_MARKER;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (show_shots)</b>
+<b class="fc">&nbsp;            for (IMove move : moves)</b>
+<b class="fc">&nbsp;                for (IPosition shot : move.getShots()) {</b>
+<b class="pc">&nbsp;                    if (shot.isInside()){</b>
+<b class="fc">&nbsp;                        int row = shot.getRow();</b>
+<b class="fc">&nbsp;                        int col = shot.getColumn();</b>
+<b class="fc">&nbsp;                        if (map[row][col] == SHIP_MARKER)</b>
+<b class="fc">&nbsp;                            map[row][col] = SHOT_SHIP_MARKER;</b>
+<b class="fc">&nbsp;                        if (map[row][col] == EMPTY_MARKER || map[row][col] == SHIP_ADJACENT_MARKER)</b>
+<b class="fc">&nbsp;                            map[row][col] = SHOT_WATER_MARKER;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.print(&quot;    &quot;);</b>
+<b class="fc">&nbsp;        for (int col = 0; col &lt; BOARD_SIZE; col++) {</b>
+<b class="fc">&nbsp;            System.out.print(&quot; &quot; + (col + 1));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.print(&quot;   +-&quot;);</b>
+<b class="fc">&nbsp;        for (int col = 0; col &lt; BOARD_SIZE; col++) {</b>
+<b class="fc">&nbsp;            System.out.print(&quot;--&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println(&quot;+&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int row = 0; row &lt; BOARD_SIZE; row++) {</b>
+<b class="fc">&nbsp;            Position pos = new Position(row, 0);</b>
+<b class="fc">&nbsp;            char rowLabel = pos.getClassicRow();</b>
+<b class="fc">&nbsp;            System.out.print(&quot; &quot; + rowLabel + &quot; |&quot;);</b>
+<b class="fc">&nbsp;            for (int col = 0; col &lt; BOARD_SIZE; col++)</b>
+<b class="fc">&nbsp;                System.out.print(&quot; &quot; + map[row][col]);</b>
+<b class="fc">&nbsp;            System.out.println(&quot; |&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.print(&quot;   +&quot;);</b>
+<b class="fc">&nbsp;        for (int col = 0; col &lt; BOARD_SIZE; col++)</b>
+<b class="fc">&nbsp;            System.out.print(&quot;--&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;-+&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (showLegend) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;          LEGENDA&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;&#39;&quot; + SHIP_MARKER + &quot;&#39;-&gt;navio, &#39;&quot; + SHIP_ADJACENT_MARKER + &quot;&#39;-&gt;adjacente a navio, &#39;&quot; + EMPTY_MARKER + &quot;&#39;-&gt;água&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;&#39;&quot; + SHOT_SHIP_MARKER + &quot;&#39;-&gt;Tiro certeiro, &#39;&quot; + SHOT_WATER_MARKER + &quot;&#39;-&gt;Tiro na água&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serializes a list of shot positions into a JSON string. Each shot is represented
+&nbsp;     * with its classic row and column values. The method uses the Jackson library for
+&nbsp;     * JSON serialization.
+&nbsp;     *
+&nbsp;     * @param shots a list of shot positions to be serialized. Each position is represented
+&nbsp;     *              by an implementation of the {@code IPosition} interface. The list must
+&nbsp;     *              not be null.
+&nbsp;     * @return a formatted JSON string containing the shot positions. Each shot includes
+&nbsp;     *         its classic row and column.
+&nbsp;     * @throws RuntimeException if an error occurs during JSON serialization.
+&nbsp;     */
+&nbsp;    public static String jsonShots(List&lt;IPosition&gt; shots) {
+&nbsp;
+<b class="pc">&nbsp;        assert shots != null;</b>
+&nbsp;
+&nbsp;        // Serializar os tiros gerados em JSON usando a biblioteca Jackson
+<b class="fc">&nbsp;        ObjectMapper objectMapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);</b>
+&nbsp;
+&nbsp;        // 1. Create a simplified list containing only the desired data
+<b class="fc">&nbsp;        List&lt;Map&lt;String, Object&gt;&gt; simplifiedShots = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (IPosition shot : shots) {</b>
+<b class="fc">&nbsp;            Map&lt;String, Object&gt; simplePos = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;            // We use getClassicRow() and getClassicColumn() based on your current JSON output
+<b class="fc">&nbsp;            simplePos.put(&quot;row&quot;, String.valueOf(shot.getClassicRow()));</b>
+<b class="fc">&nbsp;            simplePos.put(&quot;column&quot;, shot.getClassicColumn());</b>
+<b class="fc">&nbsp;            simplifiedShots.add(simplePos);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String jsonString = null;</b>
+&nbsp;        try {
+&nbsp;            // 2. Serialize the simplified list instead of the raw &#39;shots&#39; list
+<b class="fc">&nbsp;            jsonString = objectMapper.writeValueAsString(simplifiedShots);</b>
+&nbsp;        } catch (JsonProcessingException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Erro ao serializar o JSON&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;//		System.out.println(jsonString);
+&nbsp;//		System.out.println();
+&nbsp;
+&nbsp;        // Retornar o JSON
+<b class="fc">&nbsp;        return jsonString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //------------------------------------------------------------------
+&nbsp;    public static final int BOARD_SIZE = 10;
+&nbsp;    public static final int NUMBER_SHOTS = 3;
+&nbsp;
+&nbsp;    private static final char EMPTY_MARKER = &#39;.&#39;;
+&nbsp;    private static final char SHIP_MARKER = &#39;#&#39;;
+&nbsp;    private static final char SHOT_SHIP_MARKER = &#39;*&#39;;
+&nbsp;    private static final char SHOT_WATER_MARKER = &#39;o&#39;;
+&nbsp;    private static final char SHIP_ADJACENT_MARKER = &#39;-&#39;;
+&nbsp;
+&nbsp;    //------------------------------------------------------------------
+&nbsp;    private final IFleet myFleet;
+&nbsp;    private final List&lt;IMove&gt; alienMoves;
+&nbsp;
+&nbsp;    private final IFleet alienFleet;
+&nbsp;    private final List&lt;IMove&gt; myMoves;
+&nbsp;
+&nbsp;    private Integer countInvalidShots;
+&nbsp;    private Integer countRepeatedShots;
+&nbsp;    private Integer countHits;
+&nbsp;    private Integer countSinks;
+&nbsp;    private int moveNumber;
+&nbsp;    private int myMoveNumber;   // contador das minhas jogadas sobre o adversário
+&nbsp;
+&nbsp;    /** Cronómetro para medir o tempo de cada jogada. */
+&nbsp;    private final MoveTimer moveTimer;
+&nbsp;
+&nbsp;    //------------------------------------------------------------------
+&nbsp;    public Game(IFleet myFleet)
+<b class="fc">&nbsp;    {</b>
+&nbsp;
+<b class="fc">&nbsp;        this.myMoveNumber = 1;</b>
+<b class="fc">&nbsp;        this.moveNumber = 1;</b>
+&nbsp;
+<b class="fc">&nbsp;        this.alienMoves = new ArrayList&lt;IMove&gt;();</b>
+<b class="fc">&nbsp;        this.myMoves = new ArrayList&lt;IMove&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        this.alienFleet = Fleet.createRandom();</b>
+<b class="fc">&nbsp;        this.myFleet = myFleet;</b>
+&nbsp;
+<b class="fc">&nbsp;        this.countInvalidShots = 0;</b>
+<b class="fc">&nbsp;        this.countRepeatedShots = 0;</b>
+<b class="fc">&nbsp;        this.countHits = 0;</b>
+<b class="fc">&nbsp;        this.countSinks = 0;</b>
+&nbsp;
+<b class="fc">&nbsp;        this.moveTimer = new MoveTimer();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public IFleet getMyFleet()
+&nbsp;    {
+<b class="fc">&nbsp;        return myFleet;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;IMove&gt; getAlienMoves()
+&nbsp;    {
+<b class="fc">&nbsp;        return alienMoves;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public IFleet getAlienFleet()
+&nbsp;    {
+<b class="fc">&nbsp;        return alienFleet;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;IMove&gt; getMyMoves()
+&nbsp;    {
+<b class="fc">&nbsp;        return myMoves;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gera uma rajada de tiros aleatórios inteligentes por parte do inimigo.
+&nbsp;     * O método evita posições adjacentes a navios já afundados e posições já atacadas.
+&nbsp;     * Após gerar os tiros, processa-os contra a frota do jogador e devolve os resultados.
+&nbsp;     *
+&nbsp;     * @return String JSON com os resultados da rajada (hits, misses, sinks).
+&nbsp;     */
+&nbsp;    public String randomEnemyFire() {
+&nbsp;
+&nbsp;        // Iniciar o cronómetro antes de gerar os tiros
+<b class="fc">&nbsp;        moveTimer.start();</b>
+&nbsp;
+&nbsp;        // Criar uma instância de Random com uma seed baseada no timestamp atual
+<b class="fc">&nbsp;        Random random = new Random(System.currentTimeMillis());</b>
+&nbsp;
+<b class="fc">&nbsp;        Set&lt;IPosition&gt; usablePositions = new HashSet&lt;IPosition&gt;();</b>
+<b class="fc">&nbsp;        for (int r = 0; r &lt; BOARD_SIZE; r++)</b>
+<b class="fc">&nbsp;            for (int c = 0; c &lt; BOARD_SIZE; c++)</b>
+<b class="fc">&nbsp;                usablePositions.add(new Position(r, c));</b>
+&nbsp;
+<b class="fc">&nbsp;        this.myFleet.getSunkShips().forEach(ship -&gt; usablePositions.removeAll(ship.getAdjacentPositions()));</b>
+<b class="fc">&nbsp;        this.alienMoves.forEach(move -&gt;  usablePositions.removeAll(move.getShots()));</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;IPosition&gt; candidateShots = new ArrayList&lt;&gt;(usablePositions);</b>
+&nbsp;
+&nbsp;        // Criar lista para armazenar os tiros
+<b class="fc">&nbsp;        List&lt;IPosition&gt; shots = new ArrayList&lt;IPosition&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;        // Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
+&nbsp;
+<b class="fc">&nbsp;        IPosition newShot = null;</b>
+<b class="pc">&nbsp;        if (candidateShots.size() &gt;= Game.NUMBER_SHOTS)</b>
+<b class="fc">&nbsp;            while (shots.size() &lt; Game.NUMBER_SHOTS) {</b>
+<b class="fc">&nbsp;                newShot = candidateShots.get(random.nextInt(candidateShots.size()));</b>
+<b class="fc">&nbsp;                if (!shots.contains(newShot))</b>
+<b class="fc">&nbsp;                    shots.add(newShot);</b>
+&nbsp;            }
+&nbsp;        else {
+<b class="nc">&nbsp;            while (shots.size() &lt; candidateShots.size()) {</b>
+<b class="nc">&nbsp;                newShot = candidateShots.get(random.nextInt(candidateShots.size()));</b>
+<b class="nc">&nbsp;                if (!shots.contains(newShot))</b>
+<b class="nc">&nbsp;                    shots.add(newShot);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            while (shots.size() &lt; Game.NUMBER_SHOTS)</b>
+<b class="nc">&nbsp;                shots.add(newShot);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.print(&quot;rajada &quot;);</b>
+<b class="fc">&nbsp;        for (IPosition shot : shots)</b>
+<b class="fc">&nbsp;            System.out.print(shot + &quot; &quot;);</b>
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;
+&nbsp;        // Serializar os tiros em JSON e delegar no método readEnemyFire
+<b class="fc">&nbsp;        String shotsJson = Game.jsonShots(shots);</b>
+<b class="fc">&nbsp;        return readEnemyFire(shotsJson);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recebe os meus tiros sobre a frota do adversário em formato JSON,
+&nbsp;     * processa-os e devolve um JSON com os resultados.
+&nbsp;     *
+&nbsp;     * Formato de entrada esperado:
+&nbsp;     * [ {&quot;row&quot;:&quot;A&quot;,&quot;column&quot;:3}, {&quot;row&quot;:&quot;B&quot;,&quot;column&quot;:7}, {&quot;row&quot;:&quot;C&quot;,&quot;column&quot;:1} ]
+&nbsp;     *
+&nbsp;     * @param json   string JSON com a lista dos meus tiros
+&nbsp;     * @return string JSON com os resultados (via Move.processEnemyFire)
+&nbsp;     */
+&nbsp;    public String sendMyShotsJson(String json) {
+&nbsp;
+<b class="pc">&nbsp;        assert json != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        ObjectMapper mapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        List&lt;IPosition&gt; shots = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            List&lt;Map&lt;String, Object&gt;&gt; parsed = mapper.readValue(json,</b>
+<b class="fc">&nbsp;                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));</b>
+&nbsp;
+<b class="fc">&nbsp;            for (Map&lt;String, Object&gt; entry : parsed) {</b>
+<b class="fc">&nbsp;                char row    = ((String) entry.get(&quot;row&quot;)).charAt(0);</b>
+<b class="fc">&nbsp;                int  column = (Integer) entry.get(&quot;column&quot;);</b>
+<b class="fc">&nbsp;                shots.add(new Position(row, column));</b>
+&nbsp;            }
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Erro ao interpretar JSON dos meus tiros: &quot; + e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (shots.size() != NUMBER_SHOTS)</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;O JSON deve conter exactamente &quot; + NUMBER_SHOTS + &quot; tiros.&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;ShotResult&gt; shotResults = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;IPosition&gt; alreadyShot  = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (IPosition pos : shots) {</b>
+<b class="fc">&nbsp;            shotResults.add(fireMyShot(pos, alreadyShot.contains(pos)));</b>
+<b class="fc">&nbsp;            alreadyShot.add(pos);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Parar o cronómetro e guardar o tempo na jogada
+<b class="fc">&nbsp;        long elapsed = moveTimer.stop();</b>
+&nbsp;
+<b class="fc">&nbsp;        Move move = new Move(myMoveNumber, shots, shotResults);</b>
+<b class="fc">&nbsp;        move.setDuration(elapsed);</b>
+<b class="fc">&nbsp;        move.processEnemyFire(true);</b>
+<b class="fc">&nbsp;        myMoves.add(move);</b>
+<b class="fc">&nbsp;        myMoveNumber++;</b>
+&nbsp;
+&nbsp;        // Devolver JSON com os resultados da jogada
+<b class="fc">&nbsp;        return move.processEnemyFire(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Processa os tiros disparados pelo inimigo recebidos em formato JSON.
+&nbsp;     * O método desserializa o JSON, valida as posições e aplica o tiro à frota do jogador,
+&nbsp;     * registando os resultados (acerto, água, ou navio afundado).
+&nbsp;     *
+&nbsp;     * @param json String JSON contendo a lista de tiros (ex: [{&quot;row&quot;:&quot;A&quot;,&quot;column&quot;:1}, ...])
+&nbsp;     * @return Uma String JSON com o relatório detalhado dos resultados de cada tiro.
+&nbsp;     * @throws RuntimeException se ocorrer um erro na interpretação do JSON.
+&nbsp;     */
+&nbsp;    public String readEnemyFire(String json) {
+&nbsp;
+<b class="pc">&nbsp;        assert json != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        ObjectMapper mapper = new ObjectMapper();</b>
+<b class="fc">&nbsp;        List&lt;IPosition&gt; shots = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            List&lt;Map&lt;String, Object&gt;&gt; parsed = mapper.readValue(json,</b>
+<b class="fc">&nbsp;                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));</b>
+&nbsp;
+<b class="fc">&nbsp;            for (Map&lt;String, Object&gt; entry : parsed) {</b>
+<b class="fc">&nbsp;                char row    = ((String) entry.get(&quot;row&quot;)).charAt(0);</b>
+<b class="fc">&nbsp;                int  column = (Integer) entry.get(&quot;column&quot;);</b>
+<b class="fc">&nbsp;                shots.add(new Position(row, column));</b>
+&nbsp;            }
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Erro ao interpretar JSON dos tiros do inimigo: &quot; + e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;ShotResult&gt; shotResults = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;IPosition&gt; alreadyShot  = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (IPosition pos : shots) {</b>
+<b class="fc">&nbsp;            shotResults.add(fireSingleShot(pos, alreadyShot.contains(pos)));</b>
+<b class="fc">&nbsp;            alreadyShot.add(pos);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        long elapsed = moveTimer.stop();</b>
+&nbsp;
+<b class="fc">&nbsp;        Move move = new Move(moveNumber, shots, shotResults);</b>
+<b class="fc">&nbsp;        move.setDuration(elapsed);</b>
+<b class="fc">&nbsp;        move.processEnemyFire(true);</b>
+<b class="fc">&nbsp;        alienMoves.add(move);</b>
+<b class="fc">&nbsp;        moveNumber++;</b>
+&nbsp;
+&nbsp;        // Devolver JSON com os resultados da jogada
+<b class="fc">&nbsp;        return move.processEnemyFire(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fires a set of shots during a player&#39;s move. Each shot is resolved and
+&nbsp;     * consolidated into a move, which is processed and added to the list of alien moves.
+&nbsp;     * The method ensures exactly {@code NUMBER_SHOTS} shots are fired, validates
+&nbsp;     * each shot&#39;s position, and increments the move counter after completing the operation.
+&nbsp;     *
+&nbsp;     * @param shots a list of positions representing the locations to fire shots at.
+&nbsp;     *              The positions should be unique and valid within the bounds of the game board.
+&nbsp;     *              The size of the list must be equal to {@code NUMBER_SHOTS}.
+&nbsp;     * @throws IllegalArgumentException if the list of shots is null, contains an invalid
+&nbsp;     *                                  number of positions, or includes duplicate positions.
+&nbsp;     */
+&nbsp;    public void fireShots(List&lt;IPosition&gt; shots)
+&nbsp;    {
+<b class="pc">&nbsp;        assert shots != null;</b>
+&nbsp;
+&nbsp;        //List&lt;ShotResult&gt; shotResults = new ArrayList&lt;ShotResult&gt;();
+<b class="pc">&nbsp;        if (shots.size() != NUMBER_SHOTS) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Must fire exactly &quot; + NUMBER_SHOTS + &quot; shots per move.&quot;);</b>
+&nbsp;        }
+&nbsp;        // Delegar em receiveEnemyShotsJson para evitar lógica duplicada
+<b class="fc">&nbsp;        readEnemyFire(Game.jsonShots(shots));</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fires a single shot at the specified position, handling scenarios such as invalid positions,
+&nbsp;     * repeated shots, hits, misses, and sinking a ship. The method updates the necessary counters
+&nbsp;     * for invalid shots, repeated shots, hits, and sunk ships.
+&nbsp;     *
+&nbsp;     * @param pos the position to fire the shot at; must be valid and within the game board boundaries.
+&nbsp;     * @param isRepeated true if the shot is marked as a repeat attempt, false otherwise.
+&nbsp;     * @return a ShotResult object containing the result of the shot, including whether the shot was
+&nbsp;     *         valid, repeated, a hit, and whether a ship was sunk.
+&nbsp;     */
+&nbsp;    public ShotResult fireSingleShot(IPosition pos, boolean isRepeated) {
+&nbsp;
+<b class="pc">&nbsp;        assert pos != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!pos.isInside()) {</b>
+<b class="fc">&nbsp;            countInvalidShots++;</b>
+<b class="fc">&nbsp;            return new ShotResult(false, false, null, false);</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (isRepeated || repeatedShot(pos)) {</b>
+<b class="fc">&nbsp;            countRepeatedShots++;</b>
+<b class="fc">&nbsp;            return new ShotResult(true, true, null, false);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        IShip ship = myFleet.shipAt(pos);</b>
+<b class="fc">&nbsp;        if (ship == null)</b>
+<b class="fc">&nbsp;            return new ShotResult(true, false, null, false);</b>
+&nbsp;        else
+&nbsp;        {
+<b class="fc">&nbsp;            ship.shoot(pos);</b>
+<b class="fc">&nbsp;            countHits++;</b>
+<b class="fc">&nbsp;            if (!ship.stillFloating()) {</b>
+<b class="fc">&nbsp;                countSinks++;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return new ShotResult(true, false, ship, !ship.stillFloating());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // ==================== OS MEUS TIROS SOBRE O ADVERSÁRIO ====================
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Lê a rajada do jogador sobre a frota do adversário a partir do scanner.
+&nbsp;     *
+&nbsp;     * @param in o scanner para ler as posições dos tiros
+&nbsp;     * @return string JSON com as posições dos tiros efectuados
+&nbsp;     */
+&nbsp;    public String readMyFire(Scanner in) {
+&nbsp;
+<b class="pc">&nbsp;        assert in != null;</b>
+&nbsp;
+&nbsp;        // Iniciar o cronómetro
+<b class="fc">&nbsp;        moveTimer.start();</b>
+&nbsp;
+<b class="fc">&nbsp;        String input = in.nextLine().trim();</b>
+&nbsp;
+&nbsp;        // Se a linha lida ficou vazia (o utilizador carregou Enter após &quot;rajada&quot;),
+&nbsp;        // aguardamos a linha seguinte com os tiros — é aqui que está a demora real.
+<b class="pc">&nbsp;        if (input.isEmpty()) {</b>
+<b class="fc">&nbsp;            input = in.nextLine().trim();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;IPosition&gt; shots = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        Scanner inputScanner = new Scanner(input);</b>
+<b class="pc">&nbsp;        while (shots.size() &lt; NUMBER_SHOTS &amp;&amp; inputScanner.hasNext()) {</b>
+<b class="fc">&nbsp;            String token = inputScanner.next();</b>
+&nbsp;
+<b class="pc">&nbsp;            if (token.matches(&quot;[A-Za-z]&quot;)) {</b>
+<b class="nc">&nbsp;                if (inputScanner.hasNextInt()) {</b>
+<b class="nc">&nbsp;                    int row = inputScanner.nextInt();</b>
+<b class="nc">&nbsp;                    shots.add(new Position(token.toUpperCase().charAt(0), row));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Posição incompleta! A coluna &#39;&quot; + token + &quot;&#39; não é seguida por uma linha.&quot;);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="fc">&nbsp;                Scanner singleScanner = new Scanner(token);</b>
+<b class="fc">&nbsp;                shots.add(Tasks.readClassicPosition(singleScanner));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (shots.size() != NUMBER_SHOTS) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Deve inserir exactamente &quot; + NUMBER_SHOTS + &quot; posições!&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Serializar para JSON e delegar no método sendMyShotsJson
+<b class="fc">&nbsp;        String shotsJson = Game.jsonShots(shots);</b>
+<b class="fc">&nbsp;        return sendMyShotsJson(shotsJson);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Efectua um único tiro do jogador sobre a frota do adversário.
+&nbsp;     *
+&nbsp;     * @param pos        a posição onde efectuar o tiro
+&nbsp;     * @param isRepeated true se o tiro for uma repetição
+&nbsp;     * @return o resultado do tiro
+&nbsp;     */
+&nbsp;    public ShotResult fireMyShot(IPosition pos, boolean isRepeated) {
+&nbsp;
+<b class="pc">&nbsp;        assert pos != null;</b>
+&nbsp;
+<b class="pc">&nbsp;        if (!pos.isInside())</b>
+<b class="nc">&nbsp;            return new ShotResult(false, false, null, false);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (isRepeated || myRepeatedShot(pos))</b>
+<b class="nc">&nbsp;            return new ShotResult(true, true, null, false);</b>
+&nbsp;
+<b class="fc">&nbsp;        IShip ship = alienFleet.shipAt(pos);</b>
+<b class="fc">&nbsp;        if (ship == null)</b>
+<b class="fc">&nbsp;            return new ShotResult(true, false, null, false);</b>
+&nbsp;        else {
+<b class="fc">&nbsp;            ship.shoot(pos);</b>
+<b class="fc">&nbsp;            if (!ship.stillFloating())</b>
+<b class="fc">&nbsp;                System.out.println(&quot;*** Afundaste um(a) &quot; + ship.getCategory() + &quot;! ***&quot;);</b>
+<b class="fc">&nbsp;            return new ShotResult(true, false, ship, !ship.stillFloating());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Verifica se a posição já foi alvo de um tiro meu anteriormente.
+&nbsp;     *
+&nbsp;     * @param pos a posição a verificar
+&nbsp;     * @return true se a posição já foi atacada por mim
+&nbsp;     */
+&nbsp;    public boolean myRepeatedShot(IPosition pos) {
+<b class="pc">&nbsp;        assert pos != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (IMove move : myMoves)</b>
+<b class="pc">&nbsp;            if (move.getShots().contains(pos))</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Imprime o tabuleiro do adversário de forma &quot;escondida&quot;, mostrando apenas
+&nbsp;     * onde o jogador já disparou e o número da jogada correspondente.
+&nbsp;     * * @param showLegend se true, exibe a legenda dos símbolos no final.
+&nbsp;     */
+&nbsp;    private void printAlienBoardHidden(boolean showLegend) {
+&nbsp;        // Usamos String para suportar números de jogadas no mapa
+<b class="fc">&nbsp;        String[][] map = new String[BOARD_SIZE][BOARD_SIZE];</b>
+&nbsp;
+&nbsp;        // Inicializar o tabuleiro com o marcador de água
+<b class="fc">&nbsp;        for (int r = 0; r &lt; BOARD_SIZE; r++) {</b>
+<b class="fc">&nbsp;            for (int c = 0; c &lt; BOARD_SIZE; c++) {</b>
+<b class="fc">&nbsp;                map[r][c] = String.valueOf(EMPTY_MARKER);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Preencher o tabuleiro com o número da jogada (usamos o resto da divisão por 10
+&nbsp;        // para garantir que o tabuleiro mantém o alinhamento visual com apenas 1 caractere)
+<b class="fc">&nbsp;        for (IMove move : myMoves) {</b>
+<b class="fc">&nbsp;            for (IPosition shot : move.getShots()) {</b>
+<b class="pc">&nbsp;                if (shot.isInside()) {</b>
+<b class="fc">&nbsp;                    map[shot.getRow()][shot.getColumn()] = String.valueOf(move.getNumber() % 10);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Impressão do cabeçalho das colunas (1 2 3...)
+<b class="fc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.print(&quot;    &quot;);</b>
+<b class="fc">&nbsp;        for (int col = 0; col &lt; BOARD_SIZE; col++) {</b>
+<b class="fc">&nbsp;            System.out.print(&quot; &quot; + (col + 1));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.print(&quot;   +-&quot;);</b>
+<b class="fc">&nbsp;        for (int col = 0; col &lt; BOARD_SIZE; col++) {</b>
+<b class="fc">&nbsp;            System.out.print(&quot;--&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println(&quot;+&quot;);</b>
+&nbsp;
+&nbsp;        // Impressão das linhas (A, B, C...) e conteúdo do mapa
+<b class="fc">&nbsp;        for (int row = 0; row &lt; BOARD_SIZE; row++) {</b>
+<b class="fc">&nbsp;            char rowLabel = (char) (&#39;A&#39; + row);</b>
+<b class="fc">&nbsp;            System.out.print(&quot; &quot; + rowLabel + &quot; |&quot;);</b>
+<b class="fc">&nbsp;            for (int col = 0; col &lt; BOARD_SIZE; col++) {</b>
+<b class="fc">&nbsp;                System.out.print(&quot; &quot; + map[row][col]);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            System.out.println(&quot; |&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.print(&quot;   +&quot;);</b>
+<b class="fc">&nbsp;        for (int col = 0; col &lt; BOARD_SIZE; col++) {</b>
+<b class="fc">&nbsp;            System.out.print(&quot;--&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println(&quot;-+&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (showLegend) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;          LEGENDA&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;&#39;&quot; + EMPTY_MARKER + &quot;&#39;-&gt;água, &#39;N&#39;-&gt;tiro efetuado na jogada nº N (mostra apenas último dígito)&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println();</b>
+&nbsp;
+&nbsp;        // Chamar a visualização da frota logo abaixo do mapa
+<b class="fc">&nbsp;        printAlienFleetHealth();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mostra o estado de saúde da frota adversária.
+&nbsp;     * Revela coordenadas e jogadas apenas para partes já atingidas.
+&nbsp;     */
+&nbsp;    private void printAlienFleetHealth() {
+<b class="fc">&nbsp;        System.out.println(&quot;=== ESTADO DE DANOS DA FROTA ADVERSÁRIA ===&quot;);</b>
+&nbsp;
+&nbsp;        // Percorre todos os navios da frota inimiga
+<b class="fc">&nbsp;        for (IShip ship : alienFleet.getShips()) {</b>
+<b class="fc">&nbsp;            System.out.printf(&quot;%-15s &quot;, ship.getCategory());</b>
+&nbsp;
+&nbsp;            // Primeiro: mostrar as células atingidas (na ordem em que foram atingidas)
+&nbsp;            // Segundo: mostrar [.] para as células ainda não atingidas
+&nbsp;            // Desta forma o jogador vê os hits à esquerda mas não sabe a posição real do navio
+&nbsp;
+<b class="fc">&nbsp;            List&lt;String&gt; hitCells = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;            int unknownCount = 0;</b>
+&nbsp;
+&nbsp;            // Percorre cada célula individual do navio
+<b class="fc">&nbsp;            for (IPosition pos : ship.getPositions()) {</b>
+<b class="fc">&nbsp;                IMove hittingMove = null;</b>
+&nbsp;
+&nbsp;                // Verifica se este ponto específico foi atingido por algum tiro meu
+<b class="fc">&nbsp;                for (IMove move : myMoves) {</b>
+<b class="fc">&nbsp;                    if (move.getShots().contains(pos)) {</b>
+<b class="fc">&nbsp;                        hittingMove = move;</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                if (hittingMove != null) {</b>
+&nbsp;                    // Se foi atingido: Mostra a coordenada (ex: A5) e o número da jogada
+<b class="fc">&nbsp;                    String coord = pos.getClassicRow() + &quot;&quot; + pos.getClassicColumn();</b>
+<b class="fc">&nbsp;                    hitCells.add(String.format(&quot;[%s:%d]&quot;, coord, hittingMove.getNumber()));</b>
+&nbsp;                } else {
+<b class="fc">&nbsp;                    unknownCount++;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Mostrar hits primeiro
+<b class="fc">&nbsp;            for (String cell : hitCells)</b>
+<b class="fc">&nbsp;                System.out.print(cell + &quot; &quot;);</b>
+&nbsp;
+&nbsp;            // Depois as células desconhecidas
+<b class="fc">&nbsp;            for (int i = 0; i &lt; unknownCount; i++)</b>
+<b class="fc">&nbsp;                System.out.print(&quot;[.] &quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;            if (!ship.stillFloating()) {</b>
+<b class="fc">&nbsp;                System.out.print(&quot; -&gt; AFUNDADO!&quot;);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            System.out.println();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        System.out.println(&quot;===========================================&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Devolve o número de navios do adversário ainda a flutuar.
+&nbsp;     *
+&nbsp;     * @return número de navios do adversário por afundar
+&nbsp;     */
+&nbsp;    public int getAlienRemainingShips() {
+<b class="fc">&nbsp;        return alienFleet.getFloatingShips().size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getRepeatedShots()
+&nbsp;    {
+<b class="fc">&nbsp;        return this.countRepeatedShots;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getInvalidShots()
+&nbsp;    {
+<b class="fc">&nbsp;        return this.countInvalidShots;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getHits()
+&nbsp;    {
+<b class="fc">&nbsp;        return this.countHits;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getSunkShips()
+&nbsp;    {
+<b class="fc">&nbsp;        return this.countSinks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getRemainingShips()
+&nbsp;    {
+<b class="fc">&nbsp;        List&lt;IShip&gt; floatingShips = myFleet.getFloatingShips();</b>
+<b class="fc">&nbsp;        return floatingShips.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean repeatedShot(IPosition pos)
+&nbsp;    {
+<b class="pc">&nbsp;        assert pos != null;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (IMove move : alienMoves)</b>
+<b class="fc">&nbsp;            if (move.getShots().contains(pos))</b>
+<b class="fc">&nbsp;                return true;</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void printMyBoard(boolean show_shots, boolean show_legend)
+&nbsp;    {
+<b class="fc">&nbsp;        System.out.println(&quot;=== O MEU TABULEIRO ===&quot;);</b>
+<b class="fc">&nbsp;        Game.printBoard(this.myFleet, this.alienMoves, show_shots, show_legend);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void printAlienBoard(boolean show_shots, boolean show_legend)
+&nbsp;    {
+<b class="fc">&nbsp;        System.out.println(&quot;=== TABULEIRO DO ADVERSÁRIO ===&quot;);</b>
+<b class="fc">&nbsp;        printAlienBoardHidden(show_legend);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Imprime uma tabela com o tempo gasto em cada jogada,
+&nbsp;     * incluindo o total, a média, a jogada mais rápida e a mais lenta.
+&nbsp;     */
+&nbsp;    public void printTimingStats() {
+<b class="pc">&nbsp;        if (myMoves.isEmpty()) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Nenhuma jogada registada.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        System.out.println();</b>
+<b class="nc">&nbsp;        System.out.println(&quot;+----------- RELÓGIO DAS JOGADAS -----------+&quot;);</b>
+<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;Jogada nº&quot;, &quot;Tempo gasto&quot;);</b>
+<b class="nc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        long total = 0L;</b>
+<b class="nc">&nbsp;        long fastest = Long.MAX_VALUE;</b>
+<b class="nc">&nbsp;        long slowest = Long.MIN_VALUE;</b>
+<b class="nc">&nbsp;        int fastestMove = 0, slowestMove = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (IMove iMove : myMoves) {</b>
+<b class="nc">&nbsp;            if (iMove instanceof Move move) {</b>
+<b class="nc">&nbsp;                long d = move.getDuration();</b>
+<b class="nc">&nbsp;                total += d;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (d &lt; fastest) { fastest = d; fastestMove = move.getNumber(); }</b>
+<b class="nc">&nbsp;                if (d &gt; slowest) { slowest = d; slowestMove = move.getNumber(); }</b>
+&nbsp;
+<b class="nc">&nbsp;                System.out.printf(&quot;| %-10d | %-28s |%n&quot;,</b>
+<b class="nc">&nbsp;                        move.getNumber(), MoveTimer.format(d));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        long count = myMoves.size();</b>
+<b class="nc">&nbsp;        long avg = count &gt; 0 ? total / count : 0L;</b>
+&nbsp;
+<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;TOTAL&quot;, MoveTimer.format(total));</b>
+<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MÉDIA&quot;, MoveTimer.format(avg));</b>
+<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MAIS RÁPIDA (nº&quot; + fastestMove + &quot;)&quot;, MoveTimer.format(fastest));</b>
+<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MAIS LENTA (nº&quot;  + slowestMove + &quot;)&quot;, MoveTimer.format(slowest));</b>
+<b class="nc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
+<b class="nc">&nbsp;        System.out.println();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public void over() {
+&nbsp;        // Guardar registo e mostrar scoreboard
+<b class="fc">&nbsp;        ScoreboardManager.saveRecord(new GameRecord(this, false));</b>
+<b class="fc">&nbsp;        GameGui.showScoreboard();</b>
+&nbsp;
+&nbsp;        // Mostrar o relógio das jogadas antes da mensagem de fim de jogo
+<b class="fc">&nbsp;        printTimingStats();</b>
+<b class="fc">&nbsp;        PdfExporter.exportGameToPdf(this);</b>
+<b class="fc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;| Maldito sejas, Java Sparrow, eu voltarei, glub glub glub ... |&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Mensagem de vitória do jogador.
+&nbsp;     */
+&nbsp;    public void win() {
+&nbsp;        // Guardar registo e mostrar scoreboard
+<b class="nc">&nbsp;        ScoreboardManager.saveRecord(new GameRecord(this, true));</b>
+<b class="nc">&nbsp;        GameGui.showScoreboard();</b>
+&nbsp;
+<b class="nc">&nbsp;        printTimingStats();</b>
+<b class="nc">&nbsp;        PdfExporter.exportGameToPdf(this);</b>
+<b class="nc">&nbsp;        System.out.println();</b>
+<b class="nc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
+<b class="nc">&nbsp;        System.out.println(&quot;|       Parabéns! Afundaste toda a frota do adversário!        |&quot;);</b>
+<b class="nc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-24 18:41</div>
+</div>
+</body>
+</html>

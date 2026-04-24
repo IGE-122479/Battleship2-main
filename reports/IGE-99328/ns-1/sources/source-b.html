@@ -1,0 +1,581 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GameGui</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: GameGui (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GameGui</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85,7%
+  </span>
+  <span class="absValue">
+    (48/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98%
+  </span>
+  <span class="absValue">
+    (198/202)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.*;
+&nbsp;import javafx.scene.paint.Color;
+&nbsp;import javafx.scene.shape.Rectangle;
+&nbsp;import javafx.scene.text.Font;
+&nbsp;import javafx.scene.text.FontWeight;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Controlador principal da Interface Gráfica (GUI) para o jogo Batalha Naval.
+&nbsp; * Esta classe utiliza o padrão Singleton para garantir que apenas uma janela de monitorização
+&nbsp; * esteja ativa, permitindo atualizações em tempo real a partir da consola ou do simulador.
+&nbsp; *
+&nbsp; * A interface exibe dois tabuleiros lado a lado: a frota do jogador e o radar de ataques,
+&nbsp; * acompanhados por uma legenda explicativa das cores e o estado atual dos navios.
+&nbsp; * No fim do jogo, é exibido o scoreboard com os resultados de todos os jogos anteriores.
+&nbsp; */
+&nbsp;public class GameGui {
+&nbsp;
+&nbsp;    /** Instância única da interface (Singleton). */
+&nbsp;    private static GameGui instance;
+&nbsp;
+&nbsp;    /** Janela principal do JavaFX. */
+&nbsp;    private Stage stage;
+&nbsp;
+&nbsp;    /** Referência para o estado atual do jogo. */
+&nbsp;    private IGame game;
+&nbsp;
+&nbsp;    /** Componente visual do tabuleiro do jogador. */
+&nbsp;    private BoardView myBoard;
+&nbsp;
+&nbsp;    /** Componente visual do radar de ataques ao adversário. */
+&nbsp;    private BoardView radarBoard;
+&nbsp;
+&nbsp;    /** Painel dinâmico da legenda de navios (estado da frota). */
+&nbsp;    private VBox shipStatusBox;
+&nbsp;
+&nbsp;    /** Painel dinâmico do relógio das jogadas. */
+&nbsp;    private VBox timingBox;
+&nbsp;
+&nbsp;    /** Layout principal reutilizável. */
+&nbsp;    private VBox mainLayout;
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Singleton API
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exibe a janela da GUI. Se a janela já existir, apenas atualiza os dados do jogo
+&nbsp;     * e redesenha os componentes.
+&nbsp;     *
+&nbsp;     * @param game A instância do jogo {@link IGame} a ser visualizada.
+&nbsp;     */
+&nbsp;    public static void show(IGame game) {
+<b class="fc">&nbsp;        if (instance == null) {</b>
+<b class="fc">&nbsp;            instance = new GameGui(game);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            instance.game = game;</b>
+<b class="fc">&nbsp;            instance.refresh();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Solicita a atualização dos tabuleiros na Thread da aplicação JavaFX.
+&nbsp;     * Este método deve ser chamado sempre que houver uma alteração no estado do jogo
+&nbsp;     * (ex: após um disparo no comando &#39;rajada&#39; ou no &#39;simula&#39;).
+&nbsp;     */
+&nbsp;    public static void update() {
+<b class="fc">&nbsp;        if (instance != null) {</b>
+<b class="fc">&nbsp;            Platform.runLater(() -&gt; instance.refresh());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exibe o painel de fim de jogo com o scoreboard completo.
+&nbsp;     * Deve ser chamado quando o jogo terminar (vitória ou derrota).
+&nbsp;     */
+&nbsp;    public static void showScoreboard() {
+<b class="pc">&nbsp;        if (instance != null) {</b>
+<b class="fc">&nbsp;            Platform.runLater(() -&gt; instance.showScoreboardPanel());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Construção da janela
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construtor privado para inicializar a interface com um jogo específico.
+&nbsp;     *
+&nbsp;     * @param game Instância do jogo.
+&nbsp;     */
+<b class="fc">&nbsp;    private GameGui(IGame game) {</b>
+<b class="fc">&nbsp;        this.game = game;</b>
+<b class="fc">&nbsp;        this.stage = new Stage();</b>
+<b class="fc">&nbsp;        initContent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Configura a estrutura principal da janela, incluindo layouts, tabuleiros e legenda.
+&nbsp;     */
+&nbsp;    private void initContent() {
+<b class="fc">&nbsp;        mainLayout = new VBox(20);</b>
+<b class="fc">&nbsp;        mainLayout.setPadding(new Insets(20));</b>
+<b class="fc">&nbsp;        mainLayout.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        mainLayout.setStyle(&quot;-fx-background-color: #1a1a2e;&quot;);</b>
+&nbsp;
+&nbsp;        // --- Tabuleiros ---
+<b class="fc">&nbsp;        HBox boardsLayout = new HBox(40);</b>
+<b class="fc">&nbsp;        boardsLayout.setAlignment(Pos.CENTER);</b>
+&nbsp;
+<b class="fc">&nbsp;        myBoard    = new BoardView(game.getMyFleet(), game.getAlienMoves(), false);</b>
+<b class="fc">&nbsp;        radarBoard = new BoardView(game.getAlienFleet(), game.getMyMoves(), true);</b>
+&nbsp;
+<b class="fc">&nbsp;        VBox leftBox  = createBoardContainer(&quot;A MINHA FROTA&quot;, myBoard);</b>
+<b class="fc">&nbsp;        VBox rightBox = createBoardContainer(&quot;RADAR DE ATAQUE&quot;, radarBoard);</b>
+&nbsp;
+<b class="fc">&nbsp;        boardsLayout.getChildren().addAll(leftBox, rightBox);</b>
+&nbsp;
+&nbsp;        // --- Legenda de cores ---
+<b class="fc">&nbsp;        HBox colorLegend = createColorLegend();</b>
+&nbsp;
+&nbsp;        // --- Estado dos navios ---
+<b class="fc">&nbsp;        shipStatusBox = new VBox(6);</b>
+<b class="fc">&nbsp;        shipStatusBox.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        renderShipStatus();</b>
+&nbsp;
+&nbsp;        // --- Relógio das jogadas ---
+<b class="fc">&nbsp;        timingBox = new VBox(6);</b>
+<b class="fc">&nbsp;        timingBox.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        renderTiming();</b>
+&nbsp;
+<b class="fc">&nbsp;        mainLayout.getChildren().addAll(boardsLayout, colorLegend, shipStatusBox, timingBox);</b>
+&nbsp;
+<b class="fc">&nbsp;        ScrollPane scroll = new ScrollPane(mainLayout);</b>
+<b class="fc">&nbsp;        scroll.setFitToWidth(true);</b>
+<b class="fc">&nbsp;        scroll.setStyle(&quot;-fx-background: #1a1a2e; -fx-background-color: #1a1a2e;&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        Scene scene = new Scene(scroll, 900, 700);</b>
+<b class="fc">&nbsp;        stage.setTitle(&quot;Batalha Naval - Monitor de Jogo&quot;);</b>
+<b class="fc">&nbsp;        stage.setScene(scene);</b>
+<b class="fc">&nbsp;        stage.show();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Actualização
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Redesenha os tabuleiros e o estado dos navios com os dados mais recentes do jogo.
+&nbsp;     */
+&nbsp;    private void refresh() {
+<b class="fc">&nbsp;        myBoard.renderBoard(game.getMyFleet(), game.getAlienMoves(), false);</b>
+<b class="fc">&nbsp;        radarBoard.renderBoard(game.getAlienFleet(), game.getMyMoves(), true);</b>
+<b class="fc">&nbsp;        renderShipStatus();</b>
+<b class="fc">&nbsp;        renderTiming();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Estado dos navios
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Atualiza o painel de estado dos navios, mostrando para cada navio se ainda
+&nbsp;     * está a flutuar ou foi afundado.
+&nbsp;     */
+&nbsp;    private void renderShipStatus() {
+<b class="fc">&nbsp;        shipStatusBox.getChildren().clear();</b>
+&nbsp;
+<b class="fc">&nbsp;        Text title = new Text(&quot;ESTADO DA FROTA&quot;);</b>
+<b class="fc">&nbsp;        title.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 13));</b>
+<b class="fc">&nbsp;        title.setFill(Color.WHITE);</b>
+<b class="fc">&nbsp;        shipStatusBox.getChildren().add(title);</b>
+&nbsp;
+<b class="fc">&nbsp;        IFleet fleet = game.getMyFleet();</b>
+<b class="pc">&nbsp;        if (fleet == null || fleet.getShips() == null) return;</b>
+&nbsp;
+<b class="fc">&nbsp;        HBox row = new HBox(16);</b>
+<b class="fc">&nbsp;        row.setAlignment(Pos.CENTER);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (IShip ship : fleet.getShips()) {</b>
+<b class="fc">&nbsp;            VBox shipItem = new VBox(3);</b>
+<b class="fc">&nbsp;            shipItem.setAlignment(Pos.CENTER);</b>
+&nbsp;
+&nbsp;            // Indicador de cor: laranja = afundado, cinzento = intacto
+<b class="fc">&nbsp;            Rectangle indicator = new Rectangle(14, 14);</b>
+<b class="fc">&nbsp;            indicator.setArcWidth(4);</b>
+<b class="fc">&nbsp;            indicator.setArcHeight(4);</b>
+<b class="fc">&nbsp;            if (!ship.stillFloating()) {</b>
+<b class="fc">&nbsp;                indicator.setFill(Color.DARKORANGE);</b>
+<b class="fc">&nbsp;                indicator.setStroke(Color.ORANGE);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                indicator.setFill(Color.GRAY);</b>
+<b class="fc">&nbsp;                indicator.setStroke(Color.LIGHTGRAY);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            Text shipName = new Text(ship.getClass().getSimpleName());</b>
+<b class="fc">&nbsp;            shipName.setFont(Font.font(&quot;Arial&quot;, 10));</b>
+<b class="fc">&nbsp;            shipName.setFill(!ship.stillFloating() ? Color.DARKORANGE : Color.LIGHTGRAY);</b>
+&nbsp;
+<b class="fc">&nbsp;            Text shipStatus = new Text(!ship.stillFloating() ? &quot;✗&quot; : &quot;✓&quot;);</b>
+<b class="fc">&nbsp;            shipStatus.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 11));</b>
+<b class="fc">&nbsp;            shipStatus.setFill(!ship.stillFloating() ? Color.DARKORANGE : Color.LIGHTGREEN);</b>
+&nbsp;
+<b class="fc">&nbsp;            shipItem.getChildren().addAll(indicator, shipName, shipStatus);</b>
+<b class="fc">&nbsp;            row.getChildren().add(shipItem);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        shipStatusBox.getChildren().add(row);</b>
+&nbsp;
+&nbsp;        // Resumo: X a flutuar / Y afundados
+<b class="fc">&nbsp;        long sunk      = fleet.getShips().stream().filter(s -&gt; !s.stillFloating()).count();</b>
+<b class="fc">&nbsp;        long floating  = fleet.getShips().size() - sunk;</b>
+<b class="fc">&nbsp;        Text summary   = new Text(floating + &quot; a flutuar  |  &quot; + sunk + &quot; afundados&quot;);</b>
+<b class="fc">&nbsp;        summary.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 12));</b>
+<b class="fc">&nbsp;        summary.setFill(Color.LIGHTCYAN);</b>
+<b class="fc">&nbsp;        shipStatusBox.getChildren().add(summary);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Relógio das jogadas
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Atualiza o painel do relógio mostrando o tempo gasto em cada jogada.
+&nbsp;     * Só é exibido se existirem jogadas registadas.
+&nbsp;     */
+&nbsp;    private void renderTiming() {
+<b class="fc">&nbsp;        timingBox.getChildren().clear();</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;IMove&gt; moves = game.getMyMoves().isEmpty() ? game.getAlienMoves() : game.getMyMoves();</b>
+<b class="fc">&nbsp;        if (moves.isEmpty()) return;</b>
+&nbsp;
+<b class="fc">&nbsp;        Text title = new Text(&quot;⏱  RELÓGIO DAS JOGADAS&quot;);</b>
+<b class="fc">&nbsp;        title.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 13));</b>
+<b class="fc">&nbsp;        title.setFill(Color.WHITE);</b>
+<b class="fc">&nbsp;        timingBox.getChildren().add(title);</b>
+&nbsp;
+&nbsp;        // Tabela de jogadas
+<b class="fc">&nbsp;        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();</b>
+<b class="fc">&nbsp;        grid.setHgap(20);</b>
+<b class="fc">&nbsp;        grid.setVgap(4);</b>
+<b class="fc">&nbsp;        grid.setAlignment(Pos.CENTER);</b>
+&nbsp;
+&nbsp;        // Cabeçalho
+<b class="fc">&nbsp;        addTimingCell(grid, &quot;Jogada&quot;, 0, 0, true);</b>
+<b class="fc">&nbsp;        addTimingCell(grid, &quot;Tempo&quot;, 1, 0, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        long total = 0;</b>
+<b class="fc">&nbsp;        long fastest = Long.MAX_VALUE;</b>
+<b class="fc">&nbsp;        long slowest = Long.MIN_VALUE;</b>
+<b class="fc">&nbsp;        int fastestIdx = 0, slowestIdx = 0;</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; moves.size(); i++) {</b>
+<b class="fc">&nbsp;            IMove move = moves.get(i);</b>
+<b class="pc">&nbsp;            long duration = (move instanceof Move m) ? m.getDuration() : 0;</b>
+<b class="fc">&nbsp;            total += duration;</b>
+<b class="fc">&nbsp;            if (duration &lt; fastest) { fastest = duration; fastestIdx = i + 1; }</b>
+<b class="fc">&nbsp;            if (duration &gt; slowest) { slowest = duration; slowestIdx = i + 1; }</b>
+&nbsp;
+<b class="fc">&nbsp;            addTimingCell(grid, &quot;Jogada &quot; + move.getNumber(), 0, i + 1, false);</b>
+<b class="fc">&nbsp;            addTimingCell(grid, MoveTimer.format(duration), 1, i + 1, false);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        timingBox.getChildren().add(grid);</b>
+&nbsp;
+&nbsp;        // Resumo
+<b class="pc">&nbsp;        long avg = moves.size() &gt; 0 ? total / moves.size() : 0;</b>
+<b class="fc">&nbsp;        String summary = String.format(</b>
+&nbsp;                &quot;Total: %s  |  Média: %s  |  Mais rápida: Jog.%d (%s)  |  Mais lenta: Jog.%d (%s)&quot;,
+<b class="fc">&nbsp;                MoveTimer.format(total), MoveTimer.format(avg),</b>
+<b class="fc">&nbsp;                fastestIdx, MoveTimer.format(fastest),</b>
+<b class="fc">&nbsp;                slowestIdx, MoveTimer.format(slowest)</b>
+&nbsp;        );
+<b class="fc">&nbsp;        Text summaryText = new Text(summary);</b>
+<b class="fc">&nbsp;        summaryText.setFont(Font.font(&quot;Arial&quot;, 11));</b>
+<b class="fc">&nbsp;        summaryText.setFill(Color.LIGHTCYAN);</b>
+<b class="fc">&nbsp;        timingBox.getChildren().add(summaryText);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adiciona uma célula de texto à grelha do relógio.
+&nbsp;     */
+&nbsp;    private void addTimingCell(javafx.scene.layout.GridPane grid, String text, int col, int row, boolean bold) {
+<b class="fc">&nbsp;        Text t = new Text(text);</b>
+<b class="fc">&nbsp;        t.setFont(bold ? Font.font(&quot;Arial&quot;, FontWeight.BOLD, 11) : Font.font(&quot;Arial&quot;, 11));</b>
+<b class="fc">&nbsp;        t.setFill(bold ? Color.WHITE : Color.LIGHTGRAY);</b>
+<b class="fc">&nbsp;        javafx.scene.layout.StackPane cell = new javafx.scene.layout.StackPane(t);</b>
+<b class="fc">&nbsp;        cell.setPrefWidth(col == 0 ? 80 : 120);</b>
+<b class="fc">&nbsp;        cell.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="fc">&nbsp;        grid.add(cell, col, row);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Scoreboard
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adiciona o painel de scoreboard ao layout principal, mostrando todos os jogos
+&nbsp;     * registados até ao momento.
+&nbsp;     */
+&nbsp;    private void showScoreboardPanel() {
+&nbsp;        // Remove scoreboard anterior se existir
+<b class="fc">&nbsp;        mainLayout.getChildren().removeIf(n -&gt; &quot;scoreboard&quot;.equals(n.getId()));</b>
+&nbsp;
+<b class="fc">&nbsp;        VBox scorePanel = new VBox(10);</b>
+<b class="fc">&nbsp;        scorePanel.setId(&quot;scoreboard&quot;);</b>
+<b class="fc">&nbsp;        scorePanel.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        scorePanel.setPadding(new Insets(16));</b>
+<b class="fc">&nbsp;        scorePanel.setStyle(</b>
+&nbsp;                &quot;-fx-background-color: #16213e;&quot; +
+&nbsp;                        &quot;-fx-border-color: #e94560;&quot; +
+&nbsp;                        &quot;-fx-border-width: 2;&quot; +
+&nbsp;                        &quot;-fx-border-radius: 8;&quot; +
+&nbsp;                        &quot;-fx-background-radius: 8;&quot;
+&nbsp;        );
+<b class="fc">&nbsp;        scorePanel.setMaxWidth(700);</b>
+&nbsp;
+<b class="fc">&nbsp;        Text scoreTitle = new Text(&quot;SCOREBOARD — JOGOS PASSADOS&quot;);</b>
+<b class="fc">&nbsp;        scoreTitle.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 15));</b>
+<b class="fc">&nbsp;        scoreTitle.setFill(Color.web(&quot;#e94560&quot;));</b>
+<b class="fc">&nbsp;        scorePanel.getChildren().add(scoreTitle);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;GameRecord&gt; records = ScoreboardManager.loadRecords();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (records.isEmpty()) {</b>
+<b class="nc">&nbsp;            Text empty = new Text(&quot;Ainda não existem jogos registados.&quot;);</b>
+<b class="nc">&nbsp;            empty.setFont(Font.font(&quot;Arial&quot;, 12));</b>
+<b class="nc">&nbsp;            empty.setFill(Color.LIGHTGRAY);</b>
+<b class="nc">&nbsp;            scorePanel.getChildren().add(empty);</b>
+&nbsp;        } else {
+&nbsp;            // Cabeçalho
+<b class="fc">&nbsp;            HBox header = createScoreRow(&quot;Data/Hora&quot;, &quot;Jogadas&quot;, &quot;Acertos&quot;, &quot;Afundados&quot;, &quot;Resultado&quot;, true);</b>
+<b class="fc">&nbsp;            scorePanel.getChildren().add(header);</b>
+&nbsp;
+<b class="fc">&nbsp;            for (GameRecord r : records) {</b>
+<b class="fc">&nbsp;                boolean won = &quot;VITÓRIA&quot;.equals(r.getResult());</b>
+<b class="fc">&nbsp;                HBox recordRow = createScoreRow(</b>
+<b class="fc">&nbsp;                        r.getDateTime(),</b>
+<b class="fc">&nbsp;                        String.valueOf(r.getTotalMoves()),</b>
+<b class="fc">&nbsp;                        String.valueOf(r.getTotalHits()),</b>
+<b class="fc">&nbsp;                        String.valueOf(r.getSunkShips()),</b>
+<b class="fc">&nbsp;                        r.getResult(),</b>
+&nbsp;                        false
+&nbsp;                );
+&nbsp;                // Colorir linha conforme resultado
+<b class="fc">&nbsp;                recordRow.setStyle(&quot;-fx-background-color: &quot; +</b>
+<b class="pc">&nbsp;                        (won ? &quot;rgba(0,200,100,0.08)&quot; : &quot;rgba(233,69,96,0.08)&quot;) + &quot;;&quot;);</b>
+<b class="fc">&nbsp;                scorePanel.getChildren().add(recordRow);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Totais
+<b class="fc">&nbsp;            long wins   = records.stream().filter(r -&gt; &quot;VITÓRIA&quot;.equals(r.getResult())).count();</b>
+<b class="fc">&nbsp;            long losses = records.size() - wins;</b>
+<b class="fc">&nbsp;            Text totals = new Text(String.format(</b>
+&nbsp;                    &quot;Total: %d jogos  |  Vitórias: %d  |  Derrotas: %d&quot;,
+<b class="fc">&nbsp;                    records.size(), wins, losses));</b>
+<b class="fc">&nbsp;            totals.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 12));</b>
+<b class="fc">&nbsp;            totals.setFill(Color.LIGHTCYAN);</b>
+<b class="fc">&nbsp;            scorePanel.getChildren().add(totals);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        mainLayout.getChildren().add(scorePanel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cria uma linha da tabela do scoreboard com 5 colunas.
+&nbsp;     */
+&nbsp;    private HBox createScoreRow(String col1, String col2, String col3, String col4, String col5, boolean isHeader) {
+<b class="fc">&nbsp;        HBox row = new HBox();</b>
+<b class="fc">&nbsp;        row.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="fc">&nbsp;        row.setPadding(new Insets(4, 8, 4, 8));</b>
+&nbsp;
+<b class="fc">&nbsp;        double[] widths = {160, 70, 70, 90, 90};</b>
+<b class="fc">&nbsp;        String[] values = {col1, col2, col3, col4, col5};</b>
+&nbsp;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; values.length; i++) {</b>
+<b class="fc">&nbsp;            Text t = new Text(values[i]);</b>
+<b class="fc">&nbsp;            t.setFont(isHeader</b>
+<b class="fc">&nbsp;                    ? Font.font(&quot;Arial&quot;, FontWeight.BOLD, 11)</b>
+<b class="fc">&nbsp;                    : Font.font(&quot;Arial&quot;, 11));</b>
+&nbsp;
+<b class="fc">&nbsp;            if (isHeader) {</b>
+<b class="fc">&nbsp;                t.setFill(Color.WHITE);</b>
+<b class="fc">&nbsp;            } else if (i == 4) {</b>
+<b class="pc">&nbsp;                t.setFill(&quot;VITÓRIA&quot;.equals(values[i]) ? Color.LIGHTGREEN : Color.web(&quot;#e94560&quot;));</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                t.setFill(Color.LIGHTGRAY);</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            StackPane cell = new StackPane(t);</b>
+<b class="fc">&nbsp;            cell.setPrefWidth(widths[i]);</b>
+<b class="fc">&nbsp;            cell.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="fc">&nbsp;            row.getChildren().add(cell);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return row;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;    // Utilitários de layout
+&nbsp;    // -------------------------------------------------------------------------
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cria um contentor vertical para um tabuleiro, incluindo um título estilizado.
+&nbsp;     *
+&nbsp;     * @param title O título do tabuleiro.
+&nbsp;     * @param board A instância de {@link BoardView} a conter.
+&nbsp;     * @return Um {@link VBox} formatado.
+&nbsp;     */
+&nbsp;    private VBox createBoardContainer(String title, BoardView board) {
+<b class="fc">&nbsp;        VBox box = new VBox(10);</b>
+<b class="fc">&nbsp;        box.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        Text t = new Text(title);</b>
+<b class="fc">&nbsp;        t.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 16));</b>
+<b class="fc">&nbsp;        t.setFill(Color.WHITE);</b>
+<b class="fc">&nbsp;        box.getChildren().addAll(t, board);</b>
+<b class="fc">&nbsp;        return box;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gera a barra de legenda de cores (significado das cores do tabuleiro).
+&nbsp;     *
+&nbsp;     * @return Um {@link HBox} contendo os itens da legenda.
+&nbsp;     */
+&nbsp;    private HBox createColorLegend() {
+<b class="fc">&nbsp;        HBox hBox = new HBox(20);</b>
+<b class="fc">&nbsp;        hBox.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        hBox.getChildren().addAll(</b>
+<b class="fc">&nbsp;                createLegendItem(Color.GRAY,       &quot;Navio&quot;),</b>
+<b class="fc">&nbsp;                createLegendItem(Color.RED,        &quot;Tiro Certeiro (*)&quot;),</b>
+<b class="fc">&nbsp;                createLegendItem(Color.DARKORANGE, &quot;Afundado (-)&quot;),</b>
+<b class="fc">&nbsp;                createLegendItem(Color.WHITE,      &quot;Água (o)&quot;),</b>
+<b class="fc">&nbsp;                createLegendItem(Color.LIGHTBLUE,  &quot;Desconhecido&quot;)</b>
+&nbsp;        );
+<b class="fc">&nbsp;        return hBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cria um item individual da legenda com uma amostra de cor e um texto descritivo.
+&nbsp;     *
+&nbsp;     * @param color A cor a exibir no quadrado da legenda.
+&nbsp;     * @param label A descrição da cor.
+&nbsp;     * @return Um {@link HBox} com o quadrado colorido e o texto.
+&nbsp;     */
+&nbsp;    private HBox createLegendItem(Color color, String label) {
+<b class="fc">&nbsp;        HBox item = new HBox(5);</b>
+<b class="fc">&nbsp;        item.setAlignment(Pos.CENTER);</b>
+<b class="fc">&nbsp;        Rectangle r = new Rectangle(15, 15, color);</b>
+<b class="fc">&nbsp;        r.setStroke(Color.DARKGRAY);</b>
+<b class="fc">&nbsp;        Text txt = new Text(label);</b>
+<b class="fc">&nbsp;        txt.setFill(Color.LIGHTGRAY);</b>
+<b class="fc">&nbsp;        txt.setFont(Font.font(&quot;Arial&quot;, 11));</b>
+<b class="fc">&nbsp;        item.getChildren().addAll(r, txt);</b>
+<b class="fc">&nbsp;        return item;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-24 18:41</div>
+</div>
+</body>
+</html>

@@ -61,7 +61,7 @@ public class Tasks {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
 					game = new Game(myFleet);
-					aiadversario = new AiGame();
+					//aiadversario = new AiGame();
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
 					try {
@@ -203,8 +203,12 @@ public class Tasks {
 				case RAJADAIA:
 					if (game instanceof Game g) {
 						if (aiadversario == null) {
-							System.out.println("API_KEY não definida. Define-a nas Run Configurations.");
-							break;
+							try {
+								aiadversario = new AiGame();
+							} catch (IllegalStateException e) {
+								System.out.println("API_KEY não definida. Define-a nas Run Configurations.");
+								break;
+							}
 						}
 
 						System.out.println("--- O teu ataque ---");
