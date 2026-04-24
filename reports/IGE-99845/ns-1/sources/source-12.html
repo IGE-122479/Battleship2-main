@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MoveTimer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: MoveTimer (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MoveTimer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66,7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64,7%
+  </span>
+  <span class="absValue">
+    (11/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.time.StopWatch;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;/**
+&nbsp; * A classe MoveTimer mede o tempo decorrido em cada jogada (rajada) do jogo.
+&nbsp; * Utiliza o StopWatch da biblioteca Apache Commons Lang 3 para a cronometragem.
+&nbsp; *
+&nbsp; * Exemplo de utilização:
+&nbsp; *   MoveTimer timer = new MoveTimer();
+&nbsp; *   timer.start();
+&nbsp; *   // ... o jogador efectua os tiros ...
+&nbsp; *   long decorrido = timer.stop();
+&nbsp; *
+&nbsp; * Autor: IGE-99328
+&nbsp; */
+&nbsp;public class MoveTimer {
+&nbsp;
+&nbsp;    /** Instância do StopWatch da biblioteca Apache Commons Lang 3. */
+&nbsp;    private final StopWatch stopWatch;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cria um novo MoveTimer (ainda não iniciado).
+&nbsp;     */
+<b class="fc">&nbsp;    public MoveTimer() {</b>
+<b class="fc">&nbsp;        this.stopWatch = new StopWatch();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inicia (ou reinicia) o cronómetro.
+&nbsp;     */
+&nbsp;    public void start() {
+<b class="nc">&nbsp;        stopWatch.reset();</b>
+<b class="nc">&nbsp;        stopWatch.start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Para o cronómetro e devolve o tempo decorrido em milissegundos.
+&nbsp;     *
+&nbsp;     * @return o tempo decorrido em milissegundos, ou 0 se nunca tiver sido iniciado
+&nbsp;     */
+&nbsp;    public long stop() {
+<b class="pc">&nbsp;        if (stopWatch.isStarted()) {</b>
+<b class="nc">&nbsp;            stopWatch.stop();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return stopWatch.getTime(TimeUnit.MILLISECONDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Devolve o tempo decorrido até ao momento em milissegundos (mesmo que ainda esteja a correr).
+&nbsp;     *
+&nbsp;     * @return o tempo decorrido em milissegundos
+&nbsp;     */
+&nbsp;    public long elapsed() {
+<b class="nc">&nbsp;        return stopWatch.getTime(TimeUnit.MILLISECONDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Indica se o cronómetro está actualmente em funcionamento.
+&nbsp;     *
+&nbsp;     * @return true se estiver a correr
+&nbsp;     */
+&nbsp;    public boolean isRunning() {
+<b class="nc">&nbsp;        return stopWatch.isStarted();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Formata um tempo em milissegundos numa string legível, por exemplo &quot;2s 347ms&quot;.
+&nbsp;     *
+&nbsp;     * @param millis o tempo em milissegundos a formatar
+&nbsp;     * @return string formatada
+&nbsp;     */
+&nbsp;    public static String format(long millis) {
+<b class="fc">&nbsp;        long minutes = millis / 60_000;</b>
+<b class="fc">&nbsp;        long seconds = (millis % 60_000) / 1_000;</b>
+<b class="fc">&nbsp;        long ms      = millis % 1_000;</b>
+&nbsp;
+<b class="pc">&nbsp;        if (minutes &gt; 0) {</b>
+<b class="nc">&nbsp;            return String.format(&quot;%dm %ds %dms&quot;, minutes, seconds, ms);</b>
+<b class="fc">&nbsp;        } else if (seconds &gt; 0) {</b>
+<b class="fc">&nbsp;            return String.format(&quot;%ds %dms&quot;, seconds, ms);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return String.format(&quot;%dms&quot;, ms);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-24 19:42</div>
+</div>
+</body>
+</html>
