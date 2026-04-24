@@ -1,0 +1,254 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BoardView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">battleship</a>
+</div>
+
+<h1>Coverage Summary for Class: BoardView (battleship)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BoardView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package battleship;
+&nbsp;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.paint.Color;
+&nbsp;import javafx.scene.shape.Rectangle;
+&nbsp;import javafx.scene.text.Font;
+&nbsp;import javafx.scene.text.FontWeight;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * Representa a visualização gráfica de um tabuleiro de Batalha Naval utilizando JavaFX.
+&nbsp; * Esta classe estende {@link GridPane} para organizar as células, letras e números
+&nbsp; * numa grelha bidimensional.
+&nbsp; *
+&nbsp; * O tabuleiro inclui coordenadas (A-J e 1-10) e diferencia visualmente entre a
+&nbsp; * visão da frota própria e a visão do radar (inimigo).
+&nbsp; */
+&nbsp;public class BoardView extends GridPane {
+&nbsp;
+&nbsp;    /** Tamanho padrão do tabuleiro (10x10). */
+<b class="nc">&nbsp;    private final int SIZE = 10;</b>
+&nbsp;
+&nbsp;    /** Tamanho em pixels de cada célula quadrada. */
+<b class="nc">&nbsp;    private final double CELL_SIZE = 35.0;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constrói uma nova visualização do tabuleiro e renderiza o seu conteúdo inicial.
+&nbsp;     *
+&nbsp;     * @param fleet       A frota a ser exibida (pode ser nula se for apenas visualização de ataques).
+&nbsp;     * @param moves       A lista de jogadas (movimentos) realizados para exibir os tiros efetuados.
+&nbsp;     * @param isEnemyView Se verdadeiro, oculta os navios que ainda não foram atingidos (visão de radar).
+&nbsp;     */
+<b class="nc">&nbsp;    public BoardView(IFleet fleet, List&lt;IMove&gt; moves, boolean isEnemyView) {</b>
+<b class="nc">&nbsp;        renderBoard(fleet, moves, isEnemyView);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Responsável por desenhar todos os componentes do tabuleiro, incluindo as etiquetas
+&nbsp;     * de coordenadas e as células de jogo.
+&nbsp;     *
+&nbsp;     * @param fleet       A frota de navios para determinar as posições ocupadas.
+&nbsp;     * @param moves       O histórico de movimentos para determinar os tiros (água ou acerto).
+&nbsp;     * @param isEnemyView Define se a renderização deve seguir as regras de visualização do adversário.
+&nbsp;     */
+&nbsp;    public void renderBoard(IFleet fleet, List&lt;IMove&gt; moves, boolean isEnemyView) {
+<b class="nc">&nbsp;        this.getChildren().clear();</b>
+<b class="nc">&nbsp;        this.setAlignment(Pos.CENTER);</b>
+&nbsp;
+&nbsp;        // 1. Adicionar números no topo (1 a 10)
+<b class="nc">&nbsp;        for (int col = 0; col &lt; SIZE; col++) {</b>
+<b class="nc">&nbsp;            Text label = new Text(String.valueOf(col + 1));</b>
+<b class="nc">&nbsp;            label.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 12));</b>
+<b class="nc">&nbsp;            StackPane container = new StackPane(label);</b>
+<b class="nc">&nbsp;            container.setPrefSize(CELL_SIZE, CELL_SIZE / 2);</b>
+<b class="nc">&nbsp;            this.add(container, col + 1, 0);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 2. Adicionar letras na esquerda (A a J) e as células do tabuleiro
+<b class="nc">&nbsp;        for (int row = 0; row &lt; SIZE; row++) {</b>
+<b class="nc">&nbsp;            Text label = new Text(String.valueOf((char) (&#39;A&#39; + row)));</b>
+<b class="nc">&nbsp;            label.setFont(Font.font(&quot;Arial&quot;, FontWeight.BOLD, 12));</b>
+<b class="nc">&nbsp;            StackPane container = new StackPane(label);</b>
+<b class="nc">&nbsp;            container.setPrefSize(CELL_SIZE / 2, CELL_SIZE);</b>
+<b class="nc">&nbsp;            this.add(container, 0, row + 1);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int col = 0; col &lt; SIZE; col++) {</b>
+<b class="nc">&nbsp;                Position currentPos = new Position(row, col);</b>
+<b class="nc">&nbsp;                this.add(createCell(currentPos, fleet, moves, isEnemyView), col + 1, row + 1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cria uma célula individual (StackPane) contendo a representação visual de uma posição.
+&nbsp;     * A cor da célula muda conforme o estado: água, navio, tiro certeiro ou falhado.
+&nbsp;     * Navios completamente afundados são pintados a cor diferente (laranja escuro).
+&nbsp;     *
+&nbsp;     * @param pos         A posição correspondente na quadrícula.
+&nbsp;     * @param fleet       A frota para verificar ocupação por navios.
+&nbsp;     * @param moves       Os movimentos para verificar se a posição foi atingida.
+&nbsp;     * @param isEnemyView Se verdadeiro, não pinta os navios (cinzento) se não houver dano.
+&nbsp;     * @return Um {@link StackPane} configurado com a cor e bordas adequadas.
+&nbsp;     */
+&nbsp;    private StackPane createCell(Position pos, IFleet fleet, List&lt;IMove&gt; moves, boolean isEnemyView) {
+<b class="nc">&nbsp;        StackPane pane = new StackPane();</b>
+<b class="nc">&nbsp;        Rectangle rect = new Rectangle(CELL_SIZE, CELL_SIZE);</b>
+<b class="nc">&nbsp;        rect.setStroke(Color.DARKBLUE);</b>
+<b class="nc">&nbsp;        rect.setFill(Color.LIGHTBLUE); // Cor base: desconhecido</b>
+&nbsp;
+&nbsp;        // Verifica se a posição pertence a um navio afundado
+<b class="nc">&nbsp;        boolean isSunkShipCell = false;</b>
+&nbsp;
+&nbsp;        // Lógica de cores para Navios
+<b class="nc">&nbsp;        if (fleet != null &amp;&amp; fleet.getShips() != null) {</b>
+<b class="nc">&nbsp;            for (IShip ship : fleet.getShips()) {</b>
+<b class="nc">&nbsp;                if (ship.occupies(pos)) {</b>
+<b class="nc">&nbsp;                    if (!isEnemyView) {</b>
+&nbsp;                        // Navio afundado → cor especial (laranja escuro)
+<b class="nc">&nbsp;                        if (!ship.stillFloating()) {</b>
+<b class="nc">&nbsp;                            rect.setFill(Color.DARKORANGE);</b>
+<b class="nc">&nbsp;                            isSunkShipCell = true;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            rect.setFill(Color.GRAY); // Navio intacto</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Lógica de cores para Tiros (sobrepõe a cor do navio se houver impacto)
+<b class="nc">&nbsp;        if (moves != null) {</b>
+<b class="nc">&nbsp;            for (IMove move : moves) {</b>
+<b class="nc">&nbsp;                List&lt;IPosition&gt; shots = move.getShots();</b>
+<b class="nc">&nbsp;                List&lt;IGame.ShotResult&gt; results = move.getShotResults();</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; shots.size(); i++) {</b>
+<b class="nc">&nbsp;                    if (shots.get(i).equals(pos)) {</b>
+<b class="nc">&nbsp;                        IGame.ShotResult result = results.get(i);</b>
+<b class="nc">&nbsp;                        if (result.ship() != null) {</b>
+<b class="nc">&nbsp;                            if (result.sunk()) {</b>
+<b class="nc">&nbsp;                                rect.setFill(Color.DARKORANGE); // Navio afundado</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                rect.setFill(Color.RED); // Tiro certeiro (não afundado)</b>
+&nbsp;                            }
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            rect.setFill(Color.WHITE); // Tiro na água</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        pane.getChildren().add(rect);</b>
+<b class="nc">&nbsp;        return pane;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-04-24 19:42</div>
+</div>
+</body>
+</html>
