@@ -42,10 +42,28 @@ public class Tasks {
 	private static final String RAJADAIA = "rajadaia"; // jogar contra uma IA
 
 	private static final String GUI = "gui";
+
+
+	/**
+	 * Creates the Game for a given fleet.
+	 * Override in tests to return a controlled fake.
+	 */
+	protected IGame createGame(IFleet fleet) {
+		return new Game(fleet);
+	}
+
+	/**
+	 * Creates the AiGame.
+	 * Override in tests to return a controlled fake (or throw on purpose).
+	 */
+	protected AiGame createAiGame() {
+		return new AiGame();
+	}
+
 	/**
 	 * This task also tests the fighting element of a round of three shots
 	 */
-	public static void menu() {
+	public void runMenu() {
 
 		IFleet myFleet = null;
 		IGame game = null;
@@ -56,11 +74,11 @@ public class Tasks {
 		Scanner in = new Scanner(System.in);
 		String command = in.next();
 		while (!command.equals(DESISTIR)) {
-
+			boolean gameEnded = false;
 			switch (command) {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
-					game = new Game(myFleet);
+					game = createGame(myFleet);
 					//aiadversario = new AiGame();
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
@@ -79,7 +97,7 @@ public class Tasks {
 					break;
 				case LEFROTA:
 					myFleet = buildFleet(in);
-					game = new Game(myFleet);
+					game = createGame(myFleet);
 					game.printMyBoard(false, true);
 					break;
 				case STATUS:
@@ -113,19 +131,20 @@ public class Tasks {
 						// Verificar se o jogador ganhou
 						if (g.getAlienRemainingShips() == 0) {
 							g.win();
-							System.exit(0);
+							gameEnded = true;
 						}
+						// Resposta do adversário (se o jogo ainda não terminou)
+						if (!gameEnded) {
+							System.out.println("--- Ataque do adversário ---");
+							game.randomEnemyFire();
+							myFleet.printStatus();
+							game.printMyBoard(true, false);
+							GameGui.update();
 
-						// Resposta do adversário
-						System.out.println("--- Ataque do adversário ---");
-						game.randomEnemyFire();
-						myFleet.printStatus();
-						game.printMyBoard(true, false);
-						GameGui.update();
-
-						if (game.getRemainingShips() == 0) {
-							game.over();
-							System.exit(0);
+							if (game.getRemainingShips() == 0) {
+								game.over();
+								gameEnded = true;
+							}
 						}
 
 					} else {
@@ -173,9 +192,9 @@ public class Tasks {
 					else
 						System.out.println("Nenhum jogo em curso ou nenhuma jogada registada.");
 					break;
-                case AJUDA:
-                    menuHelp();
-                    break;
+				case AJUDA:
+					menuHelp();
+					break;
 				case GUARDAPDF:
 					if (game != null)
 						PdfExporter.exportGameToPdf(game);
@@ -204,7 +223,7 @@ public class Tasks {
 					if (game instanceof Game g) {
 						if (aiadversario == null) {
 							try {
-								aiadversario = new AiGame();
+								aiadversario = createAiGame();
 							} catch (IllegalStateException e) {
 								System.out.println("API_KEY não definida. Define-a nas Run Configurations.");
 								break;
@@ -216,20 +235,29 @@ public class Tasks {
 						game.getAlienFleet().printStatus();
 						g.printAlienBoard(true, false);
 
-						if (g.getAlienRemainingShips() == 0) { g.win(); System.exit(0); }
-
-						System.out.println("--- Ataque do AI ---");
-						try {
-							aiadversario.generateShots(game); // LLM decide os tiros
-						} catch (RuntimeException e) {
-							System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
-							game.randomEnemyFire();
+						if (g.getAlienRemainingShips() == 0) {
+							g.win();
+							gameEnded = true;
 						}
-						myFleet.printStatus();
-						game.printMyBoard(true, false);
-						GameGui.update();
 
-						if (game.getRemainingShips() == 0) { game.over(); System.exit(0); }
+						// Resposta do AI (se o jogo ainda não terminou)
+						if (!gameEnded) {
+							System.out.println("--- Ataque do AI ---");
+							try {
+								aiadversario.generateShots(game); // LLM decide os tiros
+							} catch (RuntimeException e) {
+								System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
+								game.randomEnemyFire();
+							}
+							myFleet.printStatus();
+							game.printMyBoard(true, false);
+							GameGui.update();
+
+							if (game.getRemainingShips() == 0) {
+								game.over();
+								gameEnded = true;
+							}
+						}
 					} else {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
@@ -240,10 +268,22 @@ public class Tasks {
 				default:
 					System.out.println("Que comando é esse??? Repete ...");
 			}
-			System.out.print("> ");
-			command = in.next();
+			// Se o jogo terminou, forçar saída do menu
+			if (gameEnded) {
+				command = DESISTIR;
+			} else {
+				System.out.print("> ");
+				command = in.next();
+			}
 		}
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	/**
+	 * Static entry-point — delegates to a default Tasks instance.
+	 */
+	public static void menu() {
+		new Tasks().runMenu();
 	}
 
 	/**
@@ -347,19 +387,15 @@ public class Tasks {
 			part2 = in.next(); // Segundo token, se disponível
 		}
 
-		String input = (part2 != null) ? part1 + part2 : part1;
+		part1 = part1.toUpperCase();
 
-		// Normalizar o input para tratar letras maiúsculas e minúsculas
-		input = input.toUpperCase();
-
-		// Verificar os dois formatos possíveis: compactos e com espaço
-		if (input.matches("[A-Z]\\d+")) {
-			char column = input.charAt(0); // Extrair a coluna
-			int row = Integer.parseInt(input.substring(1)); // Extrair a linha
+		if (part2 == null && part1.matches("[A-Z]\\d+")) {
+			char column = part1.charAt(0);
+			int row = Integer.parseInt(part1.substring(1));
 			return new Position(column, row);
-		} else if (part2 != null && part1.matches("[A-Z]") && part2.matches("\\d+")) {
-			char column = part1.charAt(0); // Extrair a coluna
-			int row = Integer.parseInt(part2); // Extrair a linha
+		} else if (part2 != null && part1.matches("[A-Z]")) {
+			char column = part1.charAt(0);
+			int row = Integer.parseInt(part2);
 			return new Position(column, row);
 		} else {
 			throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");

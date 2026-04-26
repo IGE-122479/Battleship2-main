@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96,7%
+    100%
   </span>
   <span class="absValue">
-    (29/30)
+    (30/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    75,8%
+    83%
   </span>
   <span class="absValue">
-    (138/182)
+    (151/182)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    83,8%
+    96%
   </span>
   <span class="absValue">
-    (269/321)
+    (308/321)
   </span>
 </td>
 </tr>
@@ -329,20 +329,20 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        // Gerar coordenadas únicas até atingir o número definido por NUMBER_SHOTS
 &nbsp;
 <b class="fc">&nbsp;        IPosition newShot = null;</b>
-<b class="pc">&nbsp;        if (candidateShots.size() &gt;= Game.NUMBER_SHOTS)</b>
+<b class="fc">&nbsp;        if (candidateShots.size() &gt;= Game.NUMBER_SHOTS)</b>
 <b class="fc">&nbsp;            while (shots.size() &lt; Game.NUMBER_SHOTS) {</b>
 <b class="fc">&nbsp;                newShot = candidateShots.get(random.nextInt(candidateShots.size()));</b>
 <b class="fc">&nbsp;                if (!shots.contains(newShot))</b>
 <b class="fc">&nbsp;                    shots.add(newShot);</b>
 &nbsp;            }
 &nbsp;        else {
-<b class="nc">&nbsp;            while (shots.size() &lt; candidateShots.size()) {</b>
-<b class="nc">&nbsp;                newShot = candidateShots.get(random.nextInt(candidateShots.size()));</b>
-<b class="nc">&nbsp;                if (!shots.contains(newShot))</b>
-<b class="nc">&nbsp;                    shots.add(newShot);</b>
+<b class="fc">&nbsp;            while (shots.size() &lt; candidateShots.size()) {</b>
+<b class="fc">&nbsp;                newShot = candidateShots.get(random.nextInt(candidateShots.size()));</b>
+<b class="pc">&nbsp;                if (!shots.contains(newShot))</b>
+<b class="fc">&nbsp;                    shots.add(newShot);</b>
 &nbsp;            }
-<b class="nc">&nbsp;            while (shots.size() &lt; Game.NUMBER_SHOTS)</b>
-<b class="nc">&nbsp;                shots.add(newShot);</b>
+<b class="fc">&nbsp;            while (shots.size() &lt; Game.NUMBER_SHOTS)</b>
+<b class="fc">&nbsp;                shots.add(newShot);</b>
 &nbsp;        }
 &nbsp;
 <b class="fc">&nbsp;        System.out.print(&quot;rajada &quot;);</b>
@@ -802,45 +802,45 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * incluindo o total, a média, a jogada mais rápida e a mais lenta.
 &nbsp;     */
 &nbsp;    public void printTimingStats() {
-<b class="pc">&nbsp;        if (myMoves.isEmpty()) {</b>
+<b class="fc">&nbsp;        if (myMoves.isEmpty()) {</b>
 <b class="fc">&nbsp;            System.out.println(&quot;Nenhuma jogada registada.&quot;);</b>
 &nbsp;            return;
 &nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;        System.out.println();</b>
-<b class="nc">&nbsp;        System.out.println(&quot;+----------- RELÓGIO DAS JOGADAS -----------+&quot;);</b>
-<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;Jogada nº&quot;, &quot;Tempo gasto&quot;);</b>
-<b class="nc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+----------- RELÓGIO DAS JOGADAS -----------+&quot;);</b>
+<b class="fc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;Jogada nº&quot;, &quot;Tempo gasto&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
 &nbsp;
-<b class="nc">&nbsp;        long total = 0L;</b>
-<b class="nc">&nbsp;        long fastest = Long.MAX_VALUE;</b>
-<b class="nc">&nbsp;        long slowest = Long.MIN_VALUE;</b>
-<b class="nc">&nbsp;        int fastestMove = 0, slowestMove = 0;</b>
+<b class="fc">&nbsp;        long total = 0L;</b>
+<b class="fc">&nbsp;        long fastest = Long.MAX_VALUE;</b>
+<b class="fc">&nbsp;        long slowest = Long.MIN_VALUE;</b>
+<b class="fc">&nbsp;        int fastestMove = 0, slowestMove = 0;</b>
 &nbsp;
-<b class="nc">&nbsp;        for (IMove iMove : myMoves) {</b>
-<b class="nc">&nbsp;            if (iMove instanceof Move move) {</b>
-<b class="nc">&nbsp;                long d = move.getDuration();</b>
-<b class="nc">&nbsp;                total += d;</b>
+<b class="fc">&nbsp;        for (IMove iMove : myMoves) {</b>
+<b class="pc">&nbsp;            if (iMove instanceof Move move) {</b>
+<b class="fc">&nbsp;                long d = move.getDuration();</b>
+<b class="fc">&nbsp;                total += d;</b>
 &nbsp;
-<b class="nc">&nbsp;                if (d &lt; fastest) { fastest = d; fastestMove = move.getNumber(); }</b>
-<b class="nc">&nbsp;                if (d &gt; slowest) { slowest = d; slowestMove = move.getNumber(); }</b>
+<b class="pc">&nbsp;                if (d &lt; fastest) { fastest = d; fastestMove = move.getNumber(); }</b>
+<b class="pc">&nbsp;                if (d &gt; slowest) { slowest = d; slowestMove = move.getNumber(); }</b>
 &nbsp;
-<b class="nc">&nbsp;                System.out.printf(&quot;| %-10d | %-28s |%n&quot;,</b>
-<b class="nc">&nbsp;                        move.getNumber(), MoveTimer.format(d));</b>
+<b class="fc">&nbsp;                System.out.printf(&quot;| %-10d | %-28s |%n&quot;,</b>
+<b class="fc">&nbsp;                        move.getNumber(), MoveTimer.format(d));</b>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
-<b class="nc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
 &nbsp;
-<b class="nc">&nbsp;        long count = myMoves.size();</b>
-<b class="nc">&nbsp;        long avg = count &gt; 0 ? total / count : 0L;</b>
+<b class="fc">&nbsp;        long count = myMoves.size();</b>
+<b class="pc">&nbsp;        long avg = count &gt; 0 ? total / count : 0L;</b>
 &nbsp;
-<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;TOTAL&quot;, MoveTimer.format(total));</b>
-<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MÉDIA&quot;, MoveTimer.format(avg));</b>
-<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MAIS RÁPIDA (nº&quot; + fastestMove + &quot;)&quot;, MoveTimer.format(fastest));</b>
-<b class="nc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MAIS LENTA (nº&quot;  + slowestMove + &quot;)&quot;, MoveTimer.format(slowest));</b>
-<b class="nc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
-<b class="nc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;TOTAL&quot;, MoveTimer.format(total));</b>
+<b class="fc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MÉDIA&quot;, MoveTimer.format(avg));</b>
+<b class="fc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MAIS RÁPIDA (nº&quot; + fastestMove + &quot;)&quot;, MoveTimer.format(fastest));</b>
+<b class="fc">&nbsp;        System.out.printf(&quot;| %-10s | %-28s |%n&quot;, &quot;MAIS LENTA (nº&quot;  + slowestMove + &quot;)&quot;, MoveTimer.format(slowest));</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+------------+-----------------------------+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println();</b>
 &nbsp;    }
 &nbsp;
 &nbsp;
@@ -863,15 +863,15 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     */
 &nbsp;    public void win() {
 &nbsp;        // Guardar registo e mostrar scoreboard
-<b class="nc">&nbsp;        ScoreboardManager.saveRecord(new GameRecord(this, true));</b>
-<b class="nc">&nbsp;        GameGui.showScoreboard();</b>
+<b class="fc">&nbsp;        ScoreboardManager.saveRecord(new GameRecord(this, true));</b>
+<b class="fc">&nbsp;        GameGui.showScoreboard();</b>
 &nbsp;
-<b class="nc">&nbsp;        printTimingStats();</b>
-<b class="nc">&nbsp;        PdfExporter.exportGameToPdf(this);</b>
-<b class="nc">&nbsp;        System.out.println();</b>
-<b class="nc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
-<b class="nc">&nbsp;        System.out.println(&quot;|       Parabéns! Afundaste toda a frota do adversário!        |&quot;);</b>
-<b class="nc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
+<b class="fc">&nbsp;        printTimingStats();</b>
+<b class="fc">&nbsp;        PdfExporter.exportGameToPdf(this);</b>
+<b class="fc">&nbsp;        System.out.println();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;|       Parabéns! Afundaste toda a frota do adversário!        |&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;+--------------------------------------------------------------+&quot;);</b>
 &nbsp;    }
 &nbsp;}
 </code>
@@ -897,7 +897,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-24 18:41</div>
+    <div style="float:right;">generated on 2026-04-26 17:14</div>
 </div>
 </body>
 </html>

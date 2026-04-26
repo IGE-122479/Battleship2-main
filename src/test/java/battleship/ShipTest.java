@@ -141,6 +141,17 @@ public class ShipTest {
     }
 
     /**
+     * Test for the shoot method  (test assert).
+     */
+    @Test
+    void testShoot3() {
+        Ship ship = Ship.buildShip("barca", Compass.NORTH, new Position(0,0));
+        IPosition outside = new Position(-1, 50);
+        assertThrows(AssertionError.class, () -> ship.shoot(outside), "Error: Ship should be marked as hit.");
+        assertThrows(AssertionError.class, () -> ship.shoot(null), "Error: shoot() should throw an AssertionError when given a null position.");
+    }
+
+    /**
      * Test for the occupies method (position occupied).
      * Cyclomatic Complexity: 2
      */
@@ -158,6 +169,15 @@ public class ShipTest {
         Position pos = new Position(1, 1);
         assertFalse(ship.occupies(pos), "Error: Ship should not occupy position (1, 1).");
     }
+
+    /**
+     * Test for the occupies method (test assert).
+     */
+    @Test
+    void testOccupies3() {
+        assertThrows(AssertionError.class, () -> ship.occupies(null), "Error: occupies() should throw an AssertionError when given a null position.");
+    }
+
 
     /**
      * Test for the tooCloseTo method with another IShip (ships too close).
@@ -179,6 +199,14 @@ public class ShipTest {
     }
 
     /**
+     * Test for the tooCloseTo method with another IShip (test assert).
+     */
+    @Test
+    void testTooCloseToShip3() {
+        assertThrows(AssertionError.class, () -> ship.tooCloseTo((IShip) null), "Error: occupies() should throw an AssertionError when given a null position.");
+    }
+
+    /**
      * Test for the tooCloseTo method with an IPosition (positions adjacent).
      * Cyclomatic Complexity: 2
      */
@@ -195,6 +223,14 @@ public class ShipTest {
     void testTooCloseToPosition2() {
         Position pos = new Position(7, 7); // Non-adjacent position
         assertFalse(ship.tooCloseTo(pos), "Error: Ship should not be too close to the given position.");
+    }
+
+    /**
+     * Test for the tooCloseTo method with an IPosition (test assert).
+     */
+    @Test
+    void testTooCloseToPosition3() {
+        assertThrows(AssertionError.class, () -> ship.tooCloseTo((IPosition) null), "Error: occupies() should throw an AssertionError when given a null position.");
     }
 
     /**
@@ -248,7 +284,7 @@ public class ShipTest {
 
     /**
      * Test for the getAdjacentPositions method.
-     * Cyclomatic Complexity: 4
+     * Cyclomatic Complexity: 5
      */
     @Test
     @DisplayName("testGetAdjacentPositions1 – contem a quantidade certas de posições adjacentes.")
@@ -300,7 +336,7 @@ public class ShipTest {
 
     /**
      * Test for the buildShip method.
-     * Cyclomatic Complexity: 6
+     * Cyclomatic Complexity: 7
      */
     @Test
     @DisplayName("[buildShip] buildShip1 – 'barca' devolve uma instância de Barge")
@@ -368,6 +404,15 @@ public class ShipTest {
         Ship s = Ship.buildShip("submarino", Compass.NORTH, new Position(0, 0));
         assertNull(s,
                 "Erro: buildShip() com tipo desconhecido deve devolver null (ramo default).");
+    }
+
+    @Test
+    @DisplayName("[buildShip] buildShip7 – testa os asserts")
+    void buildShip7() {
+        assertThrows(AssertionError.class, () -> Ship.buildShip(null, null, null), "Erro: buildShip() deve lançar um AssertionError quando os argumentos são null.");
+        assertThrows(AssertionError.class, () -> Ship.buildShip("barca", null, new Position(0,0)), "Erro: buildShip() deve lançar um AssertionError quando o bearing é null.");
+        assertThrows(AssertionError.class, () -> Ship.buildShip("barca", Compass.NORTH, null), "Erro: buildShip() deve lançar um AssertionError quando a posição é null.");
+
     }
 
 }
