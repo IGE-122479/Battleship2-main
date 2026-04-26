@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//useocl
 
 /**
  * Classe que gerencia o jogo de Batalha Naval contra uma IA baseada em LLM (Large Language Model).
@@ -20,37 +19,61 @@ import java.util.regex.Pattern;
  */
 public class AiGame {
 
-    // Configurações da API e modelo LLM
     private static final String MODEL_ID = "meta-llama/Llama-3.3-70B-Instruct";
     private static final String API_URL = "https://router.huggingface.co/v1/chat/completions";
-    private static final int MAX_OUTPUT_TOKENS    = 256;      // Máximo de tokens na resposta da IA
-    private static final int HTTP_TIMEOUT_SECONDS = 45;       // Tempo máximo para resposta da API
-    private static final int MAX_RETRIES          = 3;        // Tentativas máximas se a IA responder mal
+    private static final int MAX_OUTPUT_TOKENS    = 256;
+    private static final int HTTP_TIMEOUT_SECONDS = 45;
+    private static final int MAX_RETRIES          = 3;
 
-    // Cliente HTTP e ferramentas de manipulação JSON
     private final HttpClient   httpClient;
     private final ObjectMapper objectMapper;
     private final String apiKey;
 
-    // Histórico de mensagens para manter contexto na conversa com a IA
     private final List<Map<String, Object>> conversationHistory = new ArrayList<>();
-    private boolean firstMove = true;  // Flag para saber se é o primeiro tiro
+    private boolean firstMove = true;
 
+    static java.util.function.Supplier<String> apiResponseOverride = null;
+    static String envTokenOverride = null;
+
+    @FunctionalInterface
+    interface HttpCallable {
+        java.net.http.HttpResponse<String> call(String requestJson) throws Exception;
+    }
+
+    static HttpCallable httpOverride = null;
 
     /**
      * Construtor: inicializa o cliente HTTP e carrega a chave de API das variáveis de ambiente.
      * Se a chave não estiver definida, lança uma exceção.
      */
     public AiGame(){
-        this.apiKey = System.getenv("API_TOKEN");
-        if (this.apiKey == null || this.apiKey.isEmpty()) {
+        String token = getApiToken();
+        if (token == null || token.isEmpty()) {
            throw new IllegalStateException("API_KEY environment variable is not set.");
         }
+        this.apiKey = token;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))
                 .build();
         this.objectMapper = new ObjectMapper();
+    }
 
+    String getApiToken() {
+        return (envTokenOverride != null) ? envTokenOverride : System.getenv("API_TOKEN");
+    }
+
+    /**
+     * Construtor de teste: permite injetar apiKey sem variável de ambiente.
+     */
+     AiGame(String apiKey) {
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IllegalStateException("API_KEY environment variable is not set.");
+        }
+        this.apiKey = apiKey;
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))
+                .build();
+        this.objectMapper = new ObjectMapper();
     }
 
     /**
@@ -60,7 +83,6 @@ public class AiGame {
      */
     public String generateShots(IGame game){
         assert game != null;
-        int teste = 2;
 
         String userMessage = buildUserMessage(game);
         String shotsJson = askLlmForShots(userMessage);
@@ -163,10 +185,9 @@ public class AiGame {
      * @return String contendo a mensagem para enviar à IA
      */
     private String buildUserMessage(IGame game) {
-        // Obtém o histórico de movimentos feitos pela IA
+
         List<IMove> alienMoves = game.getAlienMoves();
 
-        // Se for o primeiro tiro, envia instruções iniciais
         if (firstMove) {
             firstMove = false;
             return buildSystemPrompt() + "O jogo começa agora. " +
@@ -177,7 +198,6 @@ public class AiGame {
                     "Responde APENAS com o JSON puro, sem texto adicional.";
         }
 
-        // Para jogadas seguintes, constrói mensagem com resultado anterior
         IMove lastMove = alienMoves.get(alienMoves.size() - 1);
         int remaining = game.getRemainingShips();
         String detailedResult = lastMove.toDetailedString();
@@ -209,7 +229,6 @@ public class AiGame {
         StringBuilder sb = new StringBuilder();
         sb.append("COORDENADAS JÁ DISPARADAS (NUNCA repitas nenhuma destas):\n");
 
-        // Coleta todas as coordenadas disparadas em movimentos anteriores
         List<String> coords = new ArrayList<>();
 
         for (IMove move : alienMoves) {
@@ -218,7 +237,6 @@ public class AiGame {
             }
         }
 
-        // Formata a resposta
         if (coords.isEmpty()) {
             sb.append("Nenhuma ainda.\n");
         } else {
@@ -237,26 +255,23 @@ public class AiGame {
      * @return JSON com os 3 tiros decididos
      */
     private String askLlmForShots(String userMessage) {
-        // Adiciona a pergunta ao histórico
+
         addToHistory("user", userMessage);
 
-        // Tenta obter uma resposta válida da IA
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             String llmResponse = callApi();
 
             addToHistory("assistant", llmResponse);
 
             String extracted = extractShotsJson(llmResponse);
-            if (extracted != null && isValidShotsJson(extracted)) {
+            if (extracted != null) {
                 return extracted;
             }
 
-            // Se falhou, mostra o erro
             System.out.println("Tentativa " + attempt + "/" + MAX_RETRIES
                     + " — resposta inválida: "
                     + llmResponse.substring(0, Math.min(80, llmResponse.length())));
 
-            // Se não é a última tentativa, pede para tentar de novo
             if (attempt < MAX_RETRIES) {
                 addToHistory("user",
                         "Resposta inválida. Deves responder APENAS com um array JSON de " +
@@ -267,7 +282,6 @@ public class AiGame {
             }
         }
 
-        // Se todas as tentativas falharam, usa tiros aleatórios como fallback
         System.out.println("Todas as tentativas falharam. A usar fallback aleatório.");
         return buildRandomFallbackJson();
     }
@@ -279,8 +293,13 @@ public class AiGame {
      * @throws RuntimeException Se houver erro na chamada ou timeout
      */
     private String callApi() {
+
+        // Para teste: permite substituir a chamada real à API
+        if (apiResponseOverride != null) {
+            return apiResponseOverride.get();
+        }
+
         try {
-            // Prepara o corpo da requisição com o modelo e histórico
             Map<String, Object> requestBody = new LinkedHashMap<>();
             requestBody.put("model", MODEL_ID);
             requestBody.put("messages", conversationHistory);
@@ -289,20 +308,8 @@ public class AiGame {
 
             String requestJson = objectMapper.writeValueAsString(requestBody);
 
-            // Constrói a requisição HTTP
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(API_URL))
-                    .header("Authorization", "Bearer " + apiKey)  // Bearer token no header
-                    .header("Content-Type", "application/json")
-                    .timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))
-                    .POST(HttpRequest.BodyPublishers.ofString(requestJson))
-                    .build();
+            HttpResponse<String> response = executeHttpCall(requestJson);
 
-            // Envia a requisição e processa a resposta
-            HttpResponse<String> response = httpClient.send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
-            // Verifica se a requisição foi bem-sucedida
             if (response.statusCode() != 200) {
                 throw new RuntimeException("Erro HTTP " + response.statusCode()
                         + ": " + response.body());
@@ -320,6 +327,23 @@ public class AiGame {
         }
     }
 
+    HttpResponse<String> executeHttpCall(String requestJson) throws Exception {
+        if (httpOverride != null) {
+            return httpOverride.call(requestJson);
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_URL))
+                .header("Authorization", "Bearer " + apiKey)  // Bearer token no header
+                .header("Content-Type", "application/json")
+                .timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))
+                .POST(HttpRequest.BodyPublishers.ofString(requestJson))
+                .build();
+
+        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+    }
+
     /**
      * Interpreta a resposta JSON da API da Hugging Face.
      * Extrai o texto da mensagem da IA do objeto de resposta complexo.
@@ -329,11 +353,9 @@ public class AiGame {
      */
     private String parseAiResponse(String responseBody) {
         try {
-            // Parse do JSON e extração do conteúdo
             JsonNode root    = objectMapper.readTree(responseBody);
             JsonNode choices = root.path("choices");
 
-            // Valida se choices existe e não está vazio
             if (choices.isArray() && !choices.isEmpty()) {
                 JsonNode content = choices.get(0)
                         .path("message")
@@ -349,8 +371,7 @@ public class AiGame {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar resposta: "
-                    + e.getMessage(), e);
+            throw new RuntimeException("Erro ao interpretar resposta: " + e.getMessage(), e);
         }
     }
 
@@ -364,7 +385,9 @@ public class AiGame {
     private String extractShotsJson(String llmResponse) {
         if (llmResponse == null || llmResponse.isBlank()) return null;
 
-        // Tenta extrair JSON dentro de blocos de código (```json ... ```)
+        String trimmed = llmResponse.trim();
+        if (trimmed.startsWith("[") && isValidShotsJson(trimmed)) return trimmed;
+
         Pattern codeBlock = Pattern.compile(
                 "```(?:json)?\\s*(\\[.*?])\\s*```",
                 Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
@@ -374,17 +397,12 @@ public class AiGame {
             if (isValidShotsJson(c)) return c;
         }
 
-        // Tenta extrair um array JSON diretamente
         Pattern arrayPat = Pattern.compile("(\\[\\s*\\{.*?}\\s*])", Pattern.DOTALL);
         Matcher m2 = arrayPat.matcher(llmResponse);
         while (m2.find()) {
             String c = m2.group(1).trim();
             if (isValidShotsJson(c)) return c;
         }
-
-        // Tenta usar a resposta inteira se começar com [
-        String trimmed = llmResponse.trim();
-        if (trimmed.startsWith("[") && isValidShotsJson(trimmed)) return trimmed;
 
         return null;
     }
@@ -398,16 +416,13 @@ public class AiGame {
     private boolean isValidShotsJson(String json) {
         try {
             JsonNode root = objectMapper.readTree(json);
-            // Verifica se é um array com exatamente NUMBER_SHOTS elementos
             if (!root.isArray() || root.size() != Game.NUMBER_SHOTS) return false;
 
-            // Valida cada tiro individualmente
             for (JsonNode shot : root) {
                 JsonNode rowNode = shot.get("row");
                 JsonNode colNode = shot.get("column");
                 if (rowNode == null || colNode == null) return false;
 
-                // Verifica se a linha é A-J e a coluna é 1-10
                 String row = rowNode.asText().toUpperCase();
                 int    col = colNode.asInt();
                 if (row.length() != 1 || row.charAt(0) < 'A' || row.charAt(0) > 'J') return false;
@@ -425,15 +440,12 @@ public class AiGame {
      * @return JSON formatado com 3 tiros aleatórios
      */
     private String buildRandomFallbackJson() {
-        // Cria lista com todas as posições do tabuleiro
         List<IPosition> available = new ArrayList<>();
         for (int r = 0; r < Game.BOARD_SIZE; r++)
             for (int c = 0; c < Game.BOARD_SIZE; c++)
                 available.add(new Position(r, c));
 
-        // Embaralha e pega nos primeiros 3
         Collections.shuffle(available, new Random());
-
         return Game.jsonShots(available.subList(0, Game.NUMBER_SHOTS));
     }
 

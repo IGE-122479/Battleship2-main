@@ -1,5 +1,6 @@
 package battleship;
 
+import com.itextpdf.layout.element.Table;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,11 +29,13 @@ public class PdfExporterTest {
     @BeforeEach
     void setUp() {
         game = new Game(new Fleet());
+        PdfExporter.outputFileOverride = null;
     }
 
     @AfterEach
     void tearDown() {
         game = null;
+        PdfExporter.outputFileOverride = null;
 
         File file = new File("battleship_game.pdf");
 
@@ -52,6 +55,7 @@ public class PdfExporterTest {
         }
     }
 
+    //===============================================================================\\
 
     @Test
     @DisplayName("exportGameToPdf - creates PDF file")
@@ -66,6 +70,7 @@ public class PdfExporterTest {
         assertDoesNotThrow(() -> PdfExporter.exportGameToPdf(null));
     }
 
+    //===============================================================================\\
 
     @Test
     @DisplayName("buildUnifiedTable - empty (total=0)")
@@ -91,6 +96,7 @@ public class PdfExporterTest {
         assertNotNull(table);
     }
 
+    //===============================================================================\\
 
     @Test
     @DisplayName("addMoveRow - adds row with showTime=false")
@@ -101,6 +107,7 @@ public class PdfExporterTest {
         assertNotNull(table);
     }
 
+    //===============================================================================\\
 
     @Test
     @DisplayName("buildShotsText - formats shots correctly")
@@ -114,6 +121,7 @@ public class PdfExporterTest {
         assertNotNull(table);
     }
 
+    //===============================================================================\\
 
     @Test
     @DisplayName("buildResultsText - invalid result (!result.valid())")
@@ -167,6 +175,8 @@ public class PdfExporterTest {
         assertNotNull(table);
     }
 
+    //===============================================================================\\
+
     @Test
     @DisplayName("buildTimeText - duration > 0 (instanceof Move && duration > 0)")
     void buildTimeText1() {
@@ -198,30 +208,37 @@ public class PdfExporterTest {
         assertNotNull(table);
     }
 
+    //===============================================================================\\
+
     @Test
-    @DisplayName("resolveOutputFile - file doesn't exist")
+    @DisplayName("resolveOutputFile1 - outputFileOverride não null devolve override directamente")
     void resolveOutputFile1() {
-        new File("battleship_game.pdf").delete();
-        PdfExporter.exportGameToPdf(game);
-        assertTrue(new File("battleship_game.pdf").exists());
+        PdfExporter.outputFileOverride = "custom_output.pdf";
+        String result = PdfExporter.resolveOutputFile();
+        assertEquals("custom_output.pdf", result);
     }
 
     @Test
-    @DisplayName("resolveOutputFile - fallback to timestamp")
-    void resolveOutputFile2() throws Exception {
-
-        File file = new File("battleship_game.pdf");
-        file.createNewFile();
-
-        // tentar bloquear delete (pode depender do SO)
-        file.setWritable(false);
-
-        PdfExporter.exportGameToPdf(game);
-
-        File[] matches = new File(".").listFiles((d, name) ->
-                name.startsWith("battleship_game_") && name.endsWith(".pdf"));
-
-        assertNotNull(matches);
-        assertTrue(matches.length > 0);
+    @DisplayName("resolveOutputFile3 - ficheiro existe e delete() retorna true devolve OUTPUT_FILE")
+    void resolveOutputFile2() {
+        File deletable = new File("battleship_game.pdf") {
+            @Override public boolean exists() { return true; }
+            @Override public boolean delete() { return true; }
+        };
+        String result = PdfExporter.resolveOutputFile(deletable);
+        assertEquals("battleship_game.pdf", result);
     }
+
+    @Test
+    @DisplayName("resolveOutputFile4 - ficheiro existe e delete() retorna false devolve timestamp fallback")
+    void resolveOutputFile3() {
+        File locked = new File("battleship_game.pdf") {
+            @Override public boolean exists() { return true; }
+            @Override public boolean delete() { return false; }
+        };
+        String result = PdfExporter.resolveOutputFile(locked);
+        assertTrue(result.startsWith("battleship_game_") && result.endsWith(".pdf"),
+                "Expected timestamped filename but got: " + result);
+    }
+
 }
