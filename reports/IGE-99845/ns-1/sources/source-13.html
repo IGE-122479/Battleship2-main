@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87,5%
+    90%
   </span>
   <span class="absValue">
-    (7/8)
+    (9/10)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    96,4%
+    100%
   </span>
   <span class="absValue">
-    (27/28)
+    (30/30)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    98,2%
+    98,3%
   </span>
   <span class="absValue">
-    (54/55)
+    (58/59)
   </span>
 </td>
 </tr>
@@ -114,6 +114,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;public class PdfExporter {</b>
 &nbsp;
 &nbsp;    private static final String OUTPUT_FILE = &quot;battleship_game.pdf&quot;;
+<b class="fc">&nbsp;    static String outputFileOverride = null;</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Exports the full game history to a single unified PDF table.
@@ -246,15 +247,22 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     *
 &nbsp;     * @return the resolved output file path
 &nbsp;     */
-&nbsp;    private static String resolveOutputFile() {
-&nbsp;        try {
-<b class="fc">&nbsp;            File file = new File(OUTPUT_FILE);</b>
-<b class="pc">&nbsp;            if (!file.exists() || file.delete())</b>
-<b class="fc">&nbsp;                return OUTPUT_FILE;</b>
-&nbsp;        } catch (Exception e){}
+&nbsp;    static String resolveOutputFile() {
+<b class="fc">&nbsp;        return resolveOutputFile(new File(OUTPUT_FILE));</b>
+&nbsp;    }
 &nbsp;
-<b class="fc">&nbsp;        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(&quot;yyyyMMdd_HHmmss&quot;));</b>
-<b class="fc">&nbsp;        return &quot;battleship_game_&quot; + timestamp + &quot;.pdf&quot;;</b>
+&nbsp;    static String resolveOutputFile(File file) {
+<b class="fc">&nbsp;        if (outputFileOverride != null) {</b>
+<b class="fc">&nbsp;            return outputFileOverride;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (file.exists()) {</b>
+<b class="fc">&nbsp;            if (!file.delete()) {</b>
+<b class="fc">&nbsp;                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(&quot;yyyyMMdd_HHmmss&quot;));</b>
+<b class="fc">&nbsp;                return &quot;battleship_game_&quot; + timestamp + &quot;.pdf&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return OUTPUT_FILE;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;}
@@ -281,7 +289,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-24 19:42</div>
+    <div style="float:right;">generated on 2026-04-26 19:51</div>
 </div>
 </body>
 </html>

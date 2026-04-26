@@ -25,12 +25,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 <h1>Coverage Summary for Class: AiGame (battleship)</h1>
 
 <table class="coverageStats">
+
 <tr>
   <th class="name">Class</th>
-<th class="coverageStat 
-">
-  Class, %
-</th>
 <th class="coverageStat 
 ">
   Method, %
@@ -51,7 +48,7 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (1/1)
+    (18/18)
   </span>
 </td>
 <td class="coverageStat">
@@ -59,27 +56,48 @@ Current scope:     <a href="../../index.html">all classes</a>
     100%
   </span>
   <span class="absValue">
-    (15/15)
+    (78/78)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    87,1%
+    100%
   </span>
   <span class="absValue">
-    (61/70)
-  </span>
-</td>
-<td class="coverageStat">
-  <span class="percent">
-    90,2%
-  </span>
-  <span class="absValue">
-    (110/122)
+    (137/137)
   </span>
 </td>
 </tr>
-
+  <tr>
+    <td class="name">AiGame$HttpCallable</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (78/78)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (137/137)
+  </span>
+</td>
+</tr>
 </table>
 
 <br/>
@@ -101,7 +119,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;import java.util.regex.Matcher;
 &nbsp;import java.util.regex.Pattern;
 &nbsp;
-&nbsp;//useocl
 &nbsp;
 &nbsp;/**
 &nbsp; * Classe que gerencia o jogo de Batalha Naval contra uma IA baseada em LLM (Large Language Model).
@@ -109,37 +126,61 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp; */
 <b class="fc">&nbsp;public class AiGame {</b>
 &nbsp;
-&nbsp;    // Configurações da API e modelo LLM
 &nbsp;    private static final String MODEL_ID = &quot;meta-llama/Llama-3.3-70B-Instruct&quot;;
 &nbsp;    private static final String API_URL = &quot;https://router.huggingface.co/v1/chat/completions&quot;;
-&nbsp;    private static final int MAX_OUTPUT_TOKENS    = 256;      // Máximo de tokens na resposta da IA
-&nbsp;    private static final int HTTP_TIMEOUT_SECONDS = 45;       // Tempo máximo para resposta da API
-&nbsp;    private static final int MAX_RETRIES          = 3;        // Tentativas máximas se a IA responder mal
+&nbsp;    private static final int MAX_OUTPUT_TOKENS    = 256;
+&nbsp;    private static final int HTTP_TIMEOUT_SECONDS = 45;
+&nbsp;    private static final int MAX_RETRIES          = 3;
 &nbsp;
-&nbsp;    // Cliente HTTP e ferramentas de manipulação JSON
 &nbsp;    private final HttpClient   httpClient;
 &nbsp;    private final ObjectMapper objectMapper;
 &nbsp;    private final String apiKey;
 &nbsp;
-&nbsp;    // Histórico de mensagens para manter contexto na conversa com a IA
 <b class="fc">&nbsp;    private final List&lt;Map&lt;String, Object&gt;&gt; conversationHistory = new ArrayList&lt;&gt;();</b>
-<b class="fc">&nbsp;    private boolean firstMove = true;  // Flag para saber se é o primeiro tiro</b>
+<b class="fc">&nbsp;    private boolean firstMove = true;</b>
 &nbsp;
+<b class="fc">&nbsp;    static java.util.function.Supplier&lt;String&gt; apiResponseOverride = null;</b>
+<b class="fc">&nbsp;    static String envTokenOverride = null;</b>
+&nbsp;
+&nbsp;    @FunctionalInterface
+&nbsp;    interface HttpCallable {
+&nbsp;        java.net.http.HttpResponse&lt;String&gt; call(String requestJson) throws Exception;
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    static HttpCallable httpOverride = null;</b>
 &nbsp;
 &nbsp;    /**
 &nbsp;     * Construtor: inicializa o cliente HTTP e carrega a chave de API das variáveis de ambiente.
 &nbsp;     * Se a chave não estiver definida, lança uma exceção.
 &nbsp;     */
 <b class="fc">&nbsp;    public AiGame(){</b>
-<b class="fc">&nbsp;        this.apiKey = System.getenv(&quot;API_TOKEN&quot;);</b>
-<b class="pc">&nbsp;        if (this.apiKey == null || this.apiKey.isEmpty()) {</b>
-<b class="nc">&nbsp;           throw new IllegalStateException(&quot;API_KEY environment variable is not set.&quot;);</b>
+<b class="fc">&nbsp;        String token = getApiToken();</b>
+<b class="fc">&nbsp;        if (token == null || token.isEmpty()) {</b>
+<b class="fc">&nbsp;           throw new IllegalStateException(&quot;API_KEY environment variable is not set.&quot;);</b>
 &nbsp;        }
+<b class="fc">&nbsp;        this.apiKey = token;</b>
 <b class="fc">&nbsp;        this.httpClient = HttpClient.newBuilder()</b>
 <b class="fc">&nbsp;                .connectTimeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))</b>
 <b class="fc">&nbsp;                .build();</b>
 <b class="fc">&nbsp;        this.objectMapper = new ObjectMapper();</b>
+&nbsp;    }
 &nbsp;
+&nbsp;    String getApiToken() {
+<b class="fc">&nbsp;        return (envTokenOverride != null) ? envTokenOverride : System.getenv(&quot;API_TOKEN&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Construtor de teste: permite injetar apiKey sem variável de ambiente.
+&nbsp;     */
+<b class="fc">&nbsp;     AiGame(String apiKey) {</b>
+<b class="fc">&nbsp;        if (apiKey == null || apiKey.isEmpty()) {</b>
+<b class="fc">&nbsp;            throw new IllegalStateException(&quot;API_KEY environment variable is not set.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.apiKey = apiKey;</b>
+<b class="fc">&nbsp;        this.httpClient = HttpClient.newBuilder()</b>
+<b class="fc">&nbsp;                .connectTimeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))</b>
+<b class="fc">&nbsp;                .build();</b>
+<b class="fc">&nbsp;        this.objectMapper = new ObjectMapper();</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -149,7 +190,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     */
 &nbsp;    public String generateShots(IGame game){
 <b class="fc">&nbsp;        assert game != null;</b>
-<b class="fc">&nbsp;        int teste = 2;</b>
 &nbsp;
 <b class="fc">&nbsp;        String userMessage = buildUserMessage(game);</b>
 <b class="fc">&nbsp;        String shotsJson = askLlmForShots(userMessage);</b>
@@ -252,10 +292,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * @return String contendo a mensagem para enviar à IA
 &nbsp;     */
 &nbsp;    private String buildUserMessage(IGame game) {
-&nbsp;        // Obtém o histórico de movimentos feitos pela IA
+&nbsp;
 <b class="fc">&nbsp;        List&lt;IMove&gt; alienMoves = game.getAlienMoves();</b>
 &nbsp;
-&nbsp;        // Se for o primeiro tiro, envia instruções iniciais
 <b class="fc">&nbsp;        if (firstMove) {</b>
 <b class="fc">&nbsp;            firstMove = false;</b>
 <b class="fc">&nbsp;            return buildSystemPrompt() + &quot;O jogo começa agora. &quot; +</b>
@@ -266,7 +305,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;                    &quot;Responde APENAS com o JSON puro, sem texto adicional.&quot;;
 &nbsp;        }
 &nbsp;
-&nbsp;        // Para jogadas seguintes, constrói mensagem com resultado anterior
 <b class="fc">&nbsp;        IMove lastMove = alienMoves.get(alienMoves.size() - 1);</b>
 <b class="fc">&nbsp;        int remaining = game.getRemainingShips();</b>
 <b class="fc">&nbsp;        String detailedResult = lastMove.toDetailedString();</b>
@@ -298,7 +336,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
 <b class="fc">&nbsp;        sb.append(&quot;COORDENADAS JÁ DISPARADAS (NUNCA repitas nenhuma destas):\n&quot;);</b>
 &nbsp;
-&nbsp;        // Coleta todas as coordenadas disparadas em movimentos anteriores
 <b class="fc">&nbsp;        List&lt;String&gt; coords = new ArrayList&lt;&gt;();</b>
 &nbsp;
 <b class="fc">&nbsp;        for (IMove move : alienMoves) {</b>
@@ -307,7 +344,6 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
-&nbsp;        // Formata a resposta
 <b class="fc">&nbsp;        if (coords.isEmpty()) {</b>
 <b class="fc">&nbsp;            sb.append(&quot;Nenhuma ainda.\n&quot;);</b>
 &nbsp;        } else {
@@ -326,28 +362,25 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * @return JSON com os 3 tiros decididos
 &nbsp;     */
 &nbsp;    private String askLlmForShots(String userMessage) {
-&nbsp;        // Adiciona a pergunta ao histórico
+&nbsp;
 <b class="fc">&nbsp;        addToHistory(&quot;user&quot;, userMessage);</b>
 &nbsp;
-&nbsp;        // Tenta obter uma resposta válida da IA
-<b class="pc">&nbsp;        for (int attempt = 1; attempt &lt;= MAX_RETRIES; attempt++) {</b>
+<b class="fc">&nbsp;        for (int attempt = 1; attempt &lt;= MAX_RETRIES; attempt++) {</b>
 <b class="fc">&nbsp;            String llmResponse = callApi();</b>
 &nbsp;
 <b class="fc">&nbsp;            addToHistory(&quot;assistant&quot;, llmResponse);</b>
 &nbsp;
 <b class="fc">&nbsp;            String extracted = extractShotsJson(llmResponse);</b>
-<b class="pc">&nbsp;            if (extracted != null &amp;&amp; isValidShotsJson(extracted)) {</b>
+<b class="fc">&nbsp;            if (extracted != null) {</b>
 <b class="fc">&nbsp;                return extracted;</b>
 &nbsp;            }
 &nbsp;
-&nbsp;            // Se falhou, mostra o erro
-<b class="nc">&nbsp;            System.out.println(&quot;Tentativa &quot; + attempt + &quot;/&quot; + MAX_RETRIES</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Tentativa &quot; + attempt + &quot;/&quot; + MAX_RETRIES</b>
 &nbsp;                    + &quot; — resposta inválida: &quot;
-<b class="nc">&nbsp;                    + llmResponse.substring(0, Math.min(80, llmResponse.length())));</b>
+<b class="fc">&nbsp;                    + llmResponse.substring(0, Math.min(80, llmResponse.length())));</b>
 &nbsp;
-&nbsp;            // Se não é a última tentativa, pede para tentar de novo
-<b class="nc">&nbsp;            if (attempt &lt; MAX_RETRIES) {</b>
-<b class="nc">&nbsp;                addToHistory(&quot;user&quot;,</b>
+<b class="fc">&nbsp;            if (attempt &lt; MAX_RETRIES) {</b>
+<b class="fc">&nbsp;                addToHistory(&quot;user&quot;,</b>
 &nbsp;                        &quot;Resposta inválida. Deves responder APENAS com um array JSON de &quot; +
 &nbsp;                                &quot;EXACTAMENTE 3 tiros, sem texto adicional. Exemplo:\n&quot; +
 &nbsp;                                &quot;[{\&quot;row\&quot;:\&quot;A\&quot;,\&quot;column\&quot;:1},{\&quot;row\&quot;:\&quot;E\&quot;,\&quot;column\&quot;:5},{\&quot;row\&quot;:\&quot;J\&quot;,\&quot;column\&quot;:10}]\n&quot; +
@@ -356,9 +389,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;            }
 &nbsp;        }
 &nbsp;
-&nbsp;        // Se todas as tentativas falharam, usa tiros aleatórios como fallback
-<b class="nc">&nbsp;        System.out.println(&quot;Todas as tentativas falharam. A usar fallback aleatório.&quot;);</b>
-<b class="nc">&nbsp;        return buildRandomFallbackJson();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;Todas as tentativas falharam. A usar fallback aleatório.&quot;);</b>
+<b class="fc">&nbsp;        return buildRandomFallbackJson();</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -368,8 +400,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * @throws RuntimeException Se houver erro na chamada ou timeout
 &nbsp;     */
 &nbsp;    private String callApi() {
+&nbsp;
+&nbsp;        // Para teste: permite substituir a chamada real à API
+<b class="fc">&nbsp;        if (apiResponseOverride != null) {</b>
+<b class="fc">&nbsp;            return apiResponseOverride.get();</b>
+&nbsp;        }
+&nbsp;
 &nbsp;        try {
-&nbsp;            // Prepara o corpo da requisição com o modelo e histórico
 <b class="fc">&nbsp;            Map&lt;String, Object&gt; requestBody = new LinkedHashMap&lt;&gt;();</b>
 <b class="fc">&nbsp;            requestBody.put(&quot;model&quot;, MODEL_ID);</b>
 <b class="fc">&nbsp;            requestBody.put(&quot;messages&quot;, conversationHistory);</b>
@@ -378,35 +415,40 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;
 <b class="fc">&nbsp;            String requestJson = objectMapper.writeValueAsString(requestBody);</b>
 &nbsp;
-&nbsp;            // Constrói a requisição HTTP
-<b class="fc">&nbsp;            HttpRequest request = HttpRequest.newBuilder()</b>
-<b class="fc">&nbsp;                    .uri(URI.create(API_URL))</b>
-<b class="fc">&nbsp;                    .header(&quot;Authorization&quot;, &quot;Bearer &quot; + apiKey)  // Bearer token no header</b>
-<b class="fc">&nbsp;                    .header(&quot;Content-Type&quot;, &quot;application/json&quot;)</b>
-<b class="fc">&nbsp;                    .timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))</b>
-<b class="fc">&nbsp;                    .POST(HttpRequest.BodyPublishers.ofString(requestJson))</b>
-<b class="fc">&nbsp;                    .build();</b>
+<b class="fc">&nbsp;            HttpResponse&lt;String&gt; response = executeHttpCall(requestJson);</b>
 &nbsp;
-&nbsp;            // Envia a requisição e processa a resposta
-<b class="fc">&nbsp;            HttpResponse&lt;String&gt; response = httpClient.send(request,</b>
-<b class="fc">&nbsp;                    HttpResponse.BodyHandlers.ofString());</b>
-&nbsp;
-&nbsp;            // Verifica se a requisição foi bem-sucedida
-<b class="pc">&nbsp;            if (response.statusCode() != 200) {</b>
-<b class="nc">&nbsp;                throw new RuntimeException(&quot;Erro HTTP &quot; + response.statusCode()</b>
-<b class="nc">&nbsp;                        + &quot;: &quot; + response.body());</b>
+<b class="fc">&nbsp;            if (response.statusCode() != 200) {</b>
+<b class="fc">&nbsp;                throw new RuntimeException(&quot;Erro HTTP &quot; + response.statusCode()</b>
+<b class="fc">&nbsp;                        + &quot;: &quot; + response.body());</b>
 &nbsp;            }
 &nbsp;
 <b class="fc">&nbsp;            return parseAiResponse(response.body());</b>
 &nbsp;
 &nbsp;        } catch (InterruptedException e) {
-<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
-<b class="nc">&nbsp;            throw new RuntimeException(&quot;Chamada interrompida&quot;, e);</b>
+<b class="fc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;Chamada interrompida&quot;, e);</b>
 &nbsp;        } catch (RuntimeException e) {
 &nbsp;            throw e;
 &nbsp;        } catch (Exception e) {
-<b class="nc">&nbsp;            throw new RuntimeException(&quot;Erro na API: &quot; + e.getMessage(), e);</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;Erro na API: &quot; + e.getMessage(), e);</b>
 &nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    HttpResponse&lt;String&gt; executeHttpCall(String requestJson) throws Exception {
+<b class="fc">&nbsp;        if (httpOverride != null) {</b>
+<b class="fc">&nbsp;            return httpOverride.call(requestJson);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        HttpRequest request = HttpRequest.newBuilder()</b>
+<b class="fc">&nbsp;                .uri(URI.create(API_URL))</b>
+<b class="fc">&nbsp;                .header(&quot;Authorization&quot;, &quot;Bearer &quot; + apiKey)  // Bearer token no header</b>
+<b class="fc">&nbsp;                .header(&quot;Content-Type&quot;, &quot;application/json&quot;)</b>
+<b class="fc">&nbsp;                .timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))</b>
+<b class="fc">&nbsp;                .POST(HttpRequest.BodyPublishers.ofString(requestJson))</b>
+<b class="fc">&nbsp;                .build();</b>
+&nbsp;
+<b class="fc">&nbsp;        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());</b>
+&nbsp;
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -418,11 +460,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     */
 &nbsp;    private String parseAiResponse(String responseBody) {
 &nbsp;        try {
-&nbsp;            // Parse do JSON e extração do conteúdo
 <b class="fc">&nbsp;            JsonNode root    = objectMapper.readTree(responseBody);</b>
 <b class="fc">&nbsp;            JsonNode choices = root.path(&quot;choices&quot;);</b>
 &nbsp;
-&nbsp;            // Valida se choices existe e não está vazio
 <b class="fc">&nbsp;            if (choices.isArray() &amp;&amp; !choices.isEmpty()) {</b>
 <b class="fc">&nbsp;                JsonNode content = choices.get(0)</b>
 <b class="fc">&nbsp;                        .path(&quot;message&quot;)</b>
@@ -438,8 +478,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        } catch (RuntimeException e) {
 &nbsp;            throw e;
 &nbsp;        } catch (Exception e) {
-<b class="fc">&nbsp;            throw new RuntimeException(&quot;Erro ao interpretar resposta: &quot;</b>
-<b class="fc">&nbsp;                    + e.getMessage(), e);</b>
+<b class="fc">&nbsp;            throw new RuntimeException(&quot;Erro ao interpretar resposta: &quot; + e.getMessage(), e);</b>
 &nbsp;        }
 &nbsp;    }
 &nbsp;
@@ -453,7 +492,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    private String extractShotsJson(String llmResponse) {
 <b class="fc">&nbsp;        if (llmResponse == null || llmResponse.isBlank()) return null;</b>
 &nbsp;
-&nbsp;        // Tenta extrair JSON dentro de blocos de código (```json ... ```)
+<b class="fc">&nbsp;        String trimmed = llmResponse.trim();</b>
+<b class="fc">&nbsp;        if (trimmed.startsWith(&quot;[&quot;) &amp;&amp; isValidShotsJson(trimmed)) return trimmed;</b>
+&nbsp;
 <b class="fc">&nbsp;        Pattern codeBlock = Pattern.compile(</b>
 &nbsp;                &quot;```(?:json)?\\s*(\\[.*?])\\s*```&quot;,
 &nbsp;                Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
@@ -463,17 +504,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
 &nbsp;        }
 &nbsp;
-&nbsp;        // Tenta extrair um array JSON diretamente
 <b class="fc">&nbsp;        Pattern arrayPat = Pattern.compile(&quot;(\\[\\s*\\{.*?}\\s*])&quot;, Pattern.DOTALL);</b>
 <b class="fc">&nbsp;        Matcher m2 = arrayPat.matcher(llmResponse);</b>
 <b class="fc">&nbsp;        while (m2.find()) {</b>
 <b class="fc">&nbsp;            String c = m2.group(1).trim();</b>
 <b class="fc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
 &nbsp;        }
-&nbsp;
-&nbsp;        // Tenta usar a resposta inteira se começar com [
-<b class="fc">&nbsp;        String trimmed = llmResponse.trim();</b>
-<b class="pc">&nbsp;        if (trimmed.startsWith(&quot;[&quot;) &amp;&amp; isValidShotsJson(trimmed)) return trimmed;</b>
 &nbsp;
 <b class="fc">&nbsp;        return null;</b>
 &nbsp;    }
@@ -487,16 +523,13 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    private boolean isValidShotsJson(String json) {
 &nbsp;        try {
 <b class="fc">&nbsp;            JsonNode root = objectMapper.readTree(json);</b>
-&nbsp;            // Verifica se é um array com exatamente NUMBER_SHOTS elementos
 <b class="fc">&nbsp;            if (!root.isArray() || root.size() != Game.NUMBER_SHOTS) return false;</b>
 &nbsp;
-&nbsp;            // Valida cada tiro individualmente
 <b class="fc">&nbsp;            for (JsonNode shot : root) {</b>
 <b class="fc">&nbsp;                JsonNode rowNode = shot.get(&quot;row&quot;);</b>
 <b class="fc">&nbsp;                JsonNode colNode = shot.get(&quot;column&quot;);</b>
 <b class="fc">&nbsp;                if (rowNode == null || colNode == null) return false;</b>
 &nbsp;
-&nbsp;                // Verifica se a linha é A-J e a coluna é 1-10
 <b class="fc">&nbsp;                String row = rowNode.asText().toUpperCase();</b>
 <b class="fc">&nbsp;                int    col = colNode.asInt();</b>
 <b class="fc">&nbsp;                if (row.length() != 1 || row.charAt(0) &lt; &#39;A&#39; || row.charAt(0) &gt; &#39;J&#39;) return false;</b>
@@ -514,15 +547,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * @return JSON formatado com 3 tiros aleatórios
 &nbsp;     */
 &nbsp;    private String buildRandomFallbackJson() {
-&nbsp;        // Cria lista com todas as posições do tabuleiro
 <b class="fc">&nbsp;        List&lt;IPosition&gt; available = new ArrayList&lt;&gt;();</b>
 <b class="fc">&nbsp;        for (int r = 0; r &lt; Game.BOARD_SIZE; r++)</b>
 <b class="fc">&nbsp;            for (int c = 0; c &lt; Game.BOARD_SIZE; c++)</b>
 <b class="fc">&nbsp;                available.add(new Position(r, c));</b>
 &nbsp;
-&nbsp;        // Embaralha e pega nos primeiros 3
 <b class="fc">&nbsp;        Collections.shuffle(available, new Random());</b>
-&nbsp;
 <b class="fc">&nbsp;        return Game.jsonShots(available.subList(0, Game.NUMBER_SHOTS));</b>
 &nbsp;    }
 &nbsp;
@@ -580,7 +610,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-24 19:42</div>
+    <div style="float:right;">generated on 2026-04-26 19:51</div>
 </div>
 </body>
 </html>
