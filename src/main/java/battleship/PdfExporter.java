@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 public class PdfExporter {
 
     private static final String OUTPUT_FILE = "battleship_game.pdf";
+    static String outputFileOverride = null;
 
     /**
      * Exports the full game history to a single unified PDF table.
@@ -157,15 +158,22 @@ public class PdfExporter {
      *
      * @return the resolved output file path
      */
-    private static String resolveOutputFile() {
-        try {
-            File file = new File(OUTPUT_FILE);
-            if (!file.exists() || file.delete())
-                return OUTPUT_FILE;
-        } catch (Exception e){}
+    static String resolveOutputFile() {
+        return resolveOutputFile(new File(OUTPUT_FILE));
+    }
 
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        return "battleship_game_" + timestamp + ".pdf";
+    static String resolveOutputFile(File file) {
+        if (outputFileOverride != null) {
+            return outputFileOverride;
+        }
+
+        if (file.exists()) {
+            if (!file.delete()) {
+                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                return "battleship_game_" + timestamp + ".pdf";
+            }
+        }
+        return OUTPUT_FILE;
     }
 
 }
