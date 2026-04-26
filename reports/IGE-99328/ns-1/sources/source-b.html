@@ -64,10 +64,10 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85,7%
+    91,1%
   </span>
   <span class="absValue">
-    (48/56)
+    (51/56)
   </span>
 </td>
 <td class="coverageStat">
@@ -174,7 +174,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * Deve ser chamado quando o jogo terminar (vitória ou derrota).
 &nbsp;     */
 &nbsp;    public static void showScoreboard() {
-<b class="pc">&nbsp;        if (instance != null) {</b>
+<b class="fc">&nbsp;        if (instance != null) {</b>
 <b class="fc">&nbsp;            Platform.runLater(() -&gt; instance.showScoreboardPanel());</b>
 &nbsp;        }
 &nbsp;    }
@@ -443,7 +443,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;                );
 &nbsp;                // Colorir linha conforme resultado
 <b class="fc">&nbsp;                recordRow.setStyle(&quot;-fx-background-color: &quot; +</b>
-<b class="pc">&nbsp;                        (won ? &quot;rgba(0,200,100,0.08)&quot; : &quot;rgba(233,69,96,0.08)&quot;) + &quot;;&quot;);</b>
+<b class="fc">&nbsp;                        (won ? &quot;rgba(0,200,100,0.08)&quot; : &quot;rgba(233,69,96,0.08)&quot;) + &quot;;&quot;);</b>
 <b class="fc">&nbsp;                scorePanel.getChildren().add(recordRow);</b>
 &nbsp;            }
 &nbsp;
@@ -481,7 +481,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;            if (isHeader) {</b>
 <b class="fc">&nbsp;                t.setFill(Color.WHITE);</b>
 <b class="fc">&nbsp;            } else if (i == 4) {</b>
-<b class="pc">&nbsp;                t.setFill(&quot;VITÓRIA&quot;.equals(values[i]) ? Color.LIGHTGREEN : Color.web(&quot;#e94560&quot;));</b>
+<b class="fc">&nbsp;                t.setFill(&quot;VITÓRIA&quot;.equals(values[i]) ? Color.LIGHTGREEN : Color.web(&quot;#e94560&quot;));</b>
 &nbsp;            } else {
 <b class="fc">&nbsp;                t.setFill(Color.LIGHTGRAY);</b>
 &nbsp;            }
@@ -575,7 +575,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-24 18:41</div>
+    <div style="float:right;">generated on 2026-04-26 17:14</div>
 </div>
 </body>
 </html>

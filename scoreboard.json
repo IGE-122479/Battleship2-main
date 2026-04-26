@@ -34,4 +34,1738 @@
   "totalHits" : 25,
   "sunkShips" : 11,
   "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:38:33",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:40:45",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:42:38",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:44:38",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:47:11",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:53:11",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:55:18",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 20:59:51",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:02:11",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:06:22",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:08:48",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:11:10",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:13:22",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:25:57",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:28:11",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:30:23",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:32:07",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:39:05",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-19 21:43:02",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 20:48:45",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:22:14",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:25:25",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:29:04",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:32:25",
+  "totalMoves" : 22,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:37:54",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:42:35",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:44:22",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:45:58",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:49:21",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 21:51:04",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 22:03:13",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-20 22:07:56",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-21 23:31:04",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-21 23:33:43",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 17:13:47",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 18:11:34",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 18:38:37",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 19:00:04",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 22:05:27",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 22:07:01",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 22:16:44",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 22:20:13",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-22 22:23:09",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 10:22:14",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 22:40:30",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 22:41:48",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 22:55:32",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 22:56:54",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:03:01",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:04:14",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:06:22",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:07:31",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:12:15",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:13:24",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:29:28",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:30:41",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:33:49",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:35:10",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:42:18",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:46:30",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:54:49",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-23 23:56:13",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 00:01:56",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 00:03:09",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 18:21:35",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 18:23:03",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 19:36:06",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 19:37:21",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 19:58:30",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 19:59:48",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:01:52",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:04:40",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:06:09",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:17:22",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:18:43",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:45:40",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-24 20:45:45",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:45:57",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-24 20:45:57",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:47:13",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:48:36",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:52:06",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-24 20:52:10",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:52:21",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:53:43",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:54:50",
+  "totalMoves" : 22,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:54:50",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-24 20:55:23",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:56:30",
+  "totalMoves" : 22,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:57:42",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-24 20:57:44",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-25 17:33:45",
+  "totalMoves" : 30,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 17:35:12",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 18:07:52",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 18:09:23",
+  "totalMoves" : 30,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 18:37:57",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 18:39:19",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 18:42:33",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 18:42:34",
+  "totalMoves" : 1,
+  "totalHits" : 2,
+  "sunkShips" : 1,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-25 18:44:43",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:31:05",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:33:36",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:34:58",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:36:16",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:46:43",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:46:43",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:48:06",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 19:56:47",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:05:54",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:08:18",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:13:26",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:33:27",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:34:52",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:37:06",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:38:25",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:39:46",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:40:57",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:46:46",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 20:48:08",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:02:34",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:03:59",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:14:30",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:15:56",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:30:01",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:31:16",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:40:26",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:41:45",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:44:48",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:46:09",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:49:07",
+  "totalMoves" : 22,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:50:29",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:55:00",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:56:12",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:58:32",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 21:59:50",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:01:47",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:02:54",
+  "totalMoves" : 22,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:06:21",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:07:33",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:09:46",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:11:11",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:19:19",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:20:37",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:24:21",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:25:34",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:27:18",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:28:36",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:31:45",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 22:33:04",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 23:09:52",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-25 23:11:16",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 09:54:39",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 09:56:01",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:06:33",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:08:00",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:10:11",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:11:33",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:18:30",
+  "totalMoves" : 22,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:19:47",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:21:00",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:27:45",
+  "totalMoves" : 31,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:29:02",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:30:06",
+  "totalMoves" : 21,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:38:44",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:39:59",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:41:09",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:55:38",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 10:56:56",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:25:42",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:26:57",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:32:25",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:33:34",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:38:27",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:39:54",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:43:52",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:45:04",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:55:56",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 11:57:24",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 12:02:02",
+  "totalMoves" : 31,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 12:03:20",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 12:58:22",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 12:59:41",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:07:16",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:08:28",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:14:15",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:15:50",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:16:54",
+  "totalMoves" : 21,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:22:51",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:24:54",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:26:12",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:31:35",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:34:25",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:35:38",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:37:04",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:39:58",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 14:41:17",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:04:11",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:05:33",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:06:59",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:07:00",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:07:00",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:07:00",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:07:00",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:08:18",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:09:36",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:41:51",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:43:13",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:48:02",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:48:14",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:48:14",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:48:14",
+  "totalMoves" : 1,
+  "totalHits" : 2,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:48:14",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:48:14",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 15:49:27",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 15:50:45",
+  "totalMoves" : 26,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:06:52",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:06:52",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:06:52",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:06:52",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:06:52",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:08:20",
+  "totalMoves" : 29,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:09:41",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:15:54",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:15:55",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:15:55",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:15:55",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:15:55",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:17:08",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:18:23",
+  "totalMoves" : 25,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:20:37",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:20:38",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:20:38",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:20:38",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:20:38",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:21:50",
+  "totalMoves" : 24,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:23:15",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:25:13",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:25:14",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:25:15",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:25:15",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:25:16",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:27:33",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:27:33",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:27:33",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:27:33",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:28:17",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 1,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:28:18",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:28:18",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:29:08",
+  "totalMoves" : 1,
+  "totalHits" : 2,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:29:09",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:29:09",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:29:09",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:29:46",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:29:47",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:29:47",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:30:26",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:30:27",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:30:27",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:30:27",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:31:16",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:31:17",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:31:17",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:32:02",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:32:03",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:32:03",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:32:03",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:32:40",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 1,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:32:40",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:32:41",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:33:09",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:33:10",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:33:10",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:33:10",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:33:49",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:33:50",
+  "totalMoves" : 1,
+  "totalHits" : 1,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:33:50",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:33:50",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:35:00",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:35:01",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:35:01",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:35:01",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 16:36:25",
+  "totalMoves" : 28,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 16:37:47",
+  "totalMoves" : 27,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 17:01:08",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 17:01:11",
+  "totalMoves" : 1,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 17:01:11",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 17:01:11",
+  "totalMoves" : 0,
+  "totalHits" : 0,
+  "sunkShips" : 0,
+  "result" : "VITÓRIA"
+}, {
+  "dateTime" : "2026-04-26 17:02:21",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
+}, {
+  "dateTime" : "2026-04-26 17:03:31",
+  "totalMoves" : 23,
+  "totalHits" : 25,
+  "sunkShips" : 11,
+  "result" : "DERROTA"
 } ]

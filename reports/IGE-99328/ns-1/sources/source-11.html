@@ -64,18 +64,18 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    60,2%
+    69,3%
   </span>
   <span class="absValue">
-    (53/88)
+    (61/88)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    85,6%
+    87,3%
   </span>
   <span class="absValue">
-    (101/118)
+    (103/118)
   </span>
 </td>
 </tr>
@@ -191,8 +191,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;				continue;
 &nbsp;			}
 &nbsp;
-<b class="pc">&nbsp;			if (result.repeated())</b>
-<b class="nc">&nbsp;				repeatedShots++; // tiro repetido</b>
+<b class="fc">&nbsp;			if (result.repeated())</b>
+<b class="fc">&nbsp;				repeatedShots++; // tiro repetido</b>
 &nbsp;			else {
 &nbsp;				// Tiro válido
 <b class="fc">&nbsp;				validShots++;</b>
@@ -218,7 +218,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="nc">&nbsp;				output.append(repeatedShots).append(&quot; tiro&quot;).append(repeatedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot; repetido&quot;).append(repeatedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;);</b>
 &nbsp;			} else {
 <b class="pc">&nbsp;				if (validShots &gt; 0) {</b>
-<b class="pc">&nbsp;					output.append(validShots).append(&quot; tiro&quot;).append(validShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot; válido&quot;).append(validShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot;: &quot;);</b>
+<b class="fc">&nbsp;					output.append(validShots).append(&quot; tiro&quot;).append(validShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot; válido&quot;).append(validShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot;: &quot;);</b>
 &nbsp;				}
 &nbsp;
 &nbsp;				// Atualizar lógica para contar múltiplos barcos afundados do mesmo tipo
@@ -240,17 +240,17 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;					}
 &nbsp;				}
 &nbsp;
-<b class="pc">&nbsp;				if (missedShots &gt; 0) {</b>
+<b class="fc">&nbsp;				if (missedShots &gt; 0) {</b>
 <b class="fc">&nbsp;					output.append(missedShots).append(&quot; tiro&quot;).append(missedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot; na água&quot;);</b>
-<b class="nc">&nbsp;				} else if (!sunkBoatsCount.isEmpty() || !hitsPerBoat.isEmpty()) {</b>
-<b class="nc">&nbsp;					output.setLength(output.length() - 2); // Remover o &quot;+&quot; final</b>
+<b class="pc">&nbsp;				} else if (!sunkBoatsCount.isEmpty() || !hitsPerBoat.isEmpty()) {</b>
+<b class="fc">&nbsp;					output.setLength(output.length() - 2); // Remover o &quot;+&quot; final</b>
 &nbsp;				}
 &nbsp;
-<b class="pc">&nbsp;				if (repeatedShots &gt; 0) {</b>
-<b class="nc">&nbsp;					if (validShots &gt; 0) {</b>
-<b class="nc">&nbsp;						output.append(&quot;, &quot;);</b>
+<b class="fc">&nbsp;				if (repeatedShots &gt; 0) {</b>
+<b class="pc">&nbsp;					if (validShots &gt; 0) {</b>
+<b class="fc">&nbsp;						output.append(&quot;, &quot;);</b>
 &nbsp;					}
-<b class="nc">&nbsp;					output.append(repeatedShots).append(&quot; tiro&quot;).append(repeatedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot; repetido&quot;).append(repeatedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;);</b>
+<b class="pc">&nbsp;					output.append(repeatedShots).append(&quot; tiro&quot;).append(repeatedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;).append(&quot; repetido&quot;).append(repeatedShots &gt; 1 ? &quot;s&quot; : &quot;&quot;);</b>
 &nbsp;				}
 &nbsp;			}
 &nbsp;
@@ -337,11 +337,11 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;				sb.append(&quot;Água\n&quot;);</b>
 <b class="fc">&nbsp;				validCount++;</b>
 <b class="fc">&nbsp;				missCount++;</b>
-<b class="fc">&nbsp;			} else if (result.sunk()) {</b>
-<b class="fc">&nbsp;				sb.append(&quot;Acertou numa &quot;).append(result.ship().getCategory()).append(&quot; (AFUNDADA!)\n&quot;);</b>
-<b class="fc">&nbsp;				validCount++;</b>
-<b class="fc">&nbsp;				hitCount++;</b>
-<b class="fc">&nbsp;				sunkCount++;</b>
+<b class="pc">&nbsp;			} else if (result.sunk()) {</b>
+<b class="nc">&nbsp;				sb.append(&quot;Acertou numa &quot;).append(result.ship().getCategory()).append(&quot; (AFUNDADA!)\n&quot;);</b>
+<b class="nc">&nbsp;				validCount++;</b>
+<b class="nc">&nbsp;				hitCount++;</b>
+<b class="nc">&nbsp;				sunkCount++;</b>
 &nbsp;			} else {
 <b class="fc">&nbsp;				sb.append(&quot;Acertou numa &quot;).append(result.ship().getCategory()).append(&quot;(ainda a flutuar)\n&quot;);</b>
 <b class="fc">&nbsp;				validCount++;</b>
@@ -350,8 +350,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;		}
 &nbsp;
 <b class="fc">&nbsp;		sb.append(&quot;Resumo: &quot;).append(validCount).append(&quot; tiros válidos&quot;);</b>
-<b class="fc">&nbsp;		if (hitCount &gt; 0) sb.append(&quot;, &quot;).append(hitCount).append(&quot; acerto(s)&quot;);</b>
-<b class="fc">&nbsp;		if (sunkCount &gt; 0) sb.append(&quot; (&quot;).append(sunkCount).append(&quot; afundado(s))&quot;);</b>
+<b class="pc">&nbsp;		if (hitCount &gt; 0) sb.append(&quot;, &quot;).append(hitCount).append(&quot; acerto(s)&quot;);</b>
+<b class="pc">&nbsp;		if (sunkCount &gt; 0) sb.append(&quot; (&quot;).append(sunkCount).append(&quot; afundado(s))&quot;);</b>
 <b class="pc">&nbsp;		if (missCount &gt; 0) sb.append(&quot;, &quot;).append(missCount).append(&quot; na água&quot;);</b>
 <b class="fc">&nbsp;		sb.append(&quot;.&quot;);</b>
 &nbsp;
@@ -381,7 +381,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-24 18:41</div>
+    <div style="float:right;">generated on 2026-04-26 17:14</div>
 </div>
 </body>
 </html>

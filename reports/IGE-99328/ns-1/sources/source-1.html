@@ -56,26 +56,26 @@ Current scope:     <a href="../../index.html">all classes</a>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    86,7%
+    60%
   </span>
   <span class="absValue">
-    (13/15)
+    (9/15)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    67,1%
+    17,1%
   </span>
   <span class="absValue">
-    (47/70)
+    (12/70)
   </span>
 </td>
 <td class="coverageStat">
   <span class="percent">
-    89,3%
+    48,4%
   </span>
   <span class="absValue">
-    (109/122)
+    (59/122)
   </span>
 </td>
 </tr>
@@ -154,9 +154,9 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        String userMessage = buildUserMessage(game);</b>
 <b class="fc">&nbsp;        String shotsJson = askLlmForShots(userMessage);</b>
 &nbsp;
-<b class="fc">&nbsp;        System.out.println(&quot;Tiros decididos pelo LLM: &quot; + shotsJson);</b>
+<b class="nc">&nbsp;        System.out.println(&quot;Tiros decididos pelo LLM: &quot; + shotsJson);</b>
 &nbsp;
-<b class="fc">&nbsp;        return game.readEnemyFire(shotsJson);</b>
+<b class="nc">&nbsp;        return game.readEnemyFire(shotsJson);</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -330,24 +330,24 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;        addToHistory(&quot;user&quot;, userMessage);</b>
 &nbsp;
 &nbsp;        // Tenta obter uma resposta válida da IA
-<b class="fc">&nbsp;        for (int attempt = 1; attempt &lt;= MAX_RETRIES; attempt++) {</b>
+<b class="pc">&nbsp;        for (int attempt = 1; attempt &lt;= MAX_RETRIES; attempt++) {</b>
 <b class="fc">&nbsp;            String llmResponse = callApi();</b>
 &nbsp;
-<b class="fc">&nbsp;            addToHistory(&quot;assistant&quot;, llmResponse);</b>
+<b class="nc">&nbsp;            addToHistory(&quot;assistant&quot;, llmResponse);</b>
 &nbsp;
-<b class="fc">&nbsp;            String extracted = extractShotsJson(llmResponse);</b>
-<b class="pc">&nbsp;            if (extracted != null &amp;&amp; isValidShotsJson(extracted)) {</b>
-<b class="fc">&nbsp;                return extracted;</b>
+<b class="nc">&nbsp;            String extracted = extractShotsJson(llmResponse);</b>
+<b class="nc">&nbsp;            if (extracted != null &amp;&amp; isValidShotsJson(extracted)) {</b>
+<b class="nc">&nbsp;                return extracted;</b>
 &nbsp;            }
 &nbsp;
 &nbsp;            // Se falhou, mostra o erro
-<b class="fc">&nbsp;            System.out.println(&quot;Tentativa &quot; + attempt + &quot;/&quot; + MAX_RETRIES</b>
+<b class="nc">&nbsp;            System.out.println(&quot;Tentativa &quot; + attempt + &quot;/&quot; + MAX_RETRIES</b>
 &nbsp;                    + &quot; — resposta inválida: &quot;
-<b class="fc">&nbsp;                    + llmResponse.substring(0, Math.min(80, llmResponse.length())));</b>
+<b class="nc">&nbsp;                    + llmResponse.substring(0, Math.min(80, llmResponse.length())));</b>
 &nbsp;
 &nbsp;            // Se não é a última tentativa, pede para tentar de novo
-<b class="fc">&nbsp;            if (attempt &lt; MAX_RETRIES) {</b>
-<b class="fc">&nbsp;                addToHistory(&quot;user&quot;,</b>
+<b class="nc">&nbsp;            if (attempt &lt; MAX_RETRIES) {</b>
+<b class="nc">&nbsp;                addToHistory(&quot;user&quot;,</b>
 &nbsp;                        &quot;Resposta inválida. Deves responder APENAS com um array JSON de &quot; +
 &nbsp;                                &quot;EXACTAMENTE 3 tiros, sem texto adicional. Exemplo:\n&quot; +
 &nbsp;                                &quot;[{\&quot;row\&quot;:\&quot;A\&quot;,\&quot;column\&quot;:1},{\&quot;row\&quot;:\&quot;E\&quot;,\&quot;column\&quot;:5},{\&quot;row\&quot;:\&quot;J\&quot;,\&quot;column\&quot;:10}]\n&quot; +
@@ -357,8 +357,8 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;        }
 &nbsp;
 &nbsp;        // Se todas as tentativas falharam, usa tiros aleatórios como fallback
-<b class="fc">&nbsp;        System.out.println(&quot;Todas as tentativas falharam. A usar fallback aleatório.&quot;);</b>
-<b class="fc">&nbsp;        return buildRandomFallbackJson();</b>
+<b class="nc">&nbsp;        System.out.println(&quot;Todas as tentativas falharam. A usar fallback aleatório.&quot;);</b>
+<b class="nc">&nbsp;        return buildRandomFallbackJson();</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -392,12 +392,12 @@ Current scope:     <a href="../../index.html">all classes</a>
 <b class="fc">&nbsp;                    HttpResponse.BodyHandlers.ofString());</b>
 &nbsp;
 &nbsp;            // Verifica se a requisição foi bem-sucedida
-<b class="fc">&nbsp;            if (response.statusCode() != 200) {</b>
+<b class="pc">&nbsp;            if (response.statusCode() != 200) {</b>
 <b class="fc">&nbsp;                throw new RuntimeException(&quot;Erro HTTP &quot; + response.statusCode()</b>
 <b class="fc">&nbsp;                        + &quot;: &quot; + response.body());</b>
 &nbsp;            }
 &nbsp;
-<b class="fc">&nbsp;            return parseAiResponse(response.body());</b>
+<b class="nc">&nbsp;            return parseAiResponse(response.body());</b>
 &nbsp;
 &nbsp;        } catch (InterruptedException e) {
 <b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
@@ -419,17 +419,17 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;    private String parseAiResponse(String responseBody) {
 &nbsp;        try {
 &nbsp;            // Parse do JSON e extração do conteúdo
-<b class="fc">&nbsp;            JsonNode root    = objectMapper.readTree(responseBody);</b>
-<b class="fc">&nbsp;            JsonNode choices = root.path(&quot;choices&quot;);</b>
+<b class="nc">&nbsp;            JsonNode root    = objectMapper.readTree(responseBody);</b>
+<b class="nc">&nbsp;            JsonNode choices = root.path(&quot;choices&quot;);</b>
 &nbsp;
 &nbsp;            // Valida se choices existe e não está vazio
-<b class="pc">&nbsp;            if (choices.isArray() &amp;&amp; !choices.isEmpty()) {</b>
-<b class="fc">&nbsp;                JsonNode content = choices.get(0)</b>
-<b class="fc">&nbsp;                        .path(&quot;message&quot;)</b>
-<b class="fc">&nbsp;                        .path(&quot;content&quot;);</b>
+<b class="nc">&nbsp;            if (choices.isArray() &amp;&amp; !choices.isEmpty()) {</b>
+<b class="nc">&nbsp;                JsonNode content = choices.get(0)</b>
+<b class="nc">&nbsp;                        .path(&quot;message&quot;)</b>
+<b class="nc">&nbsp;                        .path(&quot;content&quot;);</b>
 &nbsp;
-<b class="pc">&nbsp;                if (!content.isMissingNode()) {</b>
-<b class="fc">&nbsp;                    return content.asText().trim();</b>
+<b class="nc">&nbsp;                if (!content.isMissingNode()) {</b>
+<b class="nc">&nbsp;                    return content.asText().trim();</b>
 &nbsp;                }
 &nbsp;            }
 &nbsp;
@@ -451,31 +451,31 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     * @return String com o JSON dos tiros, ou null se não encontrou
 &nbsp;     */
 &nbsp;    private String extractShotsJson(String llmResponse) {
-<b class="pc">&nbsp;        if (llmResponse == null || llmResponse.isBlank()) return null;</b>
+<b class="nc">&nbsp;        if (llmResponse == null || llmResponse.isBlank()) return null;</b>
 &nbsp;
 &nbsp;        // Tenta extrair JSON dentro de blocos de código (```json ... ```)
-<b class="fc">&nbsp;        Pattern codeBlock = Pattern.compile(</b>
+<b class="nc">&nbsp;        Pattern codeBlock = Pattern.compile(</b>
 &nbsp;                &quot;```(?:json)?\\s*(\\[.*?])\\s*```&quot;,
 &nbsp;                Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-<b class="fc">&nbsp;        Matcher m = codeBlock.matcher(llmResponse);</b>
-<b class="pc">&nbsp;        if (m.find()) {</b>
+<b class="nc">&nbsp;        Matcher m = codeBlock.matcher(llmResponse);</b>
+<b class="nc">&nbsp;        if (m.find()) {</b>
 <b class="nc">&nbsp;            String c = m.group(1).trim();</b>
 <b class="nc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
 &nbsp;        }
 &nbsp;
 &nbsp;        // Tenta extrair um array JSON diretamente
-<b class="fc">&nbsp;        Pattern arrayPat = Pattern.compile(&quot;(\\[\\s*\\{.*?}\\s*])&quot;, Pattern.DOTALL);</b>
-<b class="fc">&nbsp;        Matcher m2 = arrayPat.matcher(llmResponse);</b>
-<b class="fc">&nbsp;        while (m2.find()) {</b>
-<b class="fc">&nbsp;            String c = m2.group(1).trim();</b>
-<b class="fc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
+<b class="nc">&nbsp;        Pattern arrayPat = Pattern.compile(&quot;(\\[\\s*\\{.*?}\\s*])&quot;, Pattern.DOTALL);</b>
+<b class="nc">&nbsp;        Matcher m2 = arrayPat.matcher(llmResponse);</b>
+<b class="nc">&nbsp;        while (m2.find()) {</b>
+<b class="nc">&nbsp;            String c = m2.group(1).trim();</b>
+<b class="nc">&nbsp;            if (isValidShotsJson(c)) return c;</b>
 &nbsp;        }
 &nbsp;
 &nbsp;        // Tenta usar a resposta inteira se começar com [
-<b class="fc">&nbsp;        String trimmed = llmResponse.trim();</b>
-<b class="pc">&nbsp;        if (trimmed.startsWith(&quot;[&quot;) &amp;&amp; isValidShotsJson(trimmed)) return trimmed;</b>
+<b class="nc">&nbsp;        String trimmed = llmResponse.trim();</b>
+<b class="nc">&nbsp;        if (trimmed.startsWith(&quot;[&quot;) &amp;&amp; isValidShotsJson(trimmed)) return trimmed;</b>
 &nbsp;
-<b class="fc">&nbsp;        return null;</b>
+<b class="nc">&nbsp;        return null;</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -486,23 +486,23 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     */
 &nbsp;    private boolean isValidShotsJson(String json) {
 &nbsp;        try {
-<b class="fc">&nbsp;            JsonNode root = objectMapper.readTree(json);</b>
+<b class="nc">&nbsp;            JsonNode root = objectMapper.readTree(json);</b>
 &nbsp;            // Verifica se é um array com exatamente NUMBER_SHOTS elementos
-<b class="pc">&nbsp;            if (!root.isArray() || root.size() != Game.NUMBER_SHOTS) return false;</b>
+<b class="nc">&nbsp;            if (!root.isArray() || root.size() != Game.NUMBER_SHOTS) return false;</b>
 &nbsp;
 &nbsp;            // Valida cada tiro individualmente
-<b class="fc">&nbsp;            for (JsonNode shot : root) {</b>
-<b class="fc">&nbsp;                JsonNode rowNode = shot.get(&quot;row&quot;);</b>
-<b class="fc">&nbsp;                JsonNode colNode = shot.get(&quot;column&quot;);</b>
-<b class="pc">&nbsp;                if (rowNode == null || colNode == null) return false;</b>
+<b class="nc">&nbsp;            for (JsonNode shot : root) {</b>
+<b class="nc">&nbsp;                JsonNode rowNode = shot.get(&quot;row&quot;);</b>
+<b class="nc">&nbsp;                JsonNode colNode = shot.get(&quot;column&quot;);</b>
+<b class="nc">&nbsp;                if (rowNode == null || colNode == null) return false;</b>
 &nbsp;
 &nbsp;                // Verifica se a linha é A-J e a coluna é 1-10
-<b class="fc">&nbsp;                String row = rowNode.asText().toUpperCase();</b>
-<b class="fc">&nbsp;                int    col = colNode.asInt();</b>
-<b class="pc">&nbsp;                if (row.length() != 1 || row.charAt(0) &lt; &#39;A&#39; || row.charAt(0) &gt; &#39;J&#39;) return false;</b>
-<b class="pc">&nbsp;                if (col &lt; 1 || col &gt; 10) return false;</b>
+<b class="nc">&nbsp;                String row = rowNode.asText().toUpperCase();</b>
+<b class="nc">&nbsp;                int    col = colNode.asInt();</b>
+<b class="nc">&nbsp;                if (row.length() != 1 || row.charAt(0) &lt; &#39;A&#39; || row.charAt(0) &gt; &#39;J&#39;) return false;</b>
+<b class="nc">&nbsp;                if (col &lt; 1 || col &gt; 10) return false;</b>
 &nbsp;            }
-<b class="fc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;            return true;</b>
 &nbsp;        } catch (Exception e) {
 <b class="nc">&nbsp;            return false;</b>
 &nbsp;        }
@@ -515,15 +515,15 @@ Current scope:     <a href="../../index.html">all classes</a>
 &nbsp;     */
 &nbsp;    private String buildRandomFallbackJson() {
 &nbsp;        // Cria lista com todas as posições do tabuleiro
-<b class="fc">&nbsp;        List&lt;IPosition&gt; available = new ArrayList&lt;&gt;();</b>
-<b class="fc">&nbsp;        for (int r = 0; r &lt; Game.BOARD_SIZE; r++)</b>
-<b class="fc">&nbsp;            for (int c = 0; c &lt; Game.BOARD_SIZE; c++)</b>
-<b class="fc">&nbsp;                available.add(new Position(r, c));</b>
+<b class="nc">&nbsp;        List&lt;IPosition&gt; available = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int r = 0; r &lt; Game.BOARD_SIZE; r++)</b>
+<b class="nc">&nbsp;            for (int c = 0; c &lt; Game.BOARD_SIZE; c++)</b>
+<b class="nc">&nbsp;                available.add(new Position(r, c));</b>
 &nbsp;
 &nbsp;        // Embaralha e pega nos primeiros 3
-<b class="fc">&nbsp;        Collections.shuffle(available, new Random());</b>
+<b class="nc">&nbsp;        Collections.shuffle(available, new Random());</b>
 &nbsp;
-<b class="fc">&nbsp;        return Game.jsonShots(available.subList(0, Game.NUMBER_SHOTS));</b>
+<b class="nc">&nbsp;        return Game.jsonShots(available.subList(0, Game.NUMBER_SHOTS));</b>
 &nbsp;    }
 &nbsp;
 &nbsp;    /**
@@ -580,7 +580,7 @@ Current scope:     <a href="../../index.html">all classes</a>
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-24 18:41</div>
+    <div style="float:right;">generated on 2026-04-26 17:14</div>
 </div>
 </body>
 </html>
