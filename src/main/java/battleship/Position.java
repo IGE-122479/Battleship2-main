@@ -115,7 +115,7 @@ public class Position implements IPosition {
 	}
 
 	/**
-	 * Checks if this position is adjacent to another position.
+	 * Checks if this position is adjacent to another position.<
 	 * Two positions are adjacent if they are next to each other horizontally, vertically, or diagonally.
 	 *
 	 * @param other the other position to compare
