@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * - getFloatingShips: 2
  * - shipAt: 2
  * - isInsideBoard: 3
- * - colisionRisk: 2
+ * - collisionRisk: 2
  */
 	public class FleetTest {
 
@@ -168,12 +168,12 @@ import java.util.ArrayList;
 		}
 
 		/**
-		 * Test for private method colisionRisk.
+		 * Test for private method collisionRisk.
 		 * Cyclomatic Complexity: 2
 		 */
 		@Test
-		void testColisionRisk() throws Exception {
-			var method = Fleet.class.getDeclaredMethod("colisionRisk", IShip.class);
+		void testCollisionRisk() throws Exception {
+			var method = Fleet.class.getDeclaredMethod("collisionRisk", IShip.class);
 			method.setAccessible(true);
 
 			IShip ship1 = new Barge(Compass.NORTH, new Position(1, 1));
