@@ -55,18 +55,7 @@ public class Game implements IGame
                     }
                 }
 
-        System.out.println();
-        System.out.print("    ");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print(" " + (col + 1));
-        }
-        System.out.println();
-
-        System.out.print("   +-");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print("--");
-        }
-        System.out.println("+");
+        printBoardHeader();
 
         for (int row = 0; row < BOARD_SIZE; row++) {
             Position pos = new Position(row, 0);
@@ -555,18 +544,7 @@ public class Game implements IGame
         }
 
         // Impressão do cabeçalho das colunas (1 2 3...)
-        System.out.println();
-        System.out.print("    ");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print(" " + (col + 1));
-        }
-        System.out.println();
-
-        System.out.print("   +-");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print("--");
-        }
-        System.out.println("+");
+        printBoardHeader();
 
         // Impressão das linhas (A, B, C...) e conteúdo do mapa
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -592,6 +570,21 @@ public class Game implements IGame
 
         // Chamar a visualização da frota logo abaixo do mapa
         printAlienFleetHealth();
+    }
+
+    private static void printBoardHeader() {
+        System.out.println();
+        System.out.print("    ");
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            System.out.print(" " + (col + 1));
+        }
+        System.out.println();
+
+        System.out.print("   +-");
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            System.out.print("--");
+        }
+        System.out.println("+");
     }
 
     /**
