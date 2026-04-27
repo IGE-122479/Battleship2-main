@@ -1,103 +1,278 @@
 package battleship;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Test class for Game.
- * Author: britoeabreu
- * Date: 2024-03-19
- * Time: 15:30
- * Cyclomatic Complexity for each method:
- * - Game (constructor): 1
- * - fire: 7
- * - getShots: 1
- * - getRepeatedShots: 1
- * - getInvalidShots: 1
- * - getHits: 1
- * - getSunkShips: 1
- * - getRemainingShips: 1
- * - validShot: 3
- * - repeatedShot: 2
- * - printBoard: 1
- * - printValidShots: 1
- * - printFleet: 1
- */
-public class GameTest {
+@DisplayName("Tests for the Game class")
+class GameTest {
 
-	private Game game;
+    private Game game;
+    private IFleet myFleet;
 
-	@BeforeEach
-	void setUp() {
-		game = new Game(new Fleet()); // Assuming Fleet is a concrete implementation of IFleet
-	}
+    @BeforeEach
+    void setUp() {
+        myFleet = Fleet.createRandom();
+        game = new Game(myFleet);
+    }
 
-	@AfterEach
-	void tearDown() {
-		game = null;
-	}
+    // ── Constructor / getters ─────────────────────────────────────────────────
 
-	@Test
-	void constructor() {
-		assertNotNull(game, "Game instance should not be null after construction.");
-		assertNotNull(game.getAlienMoves(), "Shots list should not be null after initialization.");
-		assertTrue(game.getAlienMoves().isEmpty(), "Shots list should be empty upon initialization.");
-		assertEquals(0, game.getInvalidShots(), "Invalid shots count should be zero upon initialization.");
-		assertEquals(0, game.getRepeatedShots(), "Repeated shots count should be zero upon initialization.");
-		assertEquals(0, game.getHits(), "Hits count should be zero upon initialization.");
-		assertEquals(0, game.getSunkShips(), "Sunk ships count should be zero upon initialization.");
-	}
+    @Test
+    @DisplayName("getMyFleet returns the fleet passed to the constructor")
+    void getMyFleetReturnsCorrectFleet() {
+        assertSame(myFleet, game.getMyFleet());
+    }
 
-	@Test
-	void fire2() {
-		Position invalidPosition = new Position(-1, 5);
-		game.fireSingleShot(invalidPosition, false);
-		assertEquals(1, game.getInvalidShots(), "Invalid shots counter should increase for an invalid shot.");
-	}
+    @Test
+    @DisplayName("getAlienFleet returns a non-null fleet")
+    void getAlienFleetNotNull() {
+        assertNotNull(game.getAlienFleet());
+    }
 
-	@Test
-	void fire3() {
-		Position position = new Position(2, 3);
-		game.fireSingleShot(position, false);
-		game.fireSingleShot(position, true);
-		assertEquals(1, game.getRepeatedShots(), "Repeated shots counter should increase for a repeated shot.");
-	}
+    @Test
+    @DisplayName("getMyMoves starts empty")
+    void getMyMovesStartsEmpty() {
+        assertTrue(game.getMyMoves().isEmpty());
+    }
 
-	@Test
-	void repeatedShot1() {
-		List<IPosition> positions = List.of(new Position(2, 3), new Position(2, 4), new Position(2, 5));
-		game.fireShots(positions);
-		Position position = new Position(2, 3);
-		assertTrue(game.repeatedShot(position), "Position (2,3) should be marked as repeated after firing.");
-	}
+    @Test
+    @DisplayName("getAlienMoves starts empty")
+    void getAlienMovesStartsEmpty() {
+        assertTrue(game.getAlienMoves().isEmpty());
+    }
 
-	@Test
-	void repeatedShot2() {
-		Position position = new Position(2, 3);
-		assertFalse(game.repeatedShot(position), "Position (2,3) should not be marked as repeated before firing.");
-	}
+    @Test
+    @DisplayName("initial repeated shots count is zero")
+    void initialRepeatedShotsIsZero() {
+        assertEquals(0, game.getRepeatedShots());
+    }
 
-	@Test
-	void getAlienMoves() {
-		List<IPosition> positions = List.of(new Position(2, 3), new Position(2, 4), new Position(2, 5));
-		game.fireShots(positions);
-		assertEquals(1, game.getAlienMoves().size(), "Shots list should contain one shot after firing once.");
-	}
+    @Test
+    @DisplayName("initial invalid shots count is zero")
+    void initialInvalidShotsIsZero() {
+        assertEquals(0, game.getInvalidShots());
+    }
 
-	@Test
-	void getRemainingShips() {
-		IFleet fleet = game.getMyFleet();
-		Ship ship1 = new Barge(Compass.NORTH, new Position(1, 1));
-		Ship ship2 = new Frigate(Compass.EAST, new Position(5, 5));
+    @Test
+    @DisplayName("initial hits count is zero")
+    void initialHitsIsZero() {
+        assertEquals(0, game.getHits());
+    }
 
-		fleet.addShip(ship1);
-		assertEquals(1, game.getRemainingShips(), "Just one ship was created!");
-		fleet.addShip(ship2);
-		assertEquals(2, game.getRemainingShips(), "Two ships were created!");
-		ship2.sink();
-		assertEquals(1, game.getRemainingShips(), "Remaining ships count should be 1 after sinking one of two ships.");
-	}
+    @Test
+    @DisplayName("initial sunk ships count is zero")
+    void initialSunkShipsIsZero() {
+        assertEquals(0, game.getSunkShips());
+    }
 
+    @Test
+    @DisplayName("getRemainingShips returns 11 at game start")
+    void getRemainingShipsInitial() {
+        assertEquals(11, game.getRemainingShips());
+    }
+
+    @Test
+    @DisplayName("getAlienRemainingShips returns 11 at game start")
+    void getAlienRemainingShipsInitial() {
+        assertEquals(11, game.getAlienRemainingShips());
+    }
+
+    // ── fireSingleShot ────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("fireSingleShot on invalid position returns invalid result")
+    void fireSingleShotInvalidPosition() {
+        IGame.ShotResult result = game.fireSingleShot(new Position(-1, -1), false);
+        assertFalse(result.valid());
+    }
+
+    @Test
+    @DisplayName("fireSingleShot repeated returns repeated result")
+    void fireSingleShotRepeated() {
+        IGame.ShotResult result = game.fireSingleShot(new Position(0, 0), true);
+        assertTrue(result.repeated());
+    }
+
+    @Test
+    @DisplayName("fireSingleShot on water returns valid, non-repeated, no ship")
+    void fireSingleShotOnWater() {
+        // Garante tiro numa posição sem navio — percorre até encontrar água
+        Position waterPos = null;
+        for (int r = 0; r < Game.BOARD_SIZE; r++) {
+            for (int c = 0; c < Game.BOARD_SIZE; c++) {
+                Position p = new Position(r, c);
+                if (myFleet.shipAt(p) == null) {
+                    waterPos = p;
+                    break;
+                }
+            }
+            if (waterPos != null) break;
+        }
+        assertNotNull(waterPos);
+        IGame.ShotResult result = game.fireSingleShot(waterPos, false);
+        assertTrue(result.valid());
+        assertFalse(result.repeated());
+        assertNull(result.ship());
+    }
+
+    // ── repeatedShot ──────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("repeatedShot returns false when no moves have been made")
+    void repeatedShotFalseInitially() {
+        assertFalse(game.repeatedShot(new Position(0, 0)));
+    }
+
+    // ── myRepeatedShot ────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("myRepeatedShot returns false when no my moves have been made")
+    void myRepeatedShotFalseInitially() {
+        assertFalse(game.myRepeatedShot(new Position(0, 0)));
+    }
+
+    // ── jsonShots ─────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("jsonShots returns a valid JSON string")
+    void jsonShotsReturnsJson() {
+        List<IPosition> shots = List.of(
+                new Position('A', 1),
+                new Position('B', 2),
+                new Position('C', 3)
+        );
+        String json = Game.jsonShots(shots);
+        assertNotNull(json);
+        assertTrue(json.contains("row"));
+        assertTrue(json.contains("column"));
+    }
+
+    @Test
+    @DisplayName("jsonShots with empty list returns empty JSON array")
+    void jsonShotsEmptyList() {
+        String json = Game.jsonShots(List.of());
+        assertNotNull(json);
+        assertTrue(json.contains("[]") || json.contains("[ ]"));
+    }
+
+    // ── fireShots ─────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("fireShots with wrong number of shots throws IllegalArgumentException")
+    void fireShotsWrongCountThrows() {
+        List<IPosition> twoShots = List.of(new Position('A', 1), new Position('B', 2));
+        assertThrows(IllegalArgumentException.class, () -> game.fireShots(twoShots));
+    }
+
+    @Test
+    @DisplayName("fireShots with correct number of shots does not throw")
+    void fireShotsCorrectCount() {
+        List<IPosition> threeShots = List.of(
+                new Position('A', 1),
+                new Position('B', 2),
+                new Position('C', 3)
+        );
+        assertDoesNotThrow(() -> game.fireShots(threeShots));
+    }
+
+    // ── readEnemyFire ─────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("readEnemyFire with valid JSON returns a JSON result")
+    void readEnemyFireValidJson() {
+        String json = "[{\"row\":\"A\",\"column\":1},{\"row\":\"B\",\"column\":2},{\"row\":\"C\",\"column\":3}]";
+        String result = game.readEnemyFire(json);
+        assertNotNull(result);
+        assertTrue(result.contains("validShots"));
+    }
+
+    @Test
+    @DisplayName("readEnemyFire with invalid JSON throws RuntimeException")
+    void readEnemyFireInvalidJsonThrows() {
+        assertThrows(RuntimeException.class, () -> game.readEnemyFire("not json"));
+    }
+
+    // ── sendMyShotsJson ───────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("sendMyShotsJson with valid JSON returns a result")
+    void sendMyShotsJsonValid() {
+        String json = "[{\"row\":\"A\",\"column\":1},{\"row\":\"B\",\"column\":2},{\"row\":\"C\",\"column\":3}]";
+        String result = game.sendMyShotsJson(json);
+        assertNotNull(result);
+        assertTrue(result.contains("validShots"));
+    }
+
+    @Test
+    @DisplayName("sendMyShotsJson with wrong number of shots throws IllegalArgumentException")
+    void sendMyShotsJsonWrongCountThrows() {
+        String json = "[{\"row\":\"A\",\"column\":1}]";
+        assertThrows(IllegalArgumentException.class, () -> game.sendMyShotsJson(json));
+    }
+
+    // ── printBoard ────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("printBoard without shots and without legend does not throw")
+    void printBoardNoShotsNoLegend() {
+        assertDoesNotThrow(() -> Game.printBoard(myFleet, List.of(), false, false));
+    }
+
+    @Test
+    @DisplayName("printBoard with shots and with legend does not throw")
+    void printBoardWithShotsAndLegend() {
+        assertDoesNotThrow(() -> Game.printBoard(myFleet, List.of(), true, true));
+    }
+
+    // ── printMyBoard / printAlienBoard ────────────────────────────────────────
+
+    @Test
+    @DisplayName("printMyBoard does not throw")
+    void printMyBoardDoesNotThrow() {
+        assertDoesNotThrow(() -> game.printMyBoard(true, true));
+    }
+
+    @Test
+    @DisplayName("printAlienBoard does not throw")
+    void printAlienBoardDoesNotThrow() {
+        assertDoesNotThrow(() -> game.printAlienBoard(true, true));
+    }
+
+    // ── randomEnemyFire ───────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("randomEnemyFire returns a JSON string")
+    void randomEnemyFireReturnsJson() {
+        String result = game.randomEnemyFire();
+        assertNotNull(result);
+        assertTrue(result.contains("validShots"));
+    }
+
+    @Test
+    @DisplayName("randomEnemyFire adds a move to alienMoves")
+    void randomEnemyFireAddsMove() {
+        game.randomEnemyFire();
+        assertEquals(1, game.getAlienMoves().size());
+    }
+
+    // ── printTimingStats ──────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("printTimingStats with no moves does not throw")
+    void printTimingStatsNoMoves() {
+        assertDoesNotThrow(() -> game.printTimingStats());
+    }
+
+    @Test
+    @DisplayName("printTimingStats after moves does not throw")
+    void printTimingStatsWithMoves() {
+        String json = "[{\"row\":\"A\",\"column\":1},{\"row\":\"B\",\"column\":2},{\"row\":\"C\",\"column\":3}]";
+        game.sendMyShotsJson(json);
+        assertDoesNotThrow(() -> game.printTimingStats());
+    }
 }
