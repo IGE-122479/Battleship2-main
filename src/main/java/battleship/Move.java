@@ -260,12 +260,16 @@ public class Move implements IMove {
 			}
 		}
 
-		sb.append("Resumo: ").append(validCount).append(" tiros válidos");
-		if (hitCount > 0) sb.append(", ").append(hitCount).append(" acerto(s)");
-		if (sunkCount > 0) sb.append(" (").append(sunkCount).append(" afundado(s))");
-		if (missCount > 0) sb.append(", ").append(missCount).append(" na água");
-		sb.append(".");
+        buildSummary(sb, validCount, hitCount, sunkCount, missCount);
 
-		return sb.toString();
+        return sb.toString();
 	}
+
+    private static void buildSummary(StringBuilder sb, int validCount, int hitCount, int sunkCount, int missCount) {
+        sb.append("Resumo: ").append(validCount).append(" tiros válidos");
+        if (hitCount > 0) sb.append(", ").append(hitCount).append(" acerto(s)");
+        if (sunkCount > 0) sb.append(" (").append(sunkCount).append(" afundado(s))");
+        if (missCount > 0) sb.append(", ").append(missCount).append(" na água");
+        sb.append(".");
+    }
 }
