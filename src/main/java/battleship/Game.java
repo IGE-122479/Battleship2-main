@@ -76,10 +76,7 @@ public class Game implements IGame
             System.out.println(" |");
         }
 
-        System.out.print("   +");
-        for (int col = 0; col < BOARD_SIZE; col++)
-            System.out.print("--");
-        System.out.println("-+");
+        printBoardFooter();
 
         if (showLegend) {
             System.out.println("          LEGENDA");
@@ -87,6 +84,13 @@ public class Game implements IGame
             System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
         }
         System.out.println();
+    }
+
+    private static void printBoardFooter() {
+        System.out.print("   +");
+        for (int col = 0; col < BOARD_SIZE; col++)
+            System.out.print("--");
+        System.out.println("-+");
     }
 
     /**
