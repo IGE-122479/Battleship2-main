@@ -293,18 +293,7 @@ public class Game implements IGame
         ObjectMapper mapper = new ObjectMapper();
         List<IPosition> shots = new ArrayList<>();
 
-        try {
-            List<Map<String, Object>> parsed = mapper.readValue(json,
-                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-
-            for (Map<String, Object> entry : parsed) {
-                char row    = ((String) entry.get("row")).charAt(0);
-                int  column = (Integer) entry.get("column");
-                shots.add(new Position(row, column));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar JSON dos meus tiros: " + e.getMessage(), e);
-        }
+        parseShotsFromJson(mapper, json, shots, "Erro ao interpretar JSON dos meus tiros: ");
 
         if (shots.size() != NUMBER_SHOTS)
             throw new IllegalArgumentException("O JSON deve conter exactamente " + NUMBER_SHOTS + " tiros.");
@@ -345,18 +334,7 @@ public class Game implements IGame
         ObjectMapper mapper = new ObjectMapper();
         List<IPosition> shots = new ArrayList<>();
 
-        try {
-            List<Map<String, Object>> parsed = mapper.readValue(json,
-                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-
-            for (Map<String, Object> entry : parsed) {
-                char row    = ((String) entry.get("row")).charAt(0);
-                int  column = (Integer) entry.get("column");
-                shots.add(new Position(row, column));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar JSON dos tiros do inimigo: " + e.getMessage(), e);
-        }
+        parseShotsFromJson(mapper, json, shots, "Erro ao interpretar JSON dos tiros do inimigo: ");
 
         List<ShotResult> shotResults = new ArrayList<>();
         List<IPosition> alreadyShot  = new ArrayList<>();
@@ -375,6 +353,21 @@ public class Game implements IGame
 
         // Devolver JSON com os resultados da jogada
         return move.processEnemyFire(false);
+    }
+
+    private static void parseShotsFromJson(ObjectMapper mapper, String json, List<IPosition> shots, String x) {
+        try {
+            List<Map<String, Object>> parsed = mapper.readValue(json,
+                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+
+            for (Map<String, Object> entry : parsed) {
+                char row = ((String) entry.get("row")).charAt(0);
+                int column = (Integer) entry.get("column");
+                shots.add(new Position(row, column));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(x + e.getMessage(), e);
+        }
     }
 
     /**

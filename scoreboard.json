@@ -1,24 +1,24 @@
 [ {
-  "dateTime" : "2026-04-27 17:07:28",
+  "dateTime" : "2026-04-27 17:11:46",
   "totalMoves" : 1,
   "totalHits" : 0,
   "sunkShips" : 0,
   "result" : "DERROTA"
 }, {
-  "dateTime" : "2026-04-27 17:07:28",
+  "dateTime" : "2026-04-27 17:11:46",
   "totalMoves" : 0,
   "totalHits" : 0,
   "sunkShips" : 0,
   "result" : "VITÓRIA"
 }, {
-  "dateTime" : "2026-04-27 17:08:46",
-  "totalMoves" : 26,
+  "dateTime" : "2026-04-27 17:13:01",
+  "totalMoves" : 25,
   "totalHits" : 25,
   "sunkShips" : 11,
   "result" : "DERROTA"
 }, {
-  "dateTime" : "2026-04-27 17:10:16",
-  "totalMoves" : 30,
+  "dateTime" : "2026-04-27 17:14:17",
+  "totalMoves" : 25,
   "totalHits" : 25,
   "sunkShips" : 11,
   "result" : "DERROTA"
