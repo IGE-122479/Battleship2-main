@@ -415,4 +415,34 @@ public class ShipTest {
 
     }
 
+    /**
+     * Tests for the sink() method.
+     * Cyclomatic Complexity: 2 (for loop: 0 iterations branch unreachable + N iterations)
+     */
+    @Test
+    @DisplayName("[Ship] sink1 – Barca (1 posição): sink() marca a única posição como hit")
+    void testSink1() {
+        Ship barca = new Barge(Compass.NORTH, new Position(3, 3));
+        assertTrue(barca.stillFloating(), "Pré-condição: a Barca deve estar a flutuar antes de sink().");
+        barca.sink();
+        assertTrue(barca.getPositions().get(0).isHit(),
+                "Erro: sink() deve marcar a posição da Barca como hit.");
+        assertFalse(barca.stillFloating(),
+                "Erro: após sink(), stillFloating() deve devolver false.");
+    }
+
+    @Test
+    @DisplayName("[Ship] sink2 – Caravela (2 posições): sink() marca TODAS as posições como hit")
+    void testSink2() {
+        Ship caravela = new Caravel(Compass.NORTH, new Position(2, 2));
+        assertEquals(2, caravela.getPositions().size(), "Pré-condição: Caravela deve ter 2 posições.");
+        caravela.sink();
+        for (int i = 0; i < caravela.getPositions().size(); i++) {
+            assertTrue(caravela.getPositions().get(i).isHit(),
+                    "Erro: sink() deve marcar a posição " + i + " da Caravela como hit.");
+        }
+        assertFalse(caravela.stillFloating(),
+                "Erro: após sink(), stillFloating() deve devolver false para a Caravela.");
+    }
+
 }
