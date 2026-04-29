@@ -3,6 +3,7 @@ package battleship;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -54,18 +55,7 @@ public class Game implements IGame
                     }
                 }
 
-        System.out.println();
-        System.out.print("    ");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print(" " + (col + 1));
-        }
-        System.out.println();
-
-        System.out.print("   +-");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print("--");
-        }
-        System.out.println("+");
+        printBoardHeader();
 
         for (int row = 0; row < BOARD_SIZE; row++) {
             Position pos = new Position(row, 0);
@@ -76,10 +66,7 @@ public class Game implements IGame
             System.out.println(" |");
         }
 
-        System.out.print("   +");
-        for (int col = 0; col < BOARD_SIZE; col++)
-            System.out.print("--");
-        System.out.println("-+");
+        printBoardFooter();
 
         if (showLegend) {
             System.out.println("          LEGENDA");
@@ -87,6 +74,13 @@ public class Game implements IGame
             System.out.println("'" + SHOT_SHIP_MARKER + "'->Tiro certeiro, '" + SHOT_WATER_MARKER + "'->Tiro na água");
         }
         System.out.println();
+    }
+
+    private static void printBoardFooter() {
+        System.out.print("   +");
+        for (int col = 0; col < BOARD_SIZE; col++)
+            System.out.print("--");
+        System.out.println("-+");
     }
 
     /**
@@ -223,13 +217,7 @@ public class Game implements IGame
         // Criar uma instância de Random com uma seed baseada no timestamp atual
         Random random = new Random(System.currentTimeMillis());
 
-        Set<IPosition> usablePositions = new HashSet<IPosition>();
-        for (int r = 0; r < BOARD_SIZE; r++)
-            for (int c = 0; c < BOARD_SIZE; c++)
-                usablePositions.add(new Position(r, c));
-
-        this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
-        this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
+        Set<IPosition> usablePositions = getUsablePositions();
 
         List<IPosition> candidateShots = new ArrayList<>(usablePositions);
 
@@ -266,6 +254,17 @@ public class Game implements IGame
         return readEnemyFire(shotsJson);
     }
 
+    private @NotNull Set<IPosition> getUsablePositions() {
+        Set<IPosition> usablePositions = new HashSet<IPosition>();
+        for (int r = 0; r < BOARD_SIZE; r++)
+            for (int c = 0; c < BOARD_SIZE; c++)
+                usablePositions.add(new Position(r, c));
+
+        this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
+        this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
+        return usablePositions;
+    }
+
     /**
      * Recebe os meus tiros sobre a frota do adversário em formato JSON,
      * processa-os e devolve um JSON com os resultados.
@@ -283,18 +282,7 @@ public class Game implements IGame
         ObjectMapper mapper = new ObjectMapper();
         List<IPosition> shots = new ArrayList<>();
 
-        try {
-            List<Map<String, Object>> parsed = mapper.readValue(json,
-                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-
-            for (Map<String, Object> entry : parsed) {
-                char row    = ((String) entry.get("row")).charAt(0);
-                int  column = (Integer) entry.get("column");
-                shots.add(new Position(row, column));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar JSON dos meus tiros: " + e.getMessage(), e);
-        }
+        parseShotsFromJson(mapper, json, shots, "Erro ao interpretar JSON dos meus tiros: ");
 
         if (shots.size() != NUMBER_SHOTS)
             throw new IllegalArgumentException("O JSON deve conter exactamente " + NUMBER_SHOTS + " tiros.");
@@ -335,18 +323,7 @@ public class Game implements IGame
         ObjectMapper mapper = new ObjectMapper();
         List<IPosition> shots = new ArrayList<>();
 
-        try {
-            List<Map<String, Object>> parsed = mapper.readValue(json,
-                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
-
-            for (Map<String, Object> entry : parsed) {
-                char row    = ((String) entry.get("row")).charAt(0);
-                int  column = (Integer) entry.get("column");
-                shots.add(new Position(row, column));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar JSON dos tiros do inimigo: " + e.getMessage(), e);
-        }
+        parseShotsFromJson(mapper, json, shots, "Erro ao interpretar JSON dos tiros do inimigo: ");
 
         List<ShotResult> shotResults = new ArrayList<>();
         List<IPosition> alreadyShot  = new ArrayList<>();
@@ -365,6 +342,21 @@ public class Game implements IGame
 
         // Devolver JSON com os resultados da jogada
         return move.processEnemyFire(false);
+    }
+
+    private static void parseShotsFromJson(ObjectMapper mapper, String json, List<IPosition> shots, String x) {
+        try {
+            List<Map<String, Object>> parsed = mapper.readValue(json,
+                    mapper.getTypeFactory().constructCollectionType(List.class, Map.class));
+
+            for (Map<String, Object> entry : parsed) {
+                char row = ((String) entry.get("row")).charAt(0);
+                int column = (Integer) entry.get("column");
+                shots.add(new Position(row, column));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(x + e.getMessage(), e);
+        }
     }
 
     /**
@@ -552,18 +544,7 @@ public class Game implements IGame
         }
 
         // Impressão do cabeçalho das colunas (1 2 3...)
-        System.out.println();
-        System.out.print("    ");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print(" " + (col + 1));
-        }
-        System.out.println();
-
-        System.out.print("   +-");
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            System.out.print("--");
-        }
-        System.out.println("+");
+        printBoardHeader();
 
         // Impressão das linhas (A, B, C...) e conteúdo do mapa
         for (int row = 0; row < BOARD_SIZE; row++) {
@@ -589,6 +570,21 @@ public class Game implements IGame
 
         // Chamar a visualização da frota logo abaixo do mapa
         printAlienFleetHealth();
+    }
+
+    private static void printBoardHeader() {
+        System.out.println();
+        System.out.print("    ");
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            System.out.print(" " + (col + 1));
+        }
+        System.out.println();
+
+        System.out.print("   +-");
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            System.out.print("--");
+        }
+        System.out.println("+");
     }
 
     /**
