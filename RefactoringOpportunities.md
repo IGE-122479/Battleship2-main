@@ -17,3 +17,10 @@
 | `Caravel` | Código duplicado | Pull Up Method | 99845 |
 | `Carrack` | Código duplicado | Pull Up Method | 99845 |
 | `Frigate` | Código duplicado | Pull Up Method | 99845 |
+| `Game::printAlienFleetHealth` | Feature Envy | Move Method | 99328 |
+| `Tasks::runMenu` | Long Method | Extract Method | 99328 |
+| `Tasks::runMenu` | Duplicated Code | Extract Method | 99328 |
+| `Tasks::runMenu` | Primitive Obsession | Replace Type with Object / Introduce Constant | 99328 |
+| `Tasks::readClassicPosition` | Conditional Complexity | Decompose Conditional / Extract Method | 99328 |
+| `Ship::stillFloating` | Feature Envy | Move Method | 99328 |
+| `Move::toDetailedString` | Long Method | Extract Method | 99328 |
