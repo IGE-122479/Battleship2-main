@@ -2,7 +2,6 @@ package battleship;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -186,29 +185,50 @@ public class AiGame {
      */
     private String buildUserMessage(IGame game) {
 
-        List<IMove> alienMoves = game.getAlienMoves();
-
-        if (firstMove) {
-            firstMove = false;
-            return buildSystemPrompt() + "O jogo começa agora. " +
-                    "Raciocinio antes de escolher os tiros:\n" +
-                    "1. Modo: VARRIMENTO checkerboard\n" +
-                    "2. Escolhe 3 casas onde (linha + coluna) é par\n\n" +
-                    "Envia a tua primeira rajada de exactamente 3 tiros. " +
-                    "Responde APENAS com o JSON puro, sem texto adicional.";
+        if (consumeFirstMove()) {
+            return buildFirstMoveMessage();
         }
+        return buildNextMoveMessage(game);
+    }
 
-        IMove lastMove = alienMoves.get(alienMoves.size() - 1);
-        int remaining = game.getRemainingShips();
-        String detailedResult = lastMove.toDetailedString();
-        String alreadyShotList = buildAlreadyShotList(alienMoves);
+    private boolean consumeFirstMove() {
+        if (!firstMove) return false;
+        firstMove = false;
+        return true;
+    }
+
+    private String buildFirstMoveMessage() {
+        return buildSystemPrompt() + "O jogo começa agora. " +
+                "Raciocinio antes de escolher os tiros:\n" +
+                "1. Modo: VARRIMENTO checkerboard\n" +
+                "2. Escolhe 3 casas onde (linha + coluna) é par\n\n" +
+                "Envia a tua primeira rajada de exactamente 3 tiros. " +
+                "Responde APENAS com o JSON puro, sem texto adicional.";
+    }
+
+    private String buildNextMoveMessage(IGame game) {
+        List<IMove> alienMoves = game.getAlienMoves();
+        IMove lastMove = getLastMove(alienMoves);
 
         return "Resultado da tua última rajada (nº" + lastMove.getNumber() + "):\n"
-                + detailedResult
-                +"\n"
-                + alreadyShotList
-                + "\nNavios inimigos ainda a flutuar: " + remaining + ".\n\n"
-                + "Atualiza o teu Diário de Bordo\n\n"
+                + lastMove.toDetailedString()
+                + "\n"
+                + buildAlreadyShotList(alienMoves)
+                + buildGameInfo(game)
+                + buildInstructions();
+    }
+
+    private String buildGameInfo(IGame game) {
+        return "\nNavios inimigos ainda a flutuar: " + game.getRemainingShips() + ".\n\n";
+    }
+
+    private IMove getLastMove(List<IMove> alienMoves) {
+        return alienMoves.get(alienMoves.size() - 1);
+    }
+
+
+    private String buildInstructions(){
+        return "Atualiza o teu Diário de Bordo\n\n"
                 + "RACIOCÍNIO obrigatório antes de responder:\n"
                 + "1. Quais coordenadas acertei em navios ainda não afundados?\n"
                 + "2. Modo atual: PERSEGUIÇÃO ou VARRIMENTO?\n"
@@ -218,6 +238,7 @@ public class AiGame {
                 + "Depois do raciocínio envia a próxima rajada. "
                 + "Responde APENAS com o JSON puro de 3 tiros.";
     }
+
 
     /**
      * Constrói uma lista com todas as coordenadas já disparadas.
