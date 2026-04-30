@@ -6,6 +6,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Cell;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -180,11 +181,27 @@ public class PdfExporter {
 
         if (file.exists()) {
             if (!file.delete()) {
-                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                return "battleship_game_" + timestamp + ".pdf";
+                return generateTimeStamp();
             }
         }
         return OUTPUT_FILE;
+    }
+
+    /**
+     * Generates a unique filename for the game results using the current timestamp.
+     *
+     * The filename follows the pattern:
+     * "battleship_game_yyyyMMdd_HHmmss.pdf"
+     *
+     * This method is typically used when the default output file cannot be reused,
+     * ensuring that a new file is created without overwriting existing ones.
+     *
+     * @return a non-null String representing a timestamped PDF filename
+     */
+
+    private static @NotNull String generateTimeStamp() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        return "battleship_game_" + timestamp + ".pdf";
     }
 
 }
