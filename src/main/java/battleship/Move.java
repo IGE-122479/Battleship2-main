@@ -272,4 +272,13 @@ public class Move implements IMove {
         if (missCount > 0) sb.append(", ").append(missCount).append(" na água");
         sb.append(".");
     }
+
+	public List<String> getShotCoordinates() {
+		List<String> coords = new ArrayList<>();
+		for (IPosition pos : shots) {
+			coords.add(pos.toCoordString());
+		}
+		return coords;
+	}
+
 }

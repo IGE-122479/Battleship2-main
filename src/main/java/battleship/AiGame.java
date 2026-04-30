@@ -155,9 +155,7 @@ public class AiGame {
         List<String> coords = new ArrayList<>();
 
         for (IMove move : alienMoves) {
-            for (IPosition pos : move.getShots()) {
-                coords.add("" + pos.getClassicRow() + pos.getClassicColumn());
-            }
+            coords.addAll(move.getShotCoordinates());
         }
 
         if (coords.isEmpty()) {

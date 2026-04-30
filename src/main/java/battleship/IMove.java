@@ -35,4 +35,6 @@ public interface IMove {
 	String processEnemyFire(boolean verbose);
 
 	String toDetailedString();
+
+	List<String> getShotCoordinates();
 }

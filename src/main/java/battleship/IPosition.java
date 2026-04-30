@@ -92,4 +92,6 @@ public interface IPosition
 	 * @return a list of adjacent positions as IPosition objects
 	 */
 	List<IPosition> adjacentPositions();
+
+	String toCoordString();
 }
