@@ -43,7 +43,6 @@ public class Tasks {
 
 	private static final String GUI = "gui";
 
-
 	/**
 	 * Creates the Game for a given fleet.
 	 * Override in tests to return a controlled fake.
@@ -79,7 +78,6 @@ public class Tasks {
 				case GERAFROTA:
 					myFleet = Fleet.createRandom();
 					game = createGame(myFleet);
-					//aiadversario = new AiGame();
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
 					try {
@@ -101,24 +99,14 @@ public class Tasks {
 					game.printMyBoard(false, true);
 					break;
 				case STATUS:
-					// Mostra o estado das duas frotas
-					if (game != null) {
-						System.out.print("A minha frota  -> ");
-						myFleet.printStatus();
-						System.out.print("Adversário     -> ");
-						game.getAlienFleet().printStatus();
-					}
+					handleEstado(game, myFleet);
 					break;
 				case MAPA:
 					if (myFleet != null)
 						game.printMyBoard(false, true);
 					break;
 				case MAPAADV:
-					// Mostra o tabuleiro do adversário (apenas os meus tiros — não revela os navios)
-					if (game instanceof Game g)
-						g.printAlienBoard(true, true);
-					else
-						System.out.println("Nenhum jogo em curso.");
+					handleMapaAdversario(game);
 					break;
 				case RAJADA:
 					// O jogador ataca o adversário
@@ -186,39 +174,14 @@ public class Tasks {
 						game.printMyBoard(true, true);
 					break;
 				case TEMPO:
-					// Mostrar a tabela do relógio das jogadas
-					if (game instanceof Game g)
-						g.printTimingStats();
-					else
-						System.out.println("Nenhum jogo em curso ou nenhuma jogada registada.");
+					handleTempo(game);
 					break;
 				case AJUDA:
 					menuHelp();
 					break;
 				case GUARDAPDF:
-					if (game != null)
-						PdfExporter.exportGameToPdf(game);
-					else
-						System.out.println("Nenhum jogo em andamento para exportar.");
+					handleGuardaPdf(game);
 					break;
-				// Dentro do switch/case ou if/else dos comandos:
-				/*case GUI:
-				if (game == null) {
-					System.out.println("Nenhum jogo em curso. Gera uma frota primeiro!");
-				} else {
-					try {
-						// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
-						Platform.startup(() -> {});
-					} catch (IllegalStateException e) {
-						// Toolkit já estava iniciado, podemos continuar
-					}
-
-					final IGame currentGame = game;
-					Platform.runLater(() -> {
-						GameGui.show(currentGame);
-					});
-				}
-				break;*/
 				case RAJADAIA:
 					if (game instanceof Game g) {
 						if (aiadversario == null) {
@@ -277,6 +240,39 @@ public class Tasks {
 			}
 		}
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static void handleGuardaPdf(IGame game) {
+		if (game != null)
+			PdfExporter.exportGameToPdf(game);
+		else
+			System.out.println("Nenhum jogo em andamento para exportar.");
+	}
+
+	private static void handleTempo(IGame game) {
+		// Mostrar a tabela do relógio das jogadas
+		if (game instanceof Game g)
+			g.printTimingStats();
+		else
+			System.out.println("Nenhum jogo em curso ou nenhuma jogada registada.");
+	}
+
+	private static void handleMapaAdversario(IGame game) {
+		// Mostra o tabuleiro do adversário (apenas os meus tiros — não revela os navios)
+		if (game instanceof Game g)
+			g.printAlienBoard(true, true);
+		else
+			System.out.println("Nenhum jogo em curso.");
+	}
+
+	private static void handleEstado(IGame game, IFleet myFleet) {
+		// Mostra o estado das duas frotas
+		if (game != null) {
+			System.out.print("A minha frota  -> ");
+			myFleet.printStatus();
+			System.out.print("Adversário     -> ");
+			game.getAlienFleet().printStatus();
+		}
 	}
 
 	/**
