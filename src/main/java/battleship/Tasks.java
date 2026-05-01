@@ -26,22 +26,26 @@ public class Tasks {
 	/**
 	 * Strings to be used by the user
 	 */
-	private static final String AJUDA = "ajuda";
-	private static final String GERAFROTA = "gerafrota";
-	private static final String LEFROTA = "lefrota";
-	private static final String DESISTIR = "desisto";
-	private static final String RAJADA = "rajada";
-	private static final String TIROS = "tiros";
-	private static final String MAPA = "mapa";
-	private static final String STATUS = "estado";
-	private static final String SIMULA = "simula";
-	private static final String GUARDAPDF = "guardapdf";
-	private static final String TEMPO     = "tempo"; // mostra o relógio das jogadas
-	private static final String SCOREBOARD = "scoreboard";
-	private static final String MAPAADV    = "mapaadversario"; // ver o tabuleiro do adversário
-	private static final String RAJADAIA = "rajadaia"; // jogar contra uma IA
+	enum Command {
+		AJUDA      ("ajuda"),
+		GERAFROTA  ("gerafrota"),
+		LEFROTA    ("lefrota"),
+		DESISTIR   ("desisto"),
+		RAJADA     ("rajada"),
+		TIROS      ("tiros"),
+		MAPA       ("mapa"),
+		STATUS     ("estado"),
+		SIMULA     ("simula"),
+		GUARDAPDF  ("guardapdf"),
+		TEMPO      ("tempo"),
+		SCOREBOARD ("scoreboard"),
+		MAPAADV    ("mapaadversario"),
+		RAJADAIA   ("rajadaia");
 
-	private static final String GUI = "gui";
+		final String value;
+
+		Command(String value) { this.value = value; }
+	}
 
 	/**
 	 * Creates the Game for a given fleet.
@@ -72,10 +76,10 @@ public class Tasks {
 		System.out.print("> ");
 		Scanner in = new Scanner(System.in);
 		String command = in.next();
-		while (!command.equals(DESISTIR)) {
+		while (!command.equals(Command.DESISTIR.value)) {
 			boolean gameEnded = false;
 			switch (command) {
-				case GERAFROTA:
+				case "gerafrota":
 					myFleet = Fleet.createRandom();
 					game = createGame(myFleet);
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
@@ -88,22 +92,22 @@ public class Tasks {
 					});
 
 					break;
-				case LEFROTA:
+				case "lefrota":
 					myFleet = buildFleet(in);
 					game = createGame(myFleet);
 					game.printMyBoard(false, true);
 					break;
-				case STATUS:
+				case "estado":
 					handleEstado(game, myFleet);
 					break;
-				case MAPA:
+				case "mapa":
 					if (myFleet != null)
 						game.printMyBoard(false, true);
 					break;
-				case MAPAADV:
+				case "mapaadversario":
 					handleMapaAdversario(game);
 					break;
-				case RAJADA:
+				case "rajada":
 					// O jogador ataca o adversário
 					if (game instanceof Game g) {
 						System.out.println("--- O teu ataque ---");
@@ -125,7 +129,7 @@ public class Tasks {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
 					break;
-				case SIMULA:
+				case "simula":
 					if (game != null) {
 						final IGame gameParaGUI = game;
 						initJavaFX();
@@ -152,20 +156,20 @@ public class Tasks {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
 					break;
-				case TIROS:
+				case "tiros":
 					if (game != null)
 						game.printMyBoard(true, true);
 					break;
-				case TEMPO:
+				case "tempo":
 					handleTempo(game);
 					break;
-				case AJUDA:
+				case "ajuda":
 					menuHelp();
 					break;
-				case GUARDAPDF:
+				case "guardapdf":
 					handleGuardaPdf(game);
 					break;
-				case RAJADAIA:
+				case "rajadaia":
 					if (game instanceof Game g) {
 						if (aiadversario == null) {
 							try {
@@ -202,7 +206,7 @@ public class Tasks {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
 					}
 					break;
-				case SCOREBOARD:
+				case "scoreboard":
 					ScoreboardManager.printScoreboard();
 					break;
 				default:
@@ -210,7 +214,7 @@ public class Tasks {
 			}
 			// Se o jogo terminou, forçar saída do menu
 			if (gameEnded) {
-				command = DESISTIR;
+				command = Command.DESISTIR.value;
 			} else {
 				System.out.print("> ");
 				command = in.next();
@@ -287,20 +291,19 @@ public class Tasks {
 	public static void menuHelp() {
 		System.out.println("======================= AJUDA DO MENU =========================");
 		System.out.println("Digite um dos comandos abaixo para interagir com o jogo:");
-		System.out.println("- " + GERAFROTA + ": Gera uma frota aleatória de navios.");
-		System.out.println("- " + LEFROTA + ": Permite criar e carregar uma frota personalizada.");
-		System.out.println("- " + STATUS + ": Mostra o status atual da frota.)");
-		System.out.println("- " + MAPA + ": Exibe o mapa da frota.");
-		System.out.println("- " + MAPAADV    + ": Exibe o tabuleiro do adversário (só os teus tiros).");
-		System.out.println("- " + RAJADA + ": Realiza uma rajada de disparos.");
-		System.out.println("- " + SIMULA + ": Simula um jogo completo.");
-		System.out.println("- " + TIROS + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
-		System.out.println("- " + TEMPO     + ": Mostra o relógio com o tempo gasto em cada jogada.");
-		System.out.println("- " + DESISTIR + ": Encerra o jogo.");
-		//System.out.println("- " + GUI + ": Gui do jogo");
-		System.out.println("- " + GUARDAPDF + ": Exporta o histórico de jogadas para um arquivo PDF.");
-		System.out.println("- " + SCOREBOARD + ": Mostra o scoreboard dos jogos passados. ");
-		System.out.println("- " + RAJADAIA + ": Jogas contra a IA");
+		System.out.println("- " + Command.GERAFROTA.value + ": Gera uma frota aleatória de navios.");
+		System.out.println("- " +  Command.LEFROTA.value + ": Permite criar e carregar uma frota personalizada.");
+		System.out.println("- " + Command.STATUS.value + ": Mostra o status atual da frota.)");
+		System.out.println("- " + Command.MAPA.value  + ": Exibe o mapa da frota.");
+		System.out.println("- " + Command.MAPAADV.value     + ": Exibe o tabuleiro do adversário (só os teus tiros).");
+		System.out.println("- " + Command.RAJADA.value  + ": Realiza uma rajada de disparos.");
+		System.out.println("- " + Command.SIMULA.value + ": Simula um jogo completo.");
+		System.out.println("- " + Command.TIROS.value + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
+		System.out.println("- " + Command.TEMPO.value     + ": Mostra o relógio com o tempo gasto em cada jogada.");
+		System.out.println("- " + Command.DESISTIR.value + ": Encerra o jogo.");
+		System.out.println("- " + Command.GUARDAPDF.value + ": Exporta o histórico de jogadas para um arquivo PDF.");
+		System.out.println("- " + Command.SCOREBOARD.value + ": Mostra o scoreboard dos jogos passados. ");
+		System.out.println("- " + Command.RAJADAIA.value + ": Jogas contra a IA");
 		System.out.println("===============================================================");
 	}
 	/**
