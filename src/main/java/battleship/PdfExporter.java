@@ -199,7 +199,7 @@ public class PdfExporter {
      * @return a non-null String representing a timestamped PDF filename
      */
 
-    private static @NotNull String generateTimeStamp() {
+    private static String generateTimeStamp() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         return "battleship_game_" + timestamp + ".pdf";
     }

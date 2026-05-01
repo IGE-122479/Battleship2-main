@@ -1,7 +1,10 @@
 package battleship;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.Nullable;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -107,15 +110,37 @@ public class AiGame {
         return buildNextMoveMessage(game);
     }
 
+    /**
+     * Consome o estado da primeira jogada.
+     * Garante que a lógica da primeira jogada apenas é executada uma vez.
+     * Após a primeira chamada, o estado firstMove é definido como false.
+     *
+     * @return true se for a primeira jogada, false caso contrário
+     */
+
     private boolean consumeFirstMove() {
         if (!firstMove) return false;
         firstMove = false;
         return true;
     }
 
+    /**
+     * Constrói a mensagem inicial enviada à IA na primeira jogada.
+     * Inclui o system prompt e as instruções iniciais do jogo.
+     *
+     * @return mensagem inicial para a IA
+     */
+
     private String buildFirstMoveMessage() {
         return systemPrompt.firstMoveMessage();
     }
+
+    /**
+     * Constrói a mensagem enviada à IA nas jogadas seguintes.
+     *
+     * @param game estado atual do jogo
+     * @return mensagem formatada para a IA
+     */
 
     private String buildNextMoveMessage(IGame game) {
         List<IMove> alienMoves = game.getAlienMoves();
@@ -129,13 +154,35 @@ public class AiGame {
                 + buildInstructions();
     }
 
+    /**
+     * Constrói informação sobre o estado atual do jogo,
+     * incluindo o número de navios inimigos ainda ativos.
+     *
+     * @param game estado atual do jogo
+     * @return string com informação do jogo
+     */
+
     private String buildGameInfo(IGame game) {
         return "\nNavios inimigos ainda a flutuar: " + game.getRemainingShips() + ".\n\n";
     }
 
+    /**
+     * Obtém a última jogada realizada a partir da lista de jogadas.
+     *
+     * @param alienMoves lista de jogadas realizadas
+     * @return última jogada da lista
+     */
+
     private IMove getLastMove(List<IMove> alienMoves) {
         return alienMoves.get(alienMoves.size() - 1);
     }
+
+    /**
+     * Obtém as instruções de raciocínio que devem ser enviadas à IA.
+     * Estas instruções ajudam a orientar a estratégia de decisão dos tiros.
+     *
+     * @return string com instruções do sistema
+     */
 
     private String buildInstructions(){
         return systemPrompt.instructionsMessage();
@@ -170,8 +217,6 @@ public class AiGame {
 
     /**
      * Pergunta à IA os próximos tiros, com suporte a múltiplas tentativas.
-     * Se a IA responder algo inválido, tenta novamente até MAX_RETRIES vezes.
-     * Se todas as tentativas falharem, usa um fallback aleatório.
      * @param userMessage Mensagem para enviar à IA
      * @return JSON com os 3 tiros decididos
      */
@@ -179,6 +224,22 @@ public class AiGame {
 
         addToHistory("user", userMessage);
 
+        return tryValidResponseWithRetry();
+    }
+
+    /**
+     * Executa várias tentativas para obter uma resposta válida da IA.
+     * Em cada tentativa:
+     * - chama a API
+     * - adiciona a resposta ao histórico
+     * - tenta extrair JSON válido com os tiros
+     *
+     * Caso todas as tentativas falhem, devolve um fallback aleatório.
+     *
+     * @return JSON válido com 3 tiros ou fallback gerado
+     */
+
+    private String tryValidResponseWithRetry() {
         for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             String llmResponse = callApi();
 
@@ -189,17 +250,30 @@ public class AiGame {
                 return extracted;
             }
 
-            System.out.println("Tentativa " + attempt + "/" + MAX_RETRIES
-                    + " — resposta inválida: "
-                    + llmResponse.substring(0, Math.min(80, llmResponse.length())));
-
-            if (attempt < MAX_RETRIES) {
-                addToHistory("user", systemPrompt.invalidResponseMessage());
-            }
+            handleInvalidResponse(attempt, llmResponse);
         }
 
         System.out.println("Todas as tentativas falharam. A usar fallback aleatório.");
         return buildRandomFallbackJson();
+    }
+
+    /**
+     * Trata uma resposta inválida da IA durante uma tentativa.
+     * Imprime informação de debug no console e, se ainda houver tentativas
+     * disponíveis, envia uma mensagem de correção ao histórico do sistema.
+     *
+     * @param attempt número da tentativa atual
+     * @param llmResponse resposta recebida da IA
+     */
+
+    private void handleInvalidResponse(int attempt, String llmResponse) {
+        System.out.println("Tentativa " + attempt + "/" + MAX_RETRIES
+                + " — resposta inválida: "
+                + llmResponse.substring(0, Math.min(80, llmResponse.length())));
+
+        if (attempt < MAX_RETRIES) {
+            addToHistory("user", systemPrompt.invalidResponseMessage());
+        }
     }
 
     /**
@@ -209,48 +283,76 @@ public class AiGame {
      * @throws RuntimeException Se houver erro na chamada ou timeout
      */
     private String callApi() {
-
         // Para teste: permite substituir a chamada real à API
         if (apiResponseOverride != null) {
             return apiResponseOverride.get();
         }
 
         try {
-            Map<String, Object> requestBody = new LinkedHashMap<>();
-            requestBody.put("model", MODEL_ID);
-            requestBody.put("messages", conversationHistory);
-            requestBody.put("max_tokens", MAX_OUTPUT_TOKENS);
-            requestBody.put("temperature", 0.2);
-
-            String requestJson = objectMapper.writeValueAsString(requestBody);
-
+            String requestJson = buildRequestJson();
             HttpResponse<String> response = executeHttpCall(requestJson);
-
-            if (response.statusCode() != 200) {
-                throw new RuntimeException("Erro HTTP " + response.statusCode()
-                        + ": " + response.body());
-            }
-
+            validateResponse(response);
             return parseAiResponse(response.body());
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Chamada interrompida", e);
-        } catch (RuntimeException e) {
-            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Erro na API: " + e.getMessage(), e);
         }
     }
 
-    HttpResponse<String> executeHttpCall(String requestJson) throws Exception {
+    /**
+     * Valida a resposta HTTP recebida da API.
+     * Verifica se o código de estado é 200 (OK).
+     *
+     * @param response resposta HTTP retornada pela API
+     * @throws RuntimeException se o código de resposta não for 200
+     */
+    private static void validateResponse(HttpResponse<String> response) {
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("Erro HTTP " + response.statusCode() + ": " + response.body());
+        }
+    }
+
+    /**
+     * Constrói o corpo da requisição HTTP em formato JSON.
+     * Inclui:
+     * - modelo da IA
+     * - histórico da conversa
+     * - parâmetros de geração (max tokens e temperatura)
+     *
+     * @return string JSON pronta a enviar para a API
+     * @throws JsonProcessingException se houver erro na serialização JSON
+     */
+    private String buildRequestJson() throws JsonProcessingException {
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+
+        requestBody.put("model", MODEL_ID);
+        requestBody.put("messages", conversationHistory);
+        requestBody.put("max_tokens", MAX_OUTPUT_TOKENS);
+        requestBody.put("temperature", 0.2);
+
+        return objectMapper.writeValueAsString(requestBody);
+    }
+
+    /**
+     * Executa a chamada HTTP à API da IA.
+     * Caso exista um override de teste, devolve diretamente a resposta simulada.
+     * Caso contrário, constrói e envia um pedido HTTP POST com timeout.
+     *
+     * @param requestJson corpo da requisição em formato JSON
+     * @return resposta HTTP da API
+     * @throws Exception se ocorrer erro na comunicação HTTP
+     */
+    private HttpResponse<String> executeHttpCall(String requestJson) throws Exception {
         if (httpOverride != null) {
             return httpOverride.call(requestJson);
         }
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(API_URL))
-                .header("Authorization", "Bearer " + apiKey)  // Bearer token no header
+                .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
                 .timeout(Duration.ofSeconds(HTTP_TIMEOUT_SECONDS))
                 .POST(HttpRequest.BodyPublishers.ofString(requestJson))
@@ -302,24 +404,67 @@ public class AiGame {
         if (llmResponse == null || llmResponse.isBlank()) return null;
 
         String trimmed = llmResponse.trim();
-        if (trimmed.startsWith("[") && isValidShotsJson(trimmed)) return trimmed;
 
-        Pattern codeBlock = Pattern.compile(
-                "```(?:json)?\\s*(\\[.*?])\\s*```",
-                Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-        Matcher m = codeBlock.matcher(llmResponse);
-        if (m.find()) {
-            String c = m.group(1).trim();
-            if (isValidShotsJson(c)) return c;
-        }
+        String direct = tryDirectJson(trimmed);
+        if (direct != null) return direct;
 
+        String codeBlock = extractFromCodeBlock(llmResponse);
+        if (codeBlock != null) return codeBlock;
+
+        return tryExtractFromArray(llmResponse);
+    }
+
+    /**
+     * Tenta extrair um array JSON de tiros a partir de texto livre da resposta da IA.
+     * Usa regex para encontrar padrões do tipo [ { ... } ] e valida cada ocorrência.
+     *
+     * @param llmResponse resposta completa da IA
+     * @return JSON válido dos tiros, ou null se nenhum padrão válido for encontrado
+     */
+    private String tryExtractFromArray(String llmResponse) {
         Pattern arrayPat = Pattern.compile("(\\[\\s*\\{.*?}\\s*])", Pattern.DOTALL);
+
         Matcher m2 = arrayPat.matcher(llmResponse);
+
         while (m2.find()) {
             String c = m2.group(1).trim();
             if (isValidShotsJson(c)) return c;
         }
 
+        return null;
+    }
+
+    /**
+     * Extrai JSON de tiros a partir de blocos de código markdown (```json ... ```).
+     * Procura um array JSON dentro do bloco e valida o resultado.
+     *
+     * @param llmResponse resposta completa da IA
+     * @return JSON válido dos tiros, ou null se não encontrar nenhum válido
+     */
+    private String extractFromCodeBlock(String llmResponse) {
+        Pattern codeBlock = Pattern.compile(
+                "```(?:json)?\\s*(\\[.*?])\\s*```", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
+        Matcher m = codeBlock.matcher(llmResponse);
+
+        if (m.find()) {
+            String c = m.group(1).trim();
+            if (isValidShotsJson(c)) return c;
+        }
+        return null;
+    }
+
+    /**
+     * Tenta extrair JSON de tiros diretamente a partir do texto fornecido.
+     * Verifica se o texto já começa com um array JSON válido e se passa na validação.
+     *
+     * @param text resposta já normalizada (trimmed) da IA
+     * @return JSON válido dos tiros, ou null se não for válido
+     */
+    private String tryDirectJson(String text) {
+        if (text.startsWith("[") && isValidShotsJson(text)) {
+            return text;
+        }
         return null;
     }
 
