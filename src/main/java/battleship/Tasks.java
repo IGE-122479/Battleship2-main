@@ -27,24 +27,26 @@ public class Tasks {
 	 * Strings to be used by the user
 	 */
 	enum Command {
-		AJUDA      ("ajuda"),
-		GERAFROTA  ("gerafrota"),
-		LEFROTA    ("lefrota"),
-		DESISTIR   ("desisto"),
-		RAJADA     ("rajada"),
-		TIROS      ("tiros"),
-		MAPA       ("mapa"),
-		STATUS     ("estado"),
-		SIMULA     ("simula"),
-		GUARDAPDF  ("guardapdf"),
-		TEMPO      ("tempo"),
-		SCOREBOARD ("scoreboard"),
-		MAPAADV    ("mapaadversario"),
-		RAJADAIA   ("rajadaia");
+		AJUDA("ajuda"),
+		GERAFROTA("gerafrota"),
+		LEFROTA("lefrota"),
+		DESISTIR("desisto"),
+		RAJADA("rajada"),
+		TIROS("tiros"),
+		MAPA("mapa"),
+		STATUS("estado"),
+		SIMULA("simula"),
+		GUARDAPDF("guardapdf"),
+		TEMPO("tempo"),
+		SCOREBOARD("scoreboard"),
+		MAPAADV("mapaadversario"),
+		RAJADAIA("rajadaia");
 
 		final String value;
 
-		Command(String value) { this.value = value; }
+		Command(String value) {
+			this.value = value;
+		}
 	}
 
 	/**
@@ -192,11 +194,12 @@ public class Tasks {
 
 						// Resposta do AI (se o jogo ainda não terminou)
 						if (!gameEnded) {
-							final AiGame ai      = aiadversario;
-							final IGame  gameRef = game;
+							final AiGame ai = aiadversario;
+							final IGame gameRef = game;
 							gameEnded = playEnemyTurn(game, myFleet, () -> {
-								try { ai.generateShots(gameRef); }
-								catch (RuntimeException e) {
+								try {
+									ai.generateShots(gameRef);
+								} catch (RuntimeException e) {
 									System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
 									gameRef.randomEnemyFire();
 								}
@@ -239,7 +242,8 @@ public class Tasks {
 	private static void initJavaFX() {
 		try {
 			// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
-			Platform.startup(() -> {});
+			Platform.startup(() -> {
+			});
 		} catch (IllegalStateException e) {
 			// Toolkit já estava iniciado, podemos continuar
 		}
@@ -292,20 +296,21 @@ public class Tasks {
 		System.out.println("======================= AJUDA DO MENU =========================");
 		System.out.println("Digite um dos comandos abaixo para interagir com o jogo:");
 		System.out.println("- " + Command.GERAFROTA.value + ": Gera uma frota aleatória de navios.");
-		System.out.println("- " +  Command.LEFROTA.value + ": Permite criar e carregar uma frota personalizada.");
+		System.out.println("- " + Command.LEFROTA.value + ": Permite criar e carregar uma frota personalizada.");
 		System.out.println("- " + Command.STATUS.value + ": Mostra o status atual da frota.)");
-		System.out.println("- " + Command.MAPA.value  + ": Exibe o mapa da frota.");
-		System.out.println("- " + Command.MAPAADV.value     + ": Exibe o tabuleiro do adversário (só os teus tiros).");
-		System.out.println("- " + Command.RAJADA.value  + ": Realiza uma rajada de disparos.");
+		System.out.println("- " + Command.MAPA.value + ": Exibe o mapa da frota.");
+		System.out.println("- " + Command.MAPAADV.value + ": Exibe o tabuleiro do adversário (só os teus tiros).");
+		System.out.println("- " + Command.RAJADA.value + ": Realiza uma rajada de disparos.");
 		System.out.println("- " + Command.SIMULA.value + ": Simula um jogo completo.");
 		System.out.println("- " + Command.TIROS.value + ": Lista os tiros válidos realizados (* = tiro em navio, o = tiro na água)");
-		System.out.println("- " + Command.TEMPO.value     + ": Mostra o relógio com o tempo gasto em cada jogada.");
+		System.out.println("- " + Command.TEMPO.value + ": Mostra o relógio com o tempo gasto em cada jogada.");
 		System.out.println("- " + Command.DESISTIR.value + ": Encerra o jogo.");
 		System.out.println("- " + Command.GUARDAPDF.value + ": Exporta o histórico de jogadas para um arquivo PDF.");
 		System.out.println("- " + Command.SCOREBOARD.value + ": Mostra o scoreboard dos jogos passados. ");
 		System.out.println("- " + Command.RAJADAIA.value + ": Jogas contra a IA");
 		System.out.println("===============================================================");
 	}
+
 	/**
 	 * This operation allows the build up of a fleet, given user data
 	 *
@@ -387,17 +392,35 @@ public class Tasks {
 
 		part1 = part1.toUpperCase();
 
-		if (part2 == null && part1.matches("[A-Z]\\d+")) {
-			char column = part1.charAt(0);
-			int row = Integer.parseInt(part1.substring(1));
-			return new Position(column, row);
-		} else if (part2 != null && part1.matches("[A-Z]")) {
-			char column = part1.charAt(0);
-			int row = Integer.parseInt(part2);
-			return new Position(column, row);
-		} else {
-			throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");
-		}
+		if (part2 == null && isCompactFormat(part1))
+			return parseCompactFormat(part1);
+
+		if (part2 != null && isSplitFormat(part1))
+			return parseSplitFormat(part1, part2);
+
+		throw new IllegalArgumentException("Formato inválido. Use 'A3', 'A 3' ou similar.");
+	}
+
+	/** Verifica se o token segue o formato compacto, ex: "A3", "J10". */
+	private static boolean isCompactFormat(String token) {
+		return token.matches("[A-Z]\\d+");
+	}
+
+	/** Verifica se o token é uma letra isolada, ex: "A", "J". */
+	private static boolean isSplitFormat(String token) {
+		return token.matches("[A-Z]");
+	}
+
+	/** Interpreta um token compacto "A3" → Position('A', 3). */
+	private static IPosition parseCompactFormat(String token) {
+		char column = token.charAt(0);
+		int  row    = Integer.parseInt(token.substring(1));
+		return new Position(column, row);
+	}
+
+	/** Interpreta dois tokens separados "A" "3" → Position('A', 3). */
+	private static IPosition parseSplitFormat(String letter, String number) {
+		return new Position(letter.charAt(0), Integer.parseInt(number));
 	}
 
 }
