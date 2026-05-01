@@ -80,12 +80,7 @@ public class Tasks {
 					game = createGame(myFleet);
 					System.out.println("A tua frota foi gerada! A frota do adversário está pronta.");
 					game.printMyBoard(false, true);
-					try {
-						// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
-						Platform.startup(() -> {});
-					} catch (IllegalStateException e) {
-						// Toolkit já estava iniciado, podemos continuar
-					}
+					initJavaFX();
 
 					final IGame currentGame = game;
 					Platform.runLater(() -> {
@@ -123,16 +118,7 @@ public class Tasks {
 						}
 						// Resposta do adversário (se o jogo ainda não terminou)
 						if (!gameEnded) {
-							System.out.println("--- Ataque do adversário ---");
-							game.randomEnemyFire();
-							myFleet.printStatus();
-							game.printMyBoard(true, false);
-							GameGui.update();
-
-							if (game.getRemainingShips() == 0) {
-								game.over();
-								gameEnded = true;
-							}
+							gameEnded = playEnemyTurn(game, myFleet, game::randomEnemyFire);
 						}
 
 					} else {
@@ -142,10 +128,7 @@ public class Tasks {
 				case SIMULA:
 					if (game != null) {
 						final IGame gameParaGUI = game;
-						try {
-							Platform.startup(() -> {});
-						} catch (IllegalStateException e) {
-						}
+						initJavaFX();
 						Platform.runLater(() -> GameGui.show(gameParaGUI));
 						while (game.getRemainingShips() > 0) {
 							game.randomEnemyFire();
@@ -205,21 +188,15 @@ public class Tasks {
 
 						// Resposta do AI (se o jogo ainda não terminou)
 						if (!gameEnded) {
-							System.out.println("--- Ataque do AI ---");
-							try {
-								aiadversario.generateShots(game); // LLM decide os tiros
-							} catch (RuntimeException e) {
-								System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
-								game.randomEnemyFire();
-							}
-							myFleet.printStatus();
-							game.printMyBoard(true, false);
-							GameGui.update();
-
-							if (game.getRemainingShips() == 0) {
-								game.over();
-								gameEnded = true;
-							}
+							final AiGame ai      = aiadversario;
+							final IGame  gameRef = game;
+							gameEnded = playEnemyTurn(game, myFleet, () -> {
+								try { ai.generateShots(gameRef); }
+								catch (RuntimeException e) {
+									System.out.println("Erro: " + e.getMessage() + " — usando fallback aleatório.");
+									gameRef.randomEnemyFire();
+								}
+							});
 						}
 					} else {
 						System.out.println("Nenhum jogo em curso. Usa 'gerafrota' primeiro.");
@@ -240,6 +217,28 @@ public class Tasks {
 			}
 		}
 		System.out.println(GOODBYE_MESSAGE);
+	}
+
+	private static boolean playEnemyTurn(IGame game, IFleet myFleet, Runnable enemyFireAction) {
+		System.out.println("--- Ataque do adversário ---");
+		enemyFireAction.run();
+		myFleet.printStatus();
+		game.printMyBoard(true, false);
+		GameGui.update();
+		if (game.getRemainingShips() == 0) {
+			game.over();
+			return true;
+		}
+		return false;
+	}
+
+	private static void initJavaFX() {
+		try {
+			// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
+			Platform.startup(() -> {});
+		} catch (IllegalStateException e) {
+			// Toolkit já estava iniciado, podemos continuar
+		}
 	}
 
 	private static void handleGuardaPdf(IGame game) {
