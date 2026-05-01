@@ -236,33 +236,43 @@ public class Move implements IMove {
 			IPosition pos = shots.get(i);
 			IGame.ShotResult result = shotResults.get(i);
 
-			String coord = "" + pos.getClassicRow() + pos.getClassicColumn();
+			sb.append(formatShotLine(pos, result));
 
-			sb.append("- ").append(coord).append(" → ");
-
-			if (!result.valid()) {
-				sb.append("Tiro Inválido(fora do tabuleiro)\n");
-			} else if (result.repeated()) {
-				sb.append("Tiro Repetido\n");
-			} else if (result.ship() == null) {
-				sb.append("Água\n");
+			// Contadores actualizados apenas aqui, sem mistura com formatação
+			if (result.valid() && !result.repeated()) {
 				validCount++;
-				missCount++;
-			} else if (result.sunk()) {
-				sb.append("Acertou numa ").append(result.ship().getCategory()).append(" (AFUNDADA!)\n");
-				validCount++;
-				hitCount++;
-				sunkCount++;
-			} else {
-				sb.append("Acertou numa ").append(result.ship().getCategory()).append("(ainda a flutuar)\n");
-				validCount++;
-				hitCount++;
+				if (result.ship() == null) {
+					missCount++;
+				} else if (result.sunk()) {
+					hitCount++; sunkCount++;
+				} else {
+					hitCount++;
+				}
 			}
 		}
 
         buildSummary(sb, validCount, hitCount, sunkCount, missCount);
 
         return sb.toString();
+	}
+
+	private String formatShotLine(IPosition pos, IGame.ShotResult result) {
+		String coord = "" + pos.getClassicRow() + pos.getClassicColumn();
+		String detail;
+
+		if (!result.valid()) {
+			detail = "Tiro Inválido (fora do tabuleiro)";
+		} else if (result.repeated()) {
+			detail = "Tiro Repetido";
+		} else if (result.ship() == null) {
+			detail = "Água";
+		} else if (result.sunk()) {
+			detail = "Acertou numa " + result.ship().getCategory() + " (AFUNDADA!)";
+		} else {
+			detail = "Acertou numa " + result.ship().getCategory() + " (ainda a flutuar)";
+		}
+
+		return "- " + coord + " → " + detail + "\n";
 	}
 
     private static void buildSummary(StringBuilder sb, int validCount, int hitCount, int sunkCount, int missCount) {
