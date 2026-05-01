@@ -607,15 +607,8 @@ public class Game implements IGame
 
             // Percorre cada célula individual do navio
             for (IPosition pos : ship.getPositions()) {
-                IMove hittingMove = null;
 
-                // Verifica se este ponto específico foi atingido por algum tiro meu
-                for (IMove move : myMoves) {
-                    if (move.getShots().contains(pos)) {
-                        hittingMove = move;
-                        break;
-                    }
-                }
+                IMove hittingMove = Move.findHittingMove(pos, myMoves);
 
                 if (hittingMove != null) {
                     // Se foi atingido: Mostra a coordenada (ex: A5) e o número da jogada

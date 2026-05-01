@@ -282,4 +282,12 @@ public class Move implements IMove {
         if (missCount > 0) sb.append(", ").append(missCount).append(" na água");
         sb.append(".");
     }
+
+	public static IMove findHittingMove(IPosition pos, List<IMove> moves) {
+		// Verifica se este ponto específico foi atingido por algum tiro meu
+		for (IMove move : moves)
+			if (move.getShots().contains(pos))
+				return move;
+		return null;
+	}
 }
