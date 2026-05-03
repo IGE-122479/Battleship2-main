@@ -112,11 +112,10 @@ public abstract class Ship implements IShip
 		this.category = Objects.requireNonNull(category, "Ship's category must not be null");
 		this.bearing = Objects.requireNonNull(bearing, "Ship's bearing must not be null");
 		this.pos = Objects.requireNonNull(pos, "Ship's position must not be null");
-	
+
+
 		this.category = category;
-		this.bearing = bearing;
-		this.pos = pos;
-		this.size = size;
+        this.size = size;
 
 		positions = new ArrayList<>();
     }
@@ -239,6 +238,7 @@ public abstract class Ship implements IShip
     @Override
     public int getTopMostPos()
     {
+		assert getPositions() != null && !getPositions().isEmpty() : "Navio sem posições";
 	int top = getPositions().get(0).getRow();
 	for (int i = 1; i < getSize(); i++)
 	    if (getPositions().get(i).getRow() < top)
@@ -259,6 +259,7 @@ public abstract class Ship implements IShip
     @Override
     public int getBottomMostPos()
     {
+		assert getPositions() != null && !getPositions().isEmpty() : "Navio sem posições";
 	int bottom = getPositions().get(0).getRow();
 	for (int i = 1; i < getSize(); i++)
 	    if (getPositions().get(i).getRow() > bottom)
@@ -279,6 +280,7 @@ public abstract class Ship implements IShip
     @Override
     public int getLeftMostPos()
     {
+		assert getPositions() != null && !getPositions().isEmpty() : "Navio sem posições";
 	int left = getPositions().get(0).getColumn();
 	for (int i = 1; i < getSize(); i++)
 	    if (getPositions().get(i).getColumn() < left)
