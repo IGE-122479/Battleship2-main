@@ -423,4 +423,33 @@ public abstract class Ship implements IShip
 	return "[" + category + " " + bearing + " " + pos + "]";
     }
 
+	/**
+	 * Initializes the ship's occupied positions based on its starting position
+	 * and bearing (orientation).
+	 *
+	 * The ship is placed either vertically or horizontally on the grid:
+	 * - NORTH / SOUTH: positions are filled along the row axis (vertical placement)
+	 * - EAST / WEST: positions are filled along the column axis (horizontal placement)
+	 *
+	 * The number of positions generated corresponds to the ship's size.
+	 *
+	 * @param bearing the orientation of the ship (NORTH, SOUTH, EAST, or WEST)
+	 * @param pos the starting position of the ship on the board
+	 */
+
+	protected void initializeLinearPositions(Compass bearing, IPosition pos) {
+		switch (bearing) {
+			case NORTH:
+			case SOUTH:
+				for (int r = 0; r < getSize(); r++)
+					getPositions().add(new Position(pos.getRow() + r, pos.getColumn()));
+				break;
+
+			case EAST:
+			case WEST:
+				for (int c = 0; c < getSize(); c++)
+					getPositions().add(new Position(pos.getRow(), pos.getColumn() + c));
+				break;
+		}
+	}
 }

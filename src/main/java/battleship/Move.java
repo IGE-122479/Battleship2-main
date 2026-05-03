@@ -290,4 +290,12 @@ public class Move implements IMove {
 				return move;
 		return null;
 	}
+	public List<String> getShotCoordinates() {
+		List<String> coords = new ArrayList<>();
+		for (IPosition pos : shots) {
+			coords.add(pos.toCoordString());
+		}
+		return coords;
+	}
+
 }
