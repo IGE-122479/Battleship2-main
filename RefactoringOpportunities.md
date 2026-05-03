@@ -24,3 +24,9 @@
 | `Tasks::readClassicPosition` | Conditional Complexity | Decompose Conditional / Extract Method | 99328 |
 | `Ship::stillFloating` | Feature Envy | Move Method | 99328 |
 | `Move::toDetailedString` | Long Method | Extract Method | 99328 |
+| `Ship::getLeftMostPos` | Comments | Add Braces / Reformat Code | 122479 |
+| `Game::getUsablePositions` | Long Methohod | Change List to Set | 122479 |
+| `Tasks::runMenu` | Comments | Extract Method / Add Logging| 122479 |
+| `BoardView::createCell` | Lazy Class | Remove Unused Assignment | 122479 |
+| `Game::jsonShots` | Temporary Field | Inline VAriable | 122479 |
+| `Ship::Ship` | Duplicated Code | Remove Redundant Assignment| 122479 |
