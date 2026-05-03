@@ -113,7 +113,7 @@ public class Game implements IGame
             simplifiedShots.add(simplePos);
         }
 
-        String jsonString = null;
+        String jsonString;
         try {
             // 2. Serialize the simplified list instead of the raw 'shots' list
             jsonString = objectMapper.writeValueAsString(simplifiedShots);
@@ -265,6 +265,10 @@ public class Game implements IGame
     }
 
     private void extracted(Set<IPosition> usablePositions) {
+        extracted1(usablePositions);
+    }
+
+    private void extracted1(Set<IPosition> usablePositions) {
         this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
         this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
     }
