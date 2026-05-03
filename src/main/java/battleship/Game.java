@@ -260,9 +260,13 @@ public class Game implements IGame
             for (int c = 0; c < BOARD_SIZE; c++)
                 usablePositions.add(new Position(r, c));
 
+        extracted(usablePositions);
+        return usablePositions;
+    }
+
+    private void extracted(Set<IPosition> usablePositions) {
         this.myFleet.getSunkShips().forEach(ship -> usablePositions.removeAll(ship.getAdjacentPositions()));
         this.alienMoves.forEach(move ->  usablePositions.removeAll(move.getShots()));
-        return usablePositions;
     }
 
     /**
