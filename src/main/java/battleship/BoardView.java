@@ -101,7 +101,6 @@ public class BoardView extends GridPane {
                         // Navio afundado → cor especial (laranja escuro)
                         if (!ship.stillFloating()) {
                             rect.setFill(Color.DARKORANGE);
-                            isSunkShipCell = true;
                         } else {
                             rect.setFill(Color.GRAY); // Navio intacto
                         }
