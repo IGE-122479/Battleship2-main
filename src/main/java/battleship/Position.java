@@ -239,4 +239,9 @@ public class Position implements IPosition {
 		return (char) ('A' + row) + "" + (column + 1);
 //		return "Row = " + (char) ('A' + row) + ", Column = " + (column + 1);
 	}
+
+	@Override
+	public String toCoordString() {
+		return "" + getClassicRow() + getClassicColumn();
+	}
 }

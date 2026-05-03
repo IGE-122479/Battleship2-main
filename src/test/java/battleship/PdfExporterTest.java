@@ -202,6 +202,8 @@ public class PdfExporterTest {
             public String processEnemyFire(boolean verbose) { return ""; }
             @Override
             public String toDetailedString() { return ""; }
+            @Override
+            public List<String> getShotCoordinates() { return new ArrayList<>(); }
         };
         game.getMyMoves().add(notMove);
         var table = PdfExporter.buildUnifiedTable(game);

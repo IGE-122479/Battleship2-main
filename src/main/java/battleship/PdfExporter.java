@@ -6,6 +6,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Cell;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -37,21 +38,18 @@ public class PdfExporter {
         String outputFile = resolveOutputFile();
 
         try {
-            // Create PDF writer and document structures
             PdfWriter writer = new PdfWriter(outputFile);
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
 
-            // Add title to the document with formatting
             document.add(new Paragraph("Batalha Naval- Histórico de Jogadas").setBold().setFontSize(18));
-            document.add(new Paragraph(" ")); // Add empty line for spacing
+            document.add(new Paragraph(" "));
 
             document.add(buildUnifiedTable(game));
 
             document.close();
             System.out.println("Game exported to " + outputFile);
         } catch (Exception e) {
-            // Log error with message and stack trace for debugging
             System.out.println("Erro ao exportar PDF: " + e.getMessage());
             e.printStackTrace();
         }
@@ -68,7 +66,6 @@ public class PdfExporter {
 
         Table table = new Table(5);
 
-        // Add header cells with bold formatting
         table.addHeaderCell(new Cell().add(new Paragraph("Lado").setBold()));
         table.addHeaderCell(new Cell().add(new Paragraph("Jogada").setBold()));
         table.addHeaderCell(new Cell().add(new Paragraph("Tiros").setBold()));
@@ -126,18 +123,33 @@ public class PdfExporter {
     private static String buildResultsText(IMove move) {
         StringBuilder sb = new StringBuilder();
         for(IGame.ShotResult result : move.getShotResults())
-            if(!result.valid())
-                sb.append("Tiro inválido, ");
-            else if(result.repeated())
-                sb.append("Tiro repetido, ");
-            else if(result.ship() == null)
-                sb.append("Água, ");
-            else if(result.sunk())
-                sb.append("Acertou, ");
-            else
-                sb.append("Acertou em ").append(result.ship().getCategory()).append(", ");
+            formatShotResult(result, sb);
 
         return sb.toString();
+    }
+
+    /**
+     * Formats a shot result and appends the corresponding textual representation
+     * to the provided StringBuilder.
+     * The method checks the properties of the shot result (validity, repetition, hit, sunk)
+     * and appends a descriptive text for each case.
+     * The formatted text is appended to the given StringBuilder.
+     *
+     * @param result the shot result to be formatted (must not be null)
+     * @param sb the StringBuilder where the formatted text will be appended (must not be null)
+     */
+
+    private static void formatShotResult(IGame.ShotResult result, StringBuilder sb) {
+        if(!result.valid())
+            sb.append("Tiro inválido, ");
+        else if(result.repeated())
+            sb.append("Tiro repetido, ");
+        else if(result.ship() == null)
+            sb.append("Água, ");
+        else if(result.sunk())
+            sb.append("Acertou, ");
+        else
+            sb.append("Acertou em ").append(result.ship().getCategory()).append(", ");
     }
 
     /**
@@ -169,11 +181,27 @@ public class PdfExporter {
 
         if (file.exists()) {
             if (!file.delete()) {
-                String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-                return "battleship_game_" + timestamp + ".pdf";
+                return generateTimeStamp();
             }
         }
         return OUTPUT_FILE;
+    }
+
+    /**
+     * Generates a unique filename for the game results using the current timestamp.
+     *
+     * The filename follows the pattern:
+     * "battleship_game_yyyyMMdd_HHmmss.pdf"
+     *
+     * This method is typically used when the default output file cannot be reused,
+     * ensuring that a new file is created without overwriting existing ones.
+     *
+     * @return a non-null String representing a timestamped PDF filename
+     */
+
+    private static String generateTimeStamp() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        return "battleship_game_" + timestamp + ".pdf";
     }
 
 }
