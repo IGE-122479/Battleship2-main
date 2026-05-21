@@ -2,6 +2,6 @@ version: "3.8"
 
 services:
   battleship:
-    image: battleship-game:latest
+    image: ige99328/battleship-game:latest
     stdin_open: true
     tty: true
