@@ -1,5 +1,0 @@
-services:
-  battleship:
-    image: ige99328/battleship-game:latest
-    stdin_open: true
-    tty: true
