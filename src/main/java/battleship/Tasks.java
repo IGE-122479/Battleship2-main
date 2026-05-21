@@ -1,5 +1,6 @@
 package battleship;
 
+import java.awt.*;
 import java.util.Scanner;
 
 import javafx.application.Platform;
@@ -13,10 +14,12 @@ import org.jetbrains.annotations.NotNull;
  * The type Tasks.
  */
 public class Tasks {
+
+	private static boolean javaFxAvailable = false;
 	/**
 	 * The constant LOGGER.
 	 */
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger LOGGER = LogManager.getLogger(Tasks.class);
 
 	/**
 	 * The constant GOODBYE_MESSAGE.
@@ -89,9 +92,11 @@ public class Tasks {
 					initJavaFX();
 
 					final IGame currentGame = game;
-					Platform.runLater(() -> {
-						GameGui.show(currentGame);
-					});
+					if (javaFxAvailable) {
+						Platform.runLater(() -> {
+							GameGui.show(currentGame);
+						});
+					}
 
 					break;
 				case "lefrota":
@@ -239,13 +244,16 @@ public class Tasks {
 		return false;
 	}
 
-	private static void initJavaFX() {
+	public static void initJavaFX() {
 		try {
-			// Tenta iniciar o JavaFX. O catch ignora se já estiver iniciado.
-			Platform.startup(() -> {
-			});
-		} catch (IllegalStateException e) {
-			// Toolkit já estava iniciado, podemos continuar
+			if (!GraphicsEnvironment.isHeadless()) {
+				Platform.startup(() -> {});
+				javaFxAvailable = true;
+			} else {
+				System.out.println("Modo headless detetado. JavaFX desativado.");
+			}
+		} catch (Exception e) {
+			System.out.println("JavaFX não pôde ser iniciado.");
 		}
 	}
 
