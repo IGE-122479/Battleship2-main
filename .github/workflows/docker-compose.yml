@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  battleship:
+    image: battleship-game:latest
+    stdin_open: true
+    tty: true
