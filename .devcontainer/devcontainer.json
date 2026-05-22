@@ -1,8 +1,10 @@
 {
   "name": "BlackBattleship Dev Environment",
+
   "build": {
     "dockerfile": "Dockerfile"
   },
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -13,6 +15,7 @@
         "vscjava.vscode-maven"
       ]
     },
+
     "intellij": {
       "plugins": [
         "Docker",
@@ -20,6 +23,10 @@
       ]
     }
   },
-  "postCreateCommand": "mvn clean compile",
+
+  "postCreateCommand": "mvn clean compile && mvn test",
+
+  "forwardPorts": [8080],
+
   "remoteUser": "developer"
 }
