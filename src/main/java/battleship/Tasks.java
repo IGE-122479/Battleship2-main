@@ -140,7 +140,9 @@ public class Tasks {
 					if (game != null) {
 						final IGame gameParaGUI = game;
 						initJavaFX();
-						Platform.runLater(() -> GameGui.show(gameParaGUI));
+						if (javaFxAvailable) {
+							Platform.runLater(() -> GameGui.show(gameParaGUI));
+						}
 						while (game.getRemainingShips() > 0) {
 							game.randomEnemyFire();
 							GameGui.update();
