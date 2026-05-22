@@ -1,0 +1,25 @@
+{
+  "name": "BlackBattleship Dev Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "yzhang.markdown-all-in-one",
+        "redhat.java",
+        "vscjava.vscode-maven"
+      ]
+    },
+    "intellij": {
+      "plugins": [
+        "Docker",
+        "org.jetbrains.plugins.github"
+      ]
+    }
+  },
+  "postCreateCommand": "mvn clean compile",
+  "remoteUser": "developer"
+}
