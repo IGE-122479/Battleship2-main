@@ -1,10 +1,8 @@
 name: Complete CI/CD Pipeline
-
 on:
   push:
     branches: [ master ]
   workflow_dispatch:
-
 jobs:
   pipeline:
     runs-on: ubuntu-latest
@@ -14,7 +12,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       # JDK 21 (o projeto exige 21; com 17 a análise falha)
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -22,29 +19,24 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-
       # 2. Verificar dependências
       - name: Verificar dependências
         run: mvn -B dependency:resolve
-
       # 3. Compilar
       - name: Compilar projeto
         run: mvn -B clean compile
-
       # 4. Testes unitários
       - name: Executar testes
         run: mvn -B test
-
-      # 5. Análise + Quality Gate SonarCloud
+      # 5. Análise + Quality Gate SonarCloud (skipTests: já correram no passo 4)
       - name: Análise SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_113190 }}
         run: >
-          mvn -B verify sonar:sonar
+          mvn -B verify sonar:sonar -DskipTests
           -Dsonar.projectKey=IGE-122479_Battleship2-main
           -Dsonar.organization=ige-122479
           -Dsonar.host.url=https://sonarcloud.io
-
       - name: Verificar Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
@@ -52,24 +44,19 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_113190 }}
         with:
           scanMetadataReportFile: target/sonar/report-task.txt
-
       # 6 + 7. Build e push da imagem Docker
       - name: Login no Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Build da imagem Docker
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/battleship-game:latest .
-
       - name: Push da imagem Docker
         run: docker push ${{ secrets.DOCKER_USERNAME }}/battleship-game:latest
-
       # 8. Atualizar documentação no GitHub Pages
       - name: Gerar Javadoc
         run: mvn -B javadoc:javadoc
-
       - name: Commit e push da documentação
         run: |
           git config user.name "github-actions"
