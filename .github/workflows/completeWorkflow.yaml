@@ -1,0 +1,79 @@
+name: Complete CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout (fetch-depth 0 é necessário para o SonarCloud)
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # JDK 21 (o projeto exige 21; com 17 a análise falha)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # 2. Verificar dependências
+      - name: Verificar dependências
+        run: mvn -B dependency:resolve
+
+      # 3. Compilar
+      - name: Compilar projeto
+        run: mvn -B clean compile
+
+      # 4. Testes unitários
+      - name: Executar testes
+        run: mvn -B test
+
+      # 5. Análise + Quality Gate SonarCloud
+      - name: Análise SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_113190 }}
+        run: >
+          mvn -B verify sonar:sonar
+          -Dsonar.projectKey=IGE-122479_Battleship2-main
+          -Dsonar.organization=ige-122479
+          -Dsonar.host.url=https://sonarcloud.io
+
+      - name: Verificar Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_113190 }}
+        with:
+          scanMetadataReportFile: target/sonar/report-task.txt
+
+      # 6 + 7. Build e push da imagem Docker
+      - name: Login no Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build da imagem Docker
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/battleship-game:latest .
+
+      - name: Push da imagem Docker
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/battleship-game:latest
+
+      # 8. Atualizar documentação no GitHub Pages
+      - name: Gerar Javadoc
+        run: mvn -B javadoc:javadoc
+
+      - name: Commit e push da documentação
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/
+          git commit -m "Atualiza documentação [skip ci]" || echo "Sem alterações"
+          git push || echo "Nada para enviar"
