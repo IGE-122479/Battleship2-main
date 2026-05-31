@@ -204,6 +204,19 @@ Em cada execução, o workflow garante que:
 - o projeto compila sem erros;
 - todos os testes unitários passam com sucesso.
 
+## 🐋 Executar com Docker
+### 1. Fazer download da imagem do Docker Hub
+
+```bash
+docker pull ige99328/battleship-game:latest
+```
+
+### 2. Executar o contentor
+
+```bash
+docker run -it ige99328/battleship-game:latest
+```
+
 ## 📄 License
 Distributed under the MIT License. See `LICENSE` for more information.
 
